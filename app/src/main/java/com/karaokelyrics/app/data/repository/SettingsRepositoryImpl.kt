@@ -1,13 +1,14 @@
-package com.karaokelyrics.app.data.preferences
+package com.karaokelyrics.app.data.repository
 
 import android.content.Context
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import com.karaokelyrics.app.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,9 +18,10 @@ import javax.inject.Singleton
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @Singleton
-class SettingsPreferencesManager @Inject constructor(
+class SettingsRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : SettingsRepository {
+
     private val dataStore = context.dataStore
 
     companion object {
@@ -43,7 +45,7 @@ class SettingsPreferencesManager @Inject constructor(
         val IS_DARK_MODE_KEY = booleanPreferencesKey("is_dark_mode")
     }
 
-    val userSettings: Flow<UserSettings> = dataStore.data.map { preferences ->
+    override fun getUserSettings(): Flow<UserSettings> = dataStore.data.map { preferences ->
         // Migration: Use legacy keys if new ones don't exist
         val defaultDarkLyrics = Color(0xFF1DB954).toArgb()
         val defaultDarkBackground = Color(0xFF121212).toArgb()
@@ -76,7 +78,7 @@ class SettingsPreferencesManager @Inject constructor(
         )
     }
 
-    suspend fun updateLyricsColor(color: Color) {
+    override suspend fun updateLyricsColor(color: Color) {
         dataStore.edit { preferences ->
             val isDark = preferences[IS_DARK_MODE_KEY] ?: true
             if (isDark) {
@@ -87,7 +89,7 @@ class SettingsPreferencesManager @Inject constructor(
         }
     }
 
-    suspend fun updateBackgroundColor(color: Color) {
+    override suspend fun updateBackgroundColor(color: Color) {
         dataStore.edit { preferences ->
             val isDark = preferences[IS_DARK_MODE_KEY] ?: true
             if (isDark) {
@@ -98,43 +100,43 @@ class SettingsPreferencesManager @Inject constructor(
         }
     }
 
-    suspend fun updateFontSize(fontSize: FontSize) {
+    override suspend fun updateFontSize(fontSize: FontSize) {
         dataStore.edit { preferences ->
             preferences[FONT_SIZE_KEY] = fontSize.name
         }
     }
 
-    suspend fun updateAnimationsEnabled(enabled: Boolean) {
+    override suspend fun updateAnimationsEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[ENABLE_ANIMATIONS_KEY] = enabled
         }
     }
 
-    suspend fun updateBlurEffectEnabled(enabled: Boolean) {
+    override suspend fun updateBlurEffectEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[ENABLE_BLUR_EFFECT_KEY] = enabled
         }
     }
 
-    suspend fun updateCharacterAnimationsEnabled(enabled: Boolean) {
+    override suspend fun updateCharacterAnimationsEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[ENABLE_CHARACTER_ANIMATIONS_KEY] = enabled
         }
     }
 
-    suspend fun updateLyricsTimingOffset(offsetMs: Int) {
+    override suspend fun updateLyricsTimingOffset(offsetMs: Int) {
         dataStore.edit { preferences ->
             preferences[LYRICS_TIMING_OFFSET_MS_KEY] = offsetMs
         }
     }
 
-    suspend fun updateDarkMode(isDark: Boolean) {
+    override suspend fun updateDarkMode(isDark: Boolean) {
         dataStore.edit { preferences ->
             preferences[IS_DARK_MODE_KEY] = isDark
         }
     }
 
-    suspend fun resetToDefaults() {
+    override suspend fun resetToDefaults() {
         dataStore.edit { preferences ->
             preferences.clear()
         }

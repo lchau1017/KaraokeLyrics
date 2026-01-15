@@ -3,8 +3,10 @@ package com.karaokelyrics.app.di
 import android.content.Context
 import com.karaokelyrics.app.data.repository.LyricsRepositoryImpl
 import com.karaokelyrics.app.data.repository.PlayerRepositoryImpl
+import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.PlayerRepository
+import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.CalculateTextLayoutUseCase
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
@@ -14,6 +16,8 @@ import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
+import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
+import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
 import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 import dagger.Module
 import dagger.Provides
@@ -37,6 +41,12 @@ object AppModule {
     fun providePlayerRepository(
         @ApplicationContext context: Context
     ): PlayerRepository = PlayerRepositoryImpl(context)
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(
+        @ApplicationContext context: Context
+    ): SettingsRepository = SettingsRepositoryImpl(context)
 
     // Domain Use Cases
     @Provides

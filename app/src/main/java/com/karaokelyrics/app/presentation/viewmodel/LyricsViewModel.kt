@@ -2,11 +2,12 @@ package com.karaokelyrics.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.data.preferences.SettingsPreferencesManager
 import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
+import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
+import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.presentation.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.intent.LyricsIntent
@@ -24,7 +25,8 @@ class LyricsViewModel @Inject constructor(
     private val syncLyricsUseCase: SyncLyricsUseCase,
     private val coordinatePlaybackSyncUseCase: CoordinatePlaybackSyncUseCase,
     private val playerRepository: PlayerRepository,
-    private val settingsManager: SettingsPreferencesManager
+    private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
+    private val updateUserSettingsUseCase: UpdateUserSettingsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LyricsUiState())
@@ -144,7 +146,7 @@ class LyricsViewModel @Inject constructor(
 
     private fun observeUserSettings() {
         viewModelScope.launch {
-            settingsManager.userSettings.collect { settings ->
+            observeUserSettingsUseCase().collect { settings ->
                 _state.update { it.copy(userSettings = settings) }
             }
         }
@@ -153,49 +155,49 @@ class LyricsViewModel @Inject constructor(
     // Settings update methods
     private fun updateLyricsColor(color: androidx.compose.ui.graphics.Color) {
         viewModelScope.launch {
-            settingsManager.updateLyricsColor(color)
+            updateUserSettingsUseCase.updateLyricsColor(color)
         }
     }
 
     private fun updateBackgroundColor(color: androidx.compose.ui.graphics.Color) {
         viewModelScope.launch {
-            settingsManager.updateBackgroundColor(color)
+            updateUserSettingsUseCase.updateBackgroundColor(color)
         }
     }
 
     private fun updateFontSize(fontSize: com.karaokelyrics.app.domain.model.FontSize) {
         viewModelScope.launch {
-            settingsManager.updateFontSize(fontSize)
+            updateUserSettingsUseCase.updateFontSize(fontSize)
         }
     }
 
     private fun updateAnimationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            settingsManager.updateAnimationsEnabled(enabled)
+            updateUserSettingsUseCase.updateAnimationsEnabled(enabled)
         }
     }
 
     private fun updateBlurEffectEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            settingsManager.updateBlurEffectEnabled(enabled)
+            updateUserSettingsUseCase.updateBlurEffectEnabled(enabled)
         }
     }
 
     private fun updateCharacterAnimationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            settingsManager.updateCharacterAnimationsEnabled(enabled)
+            updateUserSettingsUseCase.updateCharacterAnimationsEnabled(enabled)
         }
     }
 
     private fun updateDarkMode(isDark: Boolean) {
         viewModelScope.launch {
-            settingsManager.updateDarkMode(isDark)
+            updateUserSettingsUseCase.updateDarkMode(isDark)
         }
     }
 
     private fun resetSettingsToDefaults() {
         viewModelScope.launch {
-            settingsManager.resetToDefaults()
+            updateUserSettingsUseCase.resetToDefaults()
         }
     }
 }

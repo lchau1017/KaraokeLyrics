@@ -1,0 +1,1 @@
+// This file is no longer needed - UserSettings can use Color directly
