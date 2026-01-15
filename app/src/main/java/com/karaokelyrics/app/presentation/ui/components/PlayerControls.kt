@@ -9,8 +9,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.app.presentation.ui.theme.ColorStyles
+import com.karaokelyrics.app.presentation.ui.core.*
+import com.karaokelyrics.app.presentation.ui.components.player.PlayerControlsViewData
+import com.karaokelyrics.app.presentation.ui.components.player.SliderColorsViewData
+import com.karaokelyrics.app.presentation.ui.components.player.PlayButtonColorsViewData
 
 @Composable
 fun PlayerControls(
@@ -20,13 +24,17 @@ fun PlayerControls(
     onPlayPause: () -> Unit,
     onSeek: (Long) -> Unit,
     onOpenSettings: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewData: PlayerControlsViewData = PlayerControlsViewData.default()
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        shadowElevation = 0.dp,
-        tonalElevation = 1.dp
+    AppSurface(
+        viewData = SurfaceViewData(
+            backgroundColor = viewData.surfaceColor,
+            contentColor = viewData.contentColor,
+            elevation = viewData.elevation,
+            tonalElevation = viewData.tonalElevation
+        ),
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
@@ -37,13 +45,22 @@ fun PlayerControls(
             ProgressSection(
                 position = position,
                 duration = duration,
-                onSeek = onSeek
+                onSeek = onSeek,
+                sliderColors = viewData.sliderColors,
+                timeTextStyle = viewData.timeTextStyle,
+                timeTextColor = viewData.timeTextColor
             )
 
             ControlButtons(
                 isPlaying = isPlaying,
                 onPlayPause = onPlayPause,
-                onOpenSettings = onOpenSettings
+                onOpenSettings = onOpenSettings,
+                playButtonColors = viewData.playButtonColors,
+                settingsIconColor = viewData.settingsIconColor,
+                playButtonSize = viewData.playButtonSize,
+                settingsButtonSize = viewData.settingsButtonSize,
+                iconSize = viewData.iconSize,
+                settingsIconSize = viewData.settingsIconSize
             )
         }
     }
@@ -53,7 +70,10 @@ fun PlayerControls(
 private fun ProgressSection(
     position: Long,
     duration: Long,
-    onSeek: (Long) -> Unit
+    onSeek: (Long) -> Unit,
+    sliderColors: SliderColorsViewData,
+    timeTextStyle: androidx.compose.ui.text.TextStyle,
+    timeTextColor: androidx.compose.ui.graphics.Color
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -71,15 +91,20 @@ private fun ProgressSection(
                 .fillMaxWidth()
                 .height(40.dp),
             colors = SliderDefaults.colors(
-                thumbColor = ColorStyles.sliderThumb(),
-                activeTrackColor = ColorStyles.sliderActiveTrack(),
-                inactiveTrackColor = ColorStyles.sliderInactiveTrack()
+                thumbColor = sliderColors.thumbColor,
+                activeTrackColor = sliderColors.activeTrackColor,
+                inactiveTrackColor = sliderColors.inactiveTrackColor,
+                disabledThumbColor = sliderColors.disabledThumbColor,
+                disabledActiveTrackColor = sliderColors.disabledActiveTrackColor,
+                disabledInactiveTrackColor = sliderColors.disabledInactiveTrackColor
             )
         )
 
         TimeDisplay(
             position = position,
-            duration = duration
+            duration = duration,
+            textStyle = timeTextStyle,
+            textColor = timeTextColor
         )
     }
 }
@@ -87,21 +112,27 @@ private fun ProgressSection(
 @Composable
 private fun TimeDisplay(
     position: Long,
-    duration: Long
+    duration: Long,
+    textStyle: androidx.compose.ui.text.TextStyle,
+    textColor: androidx.compose.ui.graphics.Color
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = formatTime(position),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+        AppText(
+            viewData = TextViewData(
+                text = formatTime(position),
+                style = textStyle,
+                color = textColor
+            )
         )
-        Text(
-            text = formatTime(duration),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.labelSmall
+        AppText(
+            viewData = TextViewData(
+                text = formatTime(duration),
+                style = textStyle,
+                color = textColor
+            )
         )
     }
 }
@@ -110,7 +141,13 @@ private fun TimeDisplay(
 private fun ControlButtons(
     isPlaying: Boolean,
     onPlayPause: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    playButtonColors: PlayButtonColorsViewData,
+    settingsIconColor: androidx.compose.ui.graphics.Color,
+    playButtonSize: androidx.compose.ui.unit.Dp,
+    settingsButtonSize: androidx.compose.ui.unit.Dp,
+    iconSize: androidx.compose.ui.unit.Dp,
+    settingsIconSize: androidx.compose.ui.unit.Dp
 ) {
     Row(
         modifier = Modifier
@@ -119,15 +156,21 @@ private fun ControlButtons(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.size(48.dp))
+        Spacer(modifier = Modifier.size(settingsButtonSize))
 
         PlayPauseButton(
             isPlaying = isPlaying,
-            onClick = onPlayPause
+            onClick = onPlayPause,
+            buttonColors = playButtonColors,
+            buttonSize = playButtonSize,
+            iconSize = iconSize
         )
 
         SettingsButton(
-            onClick = onOpenSettings
+            onClick = onOpenSettings,
+            iconColor = settingsIconColor,
+            buttonSize = settingsButtonSize,
+            iconSize = settingsIconSize
         )
     }
 }
@@ -135,33 +178,83 @@ private fun ControlButtons(
 @Composable
 private fun PlayPauseButton(
     isPlaying: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    buttonColors: PlayButtonColorsViewData,
+    buttonSize: androidx.compose.ui.unit.Dp,
+    iconSize: androidx.compose.ui.unit.Dp
 ) {
     FilledIconButton(
         onClick = onClick,
-        modifier = Modifier.size(56.dp),
+        modifier = Modifier.size(buttonSize),
         colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = ColorStyles.primaryButton(),
-            contentColor = ColorStyles.onPrimaryButton()
+            containerColor = buttonColors.backgroundColor,
+            contentColor = buttonColors.contentColor
         )
     ) {
         if (isPlaying) {
-            PauseIcon()
+            PauseIcon(
+                color = buttonColors.pauseIconColor,
+                modifier = Modifier.size(iconSize * 0.875f) // 28.dp for 32.dp icon
+            )
         } else {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
                 contentDescription = "Play",
-                tint = ColorStyles.onPrimaryButton(),
-                modifier = Modifier.size(32.dp)
+                tint = buttonColors.contentColor,
+                modifier = Modifier.size(iconSize)
             )
         }
     }
 }
 
 @Composable
-private fun PauseIcon() {
+private fun AppIconButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit,
+    viewData: IconButtonViewData,
+    contentDescription: String? = null
+) {
+    if (viewData.backgroundColor != null && viewData.backgroundColor != Color.Transparent) {
+        FilledIconButton(
+            onClick = onClick,
+            modifier = Modifier.size(viewData.size),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = viewData.backgroundColor,
+                contentColor = viewData.contentColor ?: MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = viewData.contentColor ?: MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(viewData.iconSize)
+            )
+        }
+    } else {
+        IconButton(
+            onClick = onClick,
+            modifier = Modifier.size(viewData.size),
+            colors = IconButtonDefaults.iconButtonColors(
+                contentColor = viewData.contentColor ?: MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = viewData.contentColor ?: MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(viewData.iconSize)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PauseIcon(
+    color: androidx.compose.ui.graphics.Color,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier.size(28.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -169,33 +262,35 @@ private fun PauseIcon() {
             modifier = Modifier
                 .width(8.dp)
                 .fillMaxHeight(0.7f)
-                .background(ColorStyles.onPrimaryButton())
+                .background(color)
         )
         Spacer(modifier = Modifier.width(6.dp))
         Box(
             modifier = Modifier
                 .width(8.dp)
                 .fillMaxHeight(0.7f)
-                .background(ColorStyles.onPrimaryButton())
+                .background(color)
         )
     }
 }
 
 @Composable
 private fun SettingsButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    iconColor: androidx.compose.ui.graphics.Color,
+    buttonSize: androidx.compose.ui.unit.Dp,
+    iconSize: androidx.compose.ui.unit.Dp
 ) {
-    IconButton(
+    AppIconButton(
+        icon = Icons.Default.Settings,
         onClick = onClick,
-        modifier = Modifier.size(48.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Settings,
-            contentDescription = "Settings",
-            tint = ColorStyles.controlIcon(),
-            modifier = Modifier.size(24.dp)
-        )
-    }
+        viewData = IconButtonViewData.default().copy(
+            contentColor = iconColor,
+            size = buttonSize,
+            iconSize = iconSize
+        ),
+        contentDescription = "Settings"
+    )
 }
 
 private fun formatTime(millis: Long): String {
