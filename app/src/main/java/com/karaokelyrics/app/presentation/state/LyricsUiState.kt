@@ -8,6 +8,7 @@ data class LyricsUiState(
     val lyrics: SyncedLyrics? = null,
     val syncState: LyricsSyncState = LyricsSyncState(),
     val playbackPosition: Long = 0,
+    val duration: Long = 0,
     val isPlaying: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
