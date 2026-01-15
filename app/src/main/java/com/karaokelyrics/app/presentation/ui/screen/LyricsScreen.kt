@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LyricsScreen(
     viewModel: LyricsViewModel = hiltViewModel(),
-    layoutManager: LyricsLayoutManager? = null // Optional for testing Clean Architecture
+    layoutManager: LyricsLayoutManager
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -136,7 +136,7 @@ private fun LyricsContent(
     onPlayPause: () -> Unit,
     onSeek: (Long) -> Unit,
     onOpenSettings: () -> Unit,
-    layoutManager: LyricsLayoutManager? = null
+    layoutManager: LyricsLayoutManager
 ) {
     state.lyrics?.let { lyricsData ->
         Box(modifier = Modifier.fillMaxSize()) {

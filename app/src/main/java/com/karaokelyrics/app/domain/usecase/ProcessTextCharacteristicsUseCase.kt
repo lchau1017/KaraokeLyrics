@@ -3,7 +3,7 @@ package com.karaokelyrics.app.domain.usecase
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
-import com.karaokelyrics.app.presentation.ui.utils.SyllableLayout
+import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
 import javax.inject.Inject
 
 /**

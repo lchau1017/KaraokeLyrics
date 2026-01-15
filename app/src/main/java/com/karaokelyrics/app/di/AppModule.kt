@@ -11,6 +11,9 @@ import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessTextCharacteristicsUseCase
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
+import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
+import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
+import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 import dagger.Module
 import dagger.Provides
@@ -70,6 +73,25 @@ object AppModule {
         syncLyricsUseCase: SyncLyricsUseCase
     ): CoordinatePlaybackSyncUseCase {
         return CoordinatePlaybackSyncUseCase(playerRepository, syncLyricsUseCase)
+    }
+
+    @Provides
+    fun provideParseTtmlUseCase(): ParseTtmlUseCase {
+        return ParseTtmlUseCase()
+    }
+
+    @Provides
+    fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase {
+        return ProcessLyricsDataUseCase()
+    }
+
+    @Provides
+    fun provideLoadLyricsUseCase(
+        lyricsRepository: LyricsRepository,
+        parseTtmlUseCase: ParseTtmlUseCase,
+        processLyricsDataUseCase: ProcessLyricsDataUseCase
+    ): LoadLyricsUseCase {
+        return LoadLyricsUseCase(lyricsRepository, parseTtmlUseCase, processLyricsDataUseCase)
     }
 
     // Presentation Managers

@@ -1,5 +1,7 @@
 package com.karaokelyrics.app.presentation.ui.utils
 
+object TextUtils {
+
 fun String.isPunctuation(): Boolean {
     if (isEmpty()) return false
     return all { it in ".,;:!?\"'()[]{}…—–" || it.category == CharCategory.OTHER_PUNCTUATION }
@@ -47,4 +49,6 @@ fun String.isRtl(): Boolean {
 fun Char.isHebrew(): Boolean {
     return code in 0x0590..0x05FF || // Hebrew
            code in 0xFB1D..0xFB4F    // Hebrew Presentation Forms
+}
+
 }

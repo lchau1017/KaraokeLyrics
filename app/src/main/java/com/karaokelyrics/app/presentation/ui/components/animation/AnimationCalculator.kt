@@ -1,8 +1,8 @@
 package com.karaokelyrics.app.presentation.ui.components.animation
 
-import com.karaokelyrics.app.presentation.ui.utils.DipAndRise
-import com.karaokelyrics.app.presentation.ui.utils.Swell
-import com.karaokelyrics.app.presentation.ui.utils.Bounce
+import com.karaokelyrics.app.presentation.ui.utils.EasingFunctions.DipAndRise
+import com.karaokelyrics.app.presentation.ui.utils.EasingFunctions.Swell
+import com.karaokelyrics.app.presentation.ui.utils.EasingFunctions.Bounce
 
 /**
  * Calculates animation values for karaoke effects

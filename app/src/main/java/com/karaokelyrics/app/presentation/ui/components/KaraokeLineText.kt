@@ -12,14 +12,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.presentation.ui.components.animation.AnimationCalculator
 import com.karaokelyrics.app.presentation.ui.components.animation.rememberAnimationStateManager
 import com.karaokelyrics.app.presentation.ui.components.rendering.GradientBrushFactory
 import com.karaokelyrics.app.presentation.ui.components.rendering.SyllableRenderer
-import com.karaokelyrics.app.presentation.ui.utils.*
+import com.karaokelyrics.app.presentation.ui.utils.EasingFunctions
 import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
+import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.LineLayout
+import com.karaokelyrics.app.presentation.ui.utils.TextUtils.isRtl
 
 /**
  * Refactored karaoke text component with better separation of concerns
@@ -34,7 +37,7 @@ fun KaraokeLineText(
     modifier: Modifier = Modifier,
     enableCharacterAnimations: Boolean = true,
     enableBlurEffect: Boolean = true,
-    layoutManager: LyricsLayoutManager? = null // Optional for backward compatibility
+    layoutManager: LyricsLayoutManager // Optional for backward compatibility
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -84,9 +87,11 @@ fun KaraokeLineText(
         val availableWidthPx = with(density) { maxWidth.toPx() }
         val lineHeight = with(density) { (textStyle.fontSize.toPx() * 1.5f) }
 
-        // Use new Clean Architecture approach with fallback for compatibility
+        // Use Clean Architecture approach through LyricsLayoutManager
         val lineLayout = remember(line, textStyle, availableWidthPx, lineHeight, enableCharacterAnimations) {
-            layoutManager?.calculateLineLayout(
+            requireNotNull(layoutManager) {
+                "LyricsLayoutManager is required for KaraokeLineText"
+            }.calculateLineLayout(
                 line = line,
                 textMeasurer = textMeasurer,
                 textStyle = textStyle,
@@ -95,37 +100,7 @@ fun KaraokeLineText(
                 canvasWidth = availableWidthPx,
                 enableCharacterAnimations = enableCharacterAnimations,
                 isRtl = isRtl
-            ) ?: run {
-                // Fallback to old method for backward compatibility
-                val spaceWidth = textMeasurer.measure(" ", textStyle).size.width.toFloat()
-                val syllableLayouts = measureSyllablesAndDetermineAnimation(
-                    syllables = line.syllables,
-                    textMeasurer = textMeasurer,
-                    style = textStyle,
-                    isAccompanimentLine = line.isAccompaniment,
-                    spaceWidth = spaceWidth,
-                    enableCharacterAnimations = enableCharacterAnimations
-                )
-                val wrappedLines = calculateGreedyWrappedLines(
-                    syllableLayouts = syllableLayouts,
-                    availableWidthPx = availableWidthPx,
-                    textMeasurer = textMeasurer,
-                    style = textStyle
-                )
-                val finalLayouts = calculateStaticLineLayout(
-                    wrappedLines = wrappedLines,
-                    isLineRightAligned = isRightAligned,
-                    canvasWidth = availableWidthPx,
-                    lineHeight = lineHeight,
-                    isRtl = isRtl
-                )
-                LineLayout(
-                    line = line,
-                    wrappedLines = wrappedLines,
-                    syllableLayouts = finalLayouts,
-                    totalHeight = wrappedLines.size.toFloat() * lineHeight
-                )
-            }
+            )
         }
 
         val finalLayouts = lineLayout.syllableLayouts
@@ -158,7 +133,7 @@ fun KaraokeLineText(
  * Extension function to draw a row of karaoke text
  */
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawKaraokeRow(
-    rowLayouts: List<SyllableLayout>,
+    rowLayouts: List<TextLayoutCalculationUtil.SyllableLayout>,
     currentTimeMs: Int,
     activeColor: Color,
     inactiveColor: Color,
@@ -241,7 +216,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawKaraokeRow(
  * Draw character animation with proper timing
  */
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCharacterAnimation(
-    syllableLayout: SyllableLayout,
+    syllableLayout: TextLayoutCalculationUtil.SyllableLayout,
     currentTimeMs: Int,
     drawColor: Color,
     enableBlurEffect: Boolean,

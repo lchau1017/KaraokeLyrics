@@ -2,6 +2,8 @@ package com.karaokelyrics.app.presentation.ui.utils
 
 import androidx.compose.animation.core.Easing
 
+object EasingFunctions {
+
 class NewtonPolynomialInterpolationEasing(points: List<Pair<Double, Double>>): Easing {
     constructor(vararg points: Pair<Double, Double>) : this(points.toList())
 
@@ -74,3 +76,5 @@ val Bounce = NewtonPolynomialInterpolationEasing(
     0.7 to 1.0,
     1.0 to 0.0
 )
+
+}

@@ -56,7 +56,7 @@ fun KaraokeLyricsView(
     useBlurEffect: Boolean = true,
     enableCharacterAnimations: Boolean = true,
     offset: Dp = 100.dp,  // Reduced from 200dp to move active line higher, closer to top bar
-    layoutManager: LyricsLayoutManager? = null // Optional for testing new Clean Architecture
+    layoutManager: LyricsLayoutManager
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()

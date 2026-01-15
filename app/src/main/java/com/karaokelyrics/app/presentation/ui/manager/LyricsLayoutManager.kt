@@ -4,7 +4,7 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.usecase.CalculateTextLayoutUseCase
-import com.karaokelyrics.app.presentation.ui.utils.LineLayout
+import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.LineLayout
 import javax.inject.Inject
 
 /**
