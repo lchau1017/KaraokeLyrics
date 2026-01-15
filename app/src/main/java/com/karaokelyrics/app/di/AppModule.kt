@@ -9,7 +9,6 @@ import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
-import com.karaokelyrics.app.presentation.ui.helper.TextCharacteristicsProcessor
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
@@ -58,19 +57,8 @@ object AppModule {
         return DetermineAnimationTypeUseCase()
     }
 
-    // Presentation Helpers
-    @Provides
-    fun provideTextCharacteristicsProcessor(
-        groupSyllablesIntoWordsUseCase: GroupSyllablesIntoWordsUseCase,
-        determineAnimationTypeUseCase: DetermineAnimationTypeUseCase
-    ): TextCharacteristicsProcessor {
-        return TextCharacteristicsProcessor(
-            groupSyllablesIntoWordsUseCase,
-            determineAnimationTypeUseCase
-        )
-    }
-
-    // TextLayoutCalculator no longer needed - calculations done locally in components
+    // Presentation Helpers removed - now created locally in components
+    // TextCharacteristicsProcessor and TextLayoutCalculator no longer needed in DI
 
     @Provides
     fun provideSyncLyricsUseCase(): SyncLyricsUseCase {
