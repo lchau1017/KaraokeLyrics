@@ -6,6 +6,8 @@ import com.karaokelyrics.app.data.preferences.SettingsPreferencesManager
 import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
+import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
+import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.presentation.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.state.LyricsUiState
@@ -20,6 +22,7 @@ import javax.inject.Inject
 class LyricsViewModel @Inject constructor(
     private val loadLyricsUseCase: LoadLyricsUseCase,
     private val syncLyricsUseCase: SyncLyricsUseCase,
+    private val coordinatePlaybackSyncUseCase: CoordinatePlaybackSyncUseCase,
     private val playerRepository: PlayerRepository,
     private val settingsManager: SettingsPreferencesManager
 ) : ViewModel() {
@@ -89,32 +92,25 @@ class LyricsViewModel @Inject constructor(
     }
 
     private fun observePlaybackState() {
-        // Observe playback position
+        // Use domain use case for coordinated playback and sync logic (simplified)
         viewModelScope.launch {
-            combine(
-                playerRepository.observePlaybackPosition(),
-                playerRepository.observeIsPlaying()
-            ) { position, isPlaying ->
-                position to isPlaying
-            }.collect { (position, isPlaying) ->
+            coordinatePlaybackSyncUseCase.observePlaybackOnly().collect { coordinated ->
                 val lyrics = _state.value.lyrics
-                if (lyrics != null) {
-                    val timingOffset = _state.value.userSettings.lyricsTimingOffsetMs
-                    val syncState = syncLyricsUseCase(lyrics, position, timingOffset)
-                    _state.update { currentState ->
-                        currentState.copy(
-                            syncState = syncState,
-                            playbackPosition = position,
-                            isPlaying = isPlaying
-                        )
-                    }
+                val userSettings = _state.value.userSettings
+
+                // If we have lyrics, get the sync state using domain logic
+                val syncState = if (lyrics != null) {
+                    syncLyricsUseCase(lyrics, coordinated.playbackPosition, userSettings.lyricsTimingOffsetMs)
                 } else {
-                    _state.update { currentState ->
-                        currentState.copy(
-                            playbackPosition = position,
-                            isPlaying = isPlaying
-                        )
-                    }
+                    null
+                }
+
+                _state.update { currentState ->
+                    currentState.copy(
+                        syncState = syncState ?: LyricsSyncState(),
+                        playbackPosition = coordinated.playbackPosition,
+                        isPlaying = coordinated.isPlaying
+                    )
                 }
             }
         }

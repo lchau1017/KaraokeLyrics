@@ -9,6 +9,8 @@ import com.karaokelyrics.app.domain.usecase.CalculateTextLayoutUseCase
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessTextCharacteristicsUseCase
+import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
+import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 import dagger.Module
 import dagger.Provides
@@ -60,6 +62,14 @@ object AppModule {
         processTextCharacteristicsUseCase: ProcessTextCharacteristicsUseCase
     ): CalculateTextLayoutUseCase {
         return CalculateTextLayoutUseCase(processTextCharacteristicsUseCase)
+    }
+
+    @Provides
+    fun provideCoordinatePlaybackSyncUseCase(
+        playerRepository: PlayerRepository,
+        syncLyricsUseCase: SyncLyricsUseCase
+    ): CoordinatePlaybackSyncUseCase {
+        return CoordinatePlaybackSyncUseCase(playerRepository, syncLyricsUseCase)
     }
 
     // Presentation Managers

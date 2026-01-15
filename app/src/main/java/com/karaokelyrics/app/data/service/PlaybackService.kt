@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.presentation.service
+package com.karaokelyrics.app.data.service
 
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -10,6 +10,10 @@ import androidx.media3.session.MediaSessionService
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 
+/**
+ * Media playback service moved to data layer following Clean Architecture.
+ * This is infrastructure/data concern, not presentation.
+ */
 class PlaybackService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
 
@@ -31,22 +35,6 @@ class PlaybackService : MediaSessionService() {
             .build()
     }
 
-    private inner class PlaybackCallback : MediaSession.Callback {
-        override fun onPlaybackResumption(
-            mediaSession: MediaSession,
-            controller: MediaSession.ControllerInfo
-        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
-            // Return an empty list since we handle media loading through the repository
-            return Futures.immediateFuture(
-                MediaSession.MediaItemsWithStartPosition(
-                    emptyList(),
-                    C.INDEX_UNSET,
-                    C.TIME_UNSET
-                )
-            )
-        }
-    }
-
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
         return mediaSession
     }
@@ -58,5 +46,15 @@ class PlaybackService : MediaSessionService() {
             mediaSession = null
         }
         super.onDestroy()
+    }
+
+    private inner class PlaybackCallback : MediaSession.Callback {
+        override fun onAddMediaItems(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+            mediaItems: List<MediaItem>
+        ): ListenableFuture<List<MediaItem>> {
+            return Futures.immediateFuture(mediaItems)
+        }
     }
 }
