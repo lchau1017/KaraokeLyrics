@@ -151,6 +151,7 @@ private fun DrawScope.drawKaraokeRow(
         val isActive = currentTimeMs >= syllableLayout.syllable.start &&
                       currentTimeMs < syllableLayout.syllable.end
         val isPast = currentTimeMs >= syllableLayout.syllable.end
+        val isFuture = currentTimeMs < syllableLayout.syllable.start
 
         // Only show as active if we're within the parent line's time range
         // This prevents words from staying bright after the line finishes
@@ -164,13 +165,19 @@ private fun DrawScope.drawKaraokeRow(
             else -> inactiveColor   // Not yet sung or line is done
         }
 
+        // Only blur future lyrics, not current or past
+        val shouldBlur = enableBlurEffect && isFuture
+
         when {
             // Character animation for awesome words
             enableCharacterAnimations && syllableLayout.useAwesomeAnimation && syllableLayout.wordAnimInfo != null -> {
                 drawCharacterAnimation(
                     syllableLayout = syllableLayout,
                     currentTimeMs = currentTimeMs,
-                    drawColor = drawColor
+                    drawColor = drawColor,
+                    enableBlurEffect = shouldBlur,
+                    isActive = isActive,
+                    parentLineActive = parentLineActive
                 )
             }
             // Simple animation
@@ -180,7 +187,10 @@ private fun DrawScope.drawKaraokeRow(
                     currentTimeMs = currentTimeMs,
                     drawColor = drawColor,
                     rowLayouts = rowLayouts,
-                    index = index
+                    index = index,
+                    enableBlurEffect = shouldBlur,
+                    isActive = isActive,
+                    parentLineActive = parentLineActive
                 )
             }
         }
@@ -190,7 +200,10 @@ private fun DrawScope.drawKaraokeRow(
 private fun DrawScope.drawCharacterAnimation(
     syllableLayout: SyllableLayout,
     currentTimeMs: Int,
-    drawColor: Color
+    drawColor: Color,
+    enableBlurEffect: Boolean = false,
+    isActive: Boolean = false,
+    parentLineActive: Boolean = false
 ) {
     val wordAnimInfo = syllableLayout.wordAnimInfo ?: return
     val fastCharAnimationThresholdMs = 200f
@@ -215,23 +228,71 @@ private fun DrawScope.drawCharacterAnimation(
         }
 
         val awesomeStartTime = (earliestStartTime + (latestStartTime - earliestStartTime) * charRatio).toLong()
-        val awesomeProgress = ((currentTimeMs - awesomeStartTime).toFloat() / awesomeDuration).coerceIn(0f, 1f)
 
-        val floatOffset = 4f * DipAndRise(
-            dip = ((0.5 * (wordAnimInfo.wordDuration - fastCharAnimationThresholdMs * numCharsInWord) / 1000))
-                .coerceIn(0.0, 0.5)
-        ).transform(1.0f - awesomeProgress)
+        // Only animate if this specific character's animation window is active
+        val timeSinceStart = currentTimeMs - awesomeStartTime
 
-        val scale = 1f + Swell(
-            (0.1 * (wordAnimInfo.wordDuration - fastCharAnimationThresholdMs * numCharsInWord) / 1000)
-                .coerceIn(0.0, 0.1)
-        ).transform(awesomeProgress)
+        // Check if we're within this specific character's animation window
+        val isCharAnimationActive = timeSinceStart >= 0 && timeSinceStart <= awesomeDuration
+
+        // Strict check: only animate if this exact syllable is currently active or just finished
+        // This prevents other lines with similar timing from animating
+        val isSyllableActive = currentTimeMs >= syllableLayout.syllable.start &&
+                              currentTimeMs <= syllableLayout.syllable.end + 500 // Small buffer for animation completion
+
+        // Additional check: make sure we're not animating if a different word is playing
+        val isCorrectWord = wordAnimInfo.wordStartTime <= currentTimeMs &&
+                           wordAnimInfo.wordEndTime + 500 >= currentTimeMs
+
+        val shouldAnimate = isCharAnimationActive && isSyllableActive && isCorrectWord
+
+        val awesomeProgress = when {
+            shouldAnimate -> {
+                ((currentTimeMs - awesomeStartTime).toFloat() / awesomeDuration).coerceIn(0f, 1f)
+            }
+            timeSinceStart > awesomeDuration && isSyllableActive -> {
+                1f // Animation completed but syllable still active
+            }
+            else -> {
+                0f // Animation not started or wrong syllable
+            }
+        }
+
+        // Improved animation with smoother curves
+        val floatOffset = if (shouldAnimate && awesomeProgress < 1f) {
+            // Increased float effect for more dramatic animation
+            6f * DipAndRise(
+                dip = ((0.6 * (wordAnimInfo.wordDuration - fastCharAnimationThresholdMs * numCharsInWord) / 1000))
+                    .coerceIn(0.0, 0.6)
+            ).transform(1.0f - awesomeProgress)
+        } else {
+            0f // No floating effect when not animating
+        }
+
+        val scale = if (shouldAnimate && awesomeProgress < 1f) {
+            // Slightly more pronounced scale effect
+            1f + Swell(
+                (0.15 * (wordAnimInfo.wordDuration - fastCharAnimationThresholdMs * numCharsInWord) / 1000)
+                    .coerceIn(0.0, 0.15)
+            ).transform(awesomeProgress)
+        } else {
+            1f // No scaling when not animating
+        }
 
         val centeredOffsetX = (charBox.width - singleCharLayoutResult.size.width) / 2f
         val xPos = syllableLayout.position.x + charBox.left + centeredOffsetX
         val yPos = syllableLayout.position.y + charBox.top + floatOffset
 
-        val blurRadius = 10f * Bounce.transform(awesomeProgress)
+        // Apply blur for unplayed text or animation blur
+        val animationBlur = if (shouldAnimate && awesomeProgress < 1f) {
+            // Enhanced blur effect during animation
+            12f * Bounce.transform(awesomeProgress)
+        } else {
+            0f
+        }
+        val unplayedBlur = if (enableBlurEffect) 8f else 0f
+        val blurRadius = maxOf(animationBlur, unplayedBlur)
+
         val shadow = Shadow(
             color = drawColor.copy(0.4f),
             offset = Offset(0f, 0f),
@@ -254,7 +315,10 @@ private fun DrawScope.drawSimpleAnimation(
     currentTimeMs: Int,
     drawColor: Color,
     rowLayouts: List<SyllableLayout>,
-    index: Int
+    index: Int,
+    enableBlurEffect: Boolean = false,
+    isActive: Boolean = false,
+    parentLineActive: Boolean = false
 ) {
     val driverLayout = if (syllableLayout.syllable.content.trim().isPunctuation()) {
         var searchIndex = index - 1
@@ -270,23 +334,50 @@ private fun DrawScope.drawSimpleAnimation(
         syllableLayout
     }
 
+    // Only animate if this syllable is active or was recently active (within animation duration)
     val animationFixedDuration = 700f
     val timeSinceStart = currentTimeMs - driverLayout.syllable.start
-    val animationProgress = (timeSinceStart / animationFixedDuration).coerceIn(0f, 1f)
+
+    // Only animate if we're within the animation window AND the parent line is active
+    val shouldAnimate = parentLineActive && timeSinceStart >= 0 && timeSinceStart <= animationFixedDuration
+    val animationProgress = if (shouldAnimate) {
+        (timeSinceStart / animationFixedDuration).coerceIn(0f, 1f)
+    } else {
+        1f // No animation, fully settled
+    }
 
     val maxOffsetY = 4f
-    val floatCurveValue = CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f).transform(1f - animationProgress)
+    val floatCurveValue = if (shouldAnimate) {
+        CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f).transform(1f - animationProgress)
+    } else {
+        0f // No floating effect for inactive syllables
+    }
     val floatOffset = maxOffsetY * floatCurveValue
 
     val finalPosition = syllableLayout.position.copy(
         y = syllableLayout.position.y + floatOffset
     )
 
-    drawText(
-        textLayoutResult = syllableLayout.textLayoutResult,
-        color = drawColor,
-        topLeft = finalPosition
-    )
+    // Apply blur effect for unplayed text
+    if (enableBlurEffect) {
+        val shadow = Shadow(
+            color = drawColor.copy(alpha = 0.4f),
+            offset = Offset(0f, 0f),
+            blurRadius = 8f
+        )
+        drawText(
+            textLayoutResult = syllableLayout.textLayoutResult,
+            color = drawColor,
+            topLeft = finalPosition,
+            shadow = shadow
+        )
+    } else {
+        drawText(
+            textLayoutResult = syllableLayout.textLayoutResult,
+            color = drawColor,
+            topLeft = finalPosition
+        )
+    }
 }
 
 private fun createLineGradientBrush(

@@ -149,21 +149,54 @@ fun KaraokeLyricsView(
         ) { index, line ->
             val isCurrentLine = index in allFocusedLineIndices
 
-            // Calculate distance-based blur/opacity
+            // Determine if this line has been played
+            val hasBeenPlayed = line.end <= currentTimeMs
+            val isUpcoming = line.start > currentTimeMs
+
+            // Calculate distance from the closest active line
             val distanceFromCurrent = when {
-                allFocusedLineIndices.isEmpty() -> 0
+                allFocusedLineIndices.isEmpty() -> {
+                    // No active line - calculate based on whether played or upcoming
+                    if (hasBeenPlayed) {
+                        // Distance from last played line
+                        val lastPlayedIndex = lyrics.lines.indexOfLast { it.end <= currentTimeMs }
+                        if (lastPlayedIndex >= 0) kotlin.math.abs(index - lastPlayedIndex) + 3
+                        else Int.MAX_VALUE
+                    } else {
+                        // Distance from next upcoming line
+                        val nextIndex = lyrics.lines.indexOfFirst { it.start > currentTimeMs }
+                        if (nextIndex >= 0) kotlin.math.abs(index - nextIndex) + 3
+                        else Int.MAX_VALUE
+                    }
+                }
                 index < allFocusedLineIndices.first() -> allFocusedLineIndices.first() - index
                 index > allFocusedLineIndices.last() -> index - allFocusedLineIndices.last()
                 else -> 0
             }
 
-            // Animate blur/opacity based on distance
+            // Calculate opacity with proper fade for played lines
             val opacity by animateFloatAsState(
                 targetValue = when {
-                    isCurrentLine -> 1f
-                    distanceFromCurrent == 0 -> 1f
-                    distanceFromCurrent == 1 -> 0.7f
-                    distanceFromCurrent == 2 -> 0.5f
+                    isCurrentLine -> 1f // Currently playing
+                    hasBeenPlayed -> {
+                        // Fade out effect for played lines
+                        val timeSincePlayed = (currentTimeMs - line.end).coerceAtLeast(0)
+                        when {
+                            timeSincePlayed < 500 -> 0.8f
+                            timeSincePlayed < 1000 -> 0.6f
+                            timeSincePlayed < 2000 -> 0.4f
+                            else -> 0.25f // Minimum opacity for old played lines
+                        }
+                    }
+                    isUpcoming -> {
+                        // Upcoming lines based on distance
+                        when (distanceFromCurrent) {
+                            1 -> 0.6f
+                            2 -> 0.45f
+                            3 -> 0.35f
+                            else -> 0.25f
+                        }
+                    }
                     else -> 0.3f
                 },
                 animationSpec = tween(300),
