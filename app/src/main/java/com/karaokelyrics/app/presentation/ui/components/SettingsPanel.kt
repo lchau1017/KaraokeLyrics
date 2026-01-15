@@ -2,6 +2,7 @@ package com.karaokelyrics.app.presentation.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
@@ -286,27 +288,49 @@ private fun ColorSwatch(
 ) {
     Box(
         modifier = Modifier
-            .size(40.dp)
+            .size(48.dp)
             .clip(CircleShape)
-            .background(color)
-            .clickable { onClick() }
             .then(
                 if (isSelected) {
-                    Modifier.background(
-                        Color.White.copy(alpha = 0.3f),
-                        CircleShape
+                    Modifier.border(
+                        width = 3.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
                     )
                 } else {
-                    Modifier
+                    Modifier.border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        shape = CircleShape
+                    )
                 }
-            ),
+            )
+            .padding(if (isSelected) 3.dp else 1.dp)
+            .clip(CircleShape)
+            .background(color)
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         if (isSelected) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(Color.White, CircleShape)
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Selected",
+                modifier = Modifier.size(20.dp),
+                // Determine if the color is light or dark based on a simple calculation
+                // Using a basic luminance calculation: (0.299*R + 0.587*G + 0.114*B)
+                tint = run {
+                    val red = color.red
+                    val green = color.green
+                    val blue = color.blue
+                    val luminance = (0.299f * red + 0.587f * green + 0.114f * blue)
+                    if (luminance > 0.5f) {
+                        // Light color - use dark icon
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        // Dark color - use light icon
+                        MaterialTheme.colorScheme.primaryContainer
+                    }
+                }
             )
         }
     }
@@ -323,9 +347,9 @@ private fun FontSizeChip(
             .clip(RoundedCornerShape(16.dp))
             .background(
                 if (isSelected) {
-                    MaterialTheme.colorScheme.primary
+                    MaterialTheme.colorScheme.primaryContainer
                 } else {
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                    MaterialTheme.colorScheme.surfaceVariant
                 }
             )
             .clickable { onClick() }
@@ -335,9 +359,9 @@ private fun FontSizeChip(
             text = fontSize.displayName,
             style = MaterialTheme.typography.bodySmall,
             color = if (isSelected) {
-                Color.White
+                MaterialTheme.colorScheme.onPrimaryContainer
             } else {
-                MaterialTheme.colorScheme.onSurface
+                MaterialTheme.colorScheme.onSurfaceVariant
             }
         )
     }

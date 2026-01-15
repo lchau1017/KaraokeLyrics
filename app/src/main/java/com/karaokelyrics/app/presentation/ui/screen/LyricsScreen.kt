@@ -1,15 +1,21 @@
 package com.karaokelyrics.app.presentation.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextMotion
@@ -20,7 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karaokelyrics.app.presentation.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.ui.components.KaraokeLyricsView
-import com.karaokelyrics.app.presentation.ui.components.SettingsPanel
+import com.karaokelyrics.app.presentation.ui.components.SettingsBottomSheet
 import com.karaokelyrics.app.presentation.viewmodel.LyricsViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -31,6 +37,7 @@ fun LyricsScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    var showSettings by remember { mutableStateOf(false) }
 
     // Handle effects
     LaunchedEffect(viewModel) {
@@ -139,52 +146,22 @@ fun LyricsScreen(
                         enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations
                     )
 
-                    // Controls and Settings at bottom
-                    Column(
+                    // Playback controls at bottom
+                    PlayerControls(
+                        isPlaying = state.isPlaying,
+                        position = state.playbackPosition,
+                        duration = lyricsData.lines.lastOrNull()?.end?.toLong() ?: 0L,
+                        onPlayPause = {
+                            viewModel.processIntent(LyricsIntent.PlayPause)
+                        },
+                        onSeek = { position ->
+                            viewModel.processIntent(LyricsIntent.SeekToPosition(position))
+                        },
+                        onOpenSettings = {
+                            showSettings = true
+                        },
                         modifier = Modifier.align(Alignment.BottomCenter)
-                    ) {
-                        // Settings Panel
-                        SettingsPanel(
-                            settings = state.userSettings,
-                            onUpdateLyricsColor = { color ->
-                                viewModel.processIntent(LyricsIntent.UpdateLyricsColor(color))
-                            },
-                            onUpdateBackgroundColor = { color ->
-                                viewModel.processIntent(LyricsIntent.UpdateBackgroundColor(color))
-                            },
-                            onUpdateFontSize = { fontSize ->
-                                viewModel.processIntent(LyricsIntent.UpdateFontSize(fontSize))
-                            },
-                            onUpdateAnimationsEnabled = { enabled ->
-                                viewModel.processIntent(LyricsIntent.UpdateAnimationsEnabled(enabled))
-                            },
-                            onUpdateBlurEffectEnabled = { enabled ->
-                                viewModel.processIntent(LyricsIntent.UpdateBlurEffectEnabled(enabled))
-                            },
-                            onUpdateCharacterAnimationsEnabled = { enabled ->
-                                viewModel.processIntent(LyricsIntent.UpdateCharacterAnimationsEnabled(enabled))
-                            },
-                            onUpdateDarkMode = { isDark ->
-                                viewModel.processIntent(LyricsIntent.UpdateDarkMode(isDark))
-                            },
-                            onResetToDefaults = {
-                                viewModel.processIntent(LyricsIntent.ResetSettingsToDefaults)
-                            }
-                        )
-
-                        // Playback controls
-                        PlayerControls(
-                            isPlaying = state.isPlaying,
-                            position = state.playbackPosition,
-                            duration = lyricsData.lines.lastOrNull()?.end?.toLong() ?: 0L,
-                            onPlayPause = {
-                                viewModel.processIntent(LyricsIntent.PlayPause)
-                            },
-                            onSeek = { position ->
-                                viewModel.processIntent(LyricsIntent.SeekToPosition(position))
-                            }
-                        )
-                    }
+                    )
                 }
             }
         }
@@ -192,6 +169,37 @@ fun LyricsScreen(
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
+        )
+
+        // Settings Bottom Sheet
+        SettingsBottomSheet(
+            isVisible = showSettings,
+            settings = state.userSettings,
+            onDismiss = { showSettings = false },
+            onUpdateLyricsColor = { color ->
+                viewModel.processIntent(LyricsIntent.UpdateLyricsColor(color))
+            },
+            onUpdateBackgroundColor = { color ->
+                viewModel.processIntent(LyricsIntent.UpdateBackgroundColor(color))
+            },
+            onUpdateFontSize = { fontSize ->
+                viewModel.processIntent(LyricsIntent.UpdateFontSize(fontSize))
+            },
+            onUpdateAnimationsEnabled = { enabled ->
+                viewModel.processIntent(LyricsIntent.UpdateAnimationsEnabled(enabled))
+            },
+            onUpdateBlurEffectEnabled = { enabled ->
+                viewModel.processIntent(LyricsIntent.UpdateBlurEffectEnabled(enabled))
+            },
+            onUpdateCharacterAnimationsEnabled = { enabled ->
+                viewModel.processIntent(LyricsIntent.UpdateCharacterAnimationsEnabled(enabled))
+            },
+            onUpdateDarkMode = { isDark ->
+                viewModel.processIntent(LyricsIntent.UpdateDarkMode(isDark))
+            },
+            onResetToDefaults = {
+                viewModel.processIntent(LyricsIntent.ResetSettingsToDefaults)
+            }
         )
     }
 }
@@ -203,84 +211,126 @@ private fun PlayerControls(
     duration: Long,
     onPlayPause: () -> Unit,
     onSeek: (Long) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 0.dp,
+        tonalElevation = 1.dp
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
                 .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(top = 12.dp, bottom = 20.dp)
         ) {
-            // Progress slider
-            Slider(
-                value = position.toFloat(),
-                onValueChange = { onSeek(it.toLong()) },
-                valueRange = 0f..duration.toFloat(),
+            // Progress section at top
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.primary,
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = MaterialTheme.colorScheme.outline
-                )
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                IconButton(
+                // Larger progress slider with visible thumb
+                Slider(
+                    value = if (duration > 0) position.toFloat() else 0f,
+                    onValueChange = { newPosition ->
+                        if (duration > 0) {
+                            onSeek(newPosition.toLong())
+                        }
+                    },
+                    valueRange = 0f..duration.toFloat().coerceAtLeast(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    colors = SliderDefaults.colors(
+                        thumbColor = MaterialTheme.colorScheme.primary,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                )
+
+                // Time display
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = formatTime(position),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Text(
+                        text = formatTime(duration),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
+
+            // Controls row with play button and settings
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Empty spacer for balance
+                Spacer(modifier = Modifier.size(48.dp))
+
+                // Play/Pause button in center
+                FilledIconButton(
                     onClick = onPlayPause,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(56.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 ) {
                     if (isPlaying) {
-                        // Custom pause icon using two rectangles
+                        // Custom pause icon
                         Row(
-                            modifier = Modifier.size(48.dp),
-                            horizontalArrangement = Arrangement.Center
+                            modifier = Modifier.size(28.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .width(14.dp)
-                                    .fillMaxHeight()
-                                    .background(MaterialTheme.colorScheme.primary)
+                                    .width(8.dp)
+                                    .fillMaxHeight(0.7f)
+                                    .background(MaterialTheme.colorScheme.onPrimary)
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Box(
                                 modifier = Modifier
-                                    .width(14.dp)
-                                    .fillMaxHeight()
-                                    .background(MaterialTheme.colorScheme.primary)
+                                    .width(8.dp)
+                                    .fillMaxHeight(0.7f)
+                                    .background(MaterialTheme.colorScheme.onPrimary)
                             )
                         }
                     } else {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
                             contentDescription = "Play",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(48.dp)
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(32.dp)
                         )
                     }
                 }
-            }
 
-            // Time display
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = formatTime(position),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = formatTime(duration),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                // Settings icon on the right
+                IconButton(
+                    onClick = onOpenSettings,
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }
