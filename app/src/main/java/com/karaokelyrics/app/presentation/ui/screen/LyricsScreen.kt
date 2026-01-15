@@ -19,6 +19,8 @@ import com.karaokelyrics.app.presentation.state.LyricsUiState
 import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 import dagger.hilt.android.EntryPointAccessors
 import androidx.compose.ui.platform.LocalContext
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.backgroundColor
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.lyricsColor
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable

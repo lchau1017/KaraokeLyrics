@@ -22,9 +22,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.app.domain.model.ColorPresets
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.lyricsColor
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.backgroundColor
+import androidx.compose.ui.graphics.toArgb
 
 @Composable
 fun SettingsPanel(
@@ -260,11 +262,64 @@ private fun ColorPicker(
     isDarkColors: Boolean = false,
     isCurrentlyDarkTheme: Boolean = true
 ) {
+    // Define color presets directly in presentation layer
+    val spotifyGreen = Color(0xFF1DB954)
+    val spotifyBlack = Color(0xFF121212)
+    val white = Color(0xFFFFFFFF)
+
+    val darkLyricColors = listOf(
+        spotifyGreen,
+        white,
+        Color(0xFF9B59B6), // purple
+        Color(0xFF3498DB), // blue
+        Color(0xFFE74C3C), // red
+        Color(0xFFF39C12), // orange
+        Color(0xFFE91E63), // pink
+        Color(0xFF00BCD4), // cyan
+        Color(0xFFFFEB3B)  // yellow
+    )
+
+    val lightLyricColors = listOf(
+        Color(0xFF27AE60), // green
+        Color(0xFF2C3E50), // dark gray
+        Color(0xFF8E44AD), // purple
+        Color(0xFF2980B9), // blue
+        Color(0xFFC0392B), // red
+        Color(0xFFE67E22), // orange
+        Color(0xFFD81B60), // pink
+        Color(0xFF00ACC1), // cyan
+        Color(0xFFF9A825)  // yellow
+    )
+
+    val darkBackgroundColors = listOf(
+        spotifyBlack,
+        Color(0xFF000000), // pure black
+        Color(0xFF1A1A1A), // very dark gray
+        Color(0xFF2C2C2C), // dark gray
+        Color(0xFF0D0D0D), // near black
+        Color(0xFF1E1E1E), // charcoal
+        Color(0xFF101010), // jet black
+        Color(0xFF0A0A0A), // onyx
+        Color(0xFF141414)  // dark charcoal
+    )
+
+    val lightBackgroundColors = listOf(
+        white,
+        Color(0xFFF5F5F5), // light gray
+        Color(0xFFECECEC), // very light gray
+        Color(0xFFE0E0E0), // gray
+        Color(0xFFFAFAFA), // off white
+        Color(0xFFF0F0F0), // smoke white
+        Color(0xFFF8F8F8), // ghost white
+        Color(0xFFEEEEEE), // white smoke
+        Color(0xFFFDFDFD)  // snow
+    )
+
     val colors = when {
-        isDarkColors && isCurrentlyDarkTheme -> ColorPresets.darkBackgroundColors
-        isDarkColors && !isCurrentlyDarkTheme -> ColorPresets.lightBackgroundColors
-        !isDarkColors && isCurrentlyDarkTheme -> ColorPresets.darkLyricColors
-        else -> ColorPresets.lightLyricColors
+        isDarkColors && isCurrentlyDarkTheme -> darkBackgroundColors
+        isDarkColors && !isCurrentlyDarkTheme -> lightBackgroundColors
+        !isDarkColors && isCurrentlyDarkTheme -> darkLyricColors
+        else -> lightLyricColors
     }
 
     LazyRow(
@@ -280,61 +335,7 @@ private fun ColorPicker(
     }
 }
 
-@Composable
-private fun ColorSwatch(
-    color: Color,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .then(
-                if (isSelected) {
-                    Modifier.border(
-                        width = 3.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
-                    )
-                } else {
-                    Modifier.border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                        shape = CircleShape
-                    )
-                }
-            )
-            .padding(if (isSelected) 3.dp else 1.dp)
-            .clip(CircleShape)
-            .background(color)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        if (isSelected) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = "Selected",
-                modifier = Modifier.size(20.dp),
-                // Determine if the color is light or dark based on a simple calculation
-                // Using a basic luminance calculation: (0.299*R + 0.587*G + 0.114*B)
-                tint = run {
-                    val red = color.red
-                    val green = color.green
-                    val blue = color.blue
-                    val luminance = (0.299f * red + 0.587f * green + 0.114f * blue)
-                    if (luminance > 0.5f) {
-                        // Light color - use dark icon
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        // Dark color - use light icon
-                        MaterialTheme.colorScheme.primaryContainer
-                    }
-                }
-            )
-        }
-    }
-}
+// ColorSwatch is now imported from the public component
 
 @Composable
 private fun FontSizeChip(

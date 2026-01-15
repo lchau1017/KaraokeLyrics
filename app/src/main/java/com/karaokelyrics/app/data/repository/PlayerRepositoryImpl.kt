@@ -10,17 +10,13 @@ import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.data.service.PlaybackService
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -34,7 +30,6 @@ class PlayerRepositoryImpl @Inject constructor(
     private var mediaController: MediaController? = null
     private val controllerFuture: ListenableFuture<MediaController>
     private val _isPlaying = MutableStateFlow(false)
-    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val executor = Executors.newSingleThreadExecutor()
 
     init {

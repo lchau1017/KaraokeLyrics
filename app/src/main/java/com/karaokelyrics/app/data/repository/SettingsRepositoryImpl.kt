@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -47,28 +45,20 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override fun getUserSettings(): Flow<UserSettings> = dataStore.data.map { preferences ->
         // Migration: Use legacy keys if new ones don't exist
-        val defaultDarkLyrics = Color(0xFF1DB954).toArgb()
-        val defaultDarkBackground = Color(0xFF121212).toArgb()
-        val defaultLightLyrics = Color(0xFF1DB954).toArgb()
-        val defaultLightBackground = Color(0xFFFFFFFF).toArgb()
+        val defaultDarkLyrics = 0xFF1DB954.toInt()
+        val defaultDarkBackground = 0xFF121212.toInt()
+        val defaultLightLyrics = 0xFF1DB954.toInt()
+        val defaultLightBackground = 0xFFFFFFFF.toInt()
 
         UserSettings(
-            darkLyricsColor = Color(
-                preferences[DARK_LYRICS_COLOR_KEY]
+            darkLyricsColorArgb = preferences[DARK_LYRICS_COLOR_KEY]
                     ?: preferences[LYRICS_COLOR_KEY]
-                    ?: defaultDarkLyrics
-            ),
-            darkBackgroundColor = Color(
-                preferences[DARK_BACKGROUND_COLOR_KEY]
+                    ?: defaultDarkLyrics,
+            darkBackgroundColorArgb = preferences[DARK_BACKGROUND_COLOR_KEY]
                     ?: preferences[BACKGROUND_COLOR_KEY]
-                    ?: defaultDarkBackground
-            ),
-            lightLyricsColor = Color(
-                preferences[LIGHT_LYRICS_COLOR_KEY] ?: defaultLightLyrics
-            ),
-            lightBackgroundColor = Color(
-                preferences[LIGHT_BACKGROUND_COLOR_KEY] ?: defaultLightBackground
-            ),
+                    ?: defaultDarkBackground,
+            lightLyricsColorArgb = preferences[LIGHT_LYRICS_COLOR_KEY] ?: defaultLightLyrics,
+            lightBackgroundColorArgb = preferences[LIGHT_BACKGROUND_COLOR_KEY] ?: defaultLightBackground,
             fontSize = FontSize.valueOf(preferences[FONT_SIZE_KEY] ?: FontSize.MEDIUM.name),
             enableAnimations = preferences[ENABLE_ANIMATIONS_KEY] ?: true,
             enableBlurEffect = preferences[ENABLE_BLUR_EFFECT_KEY] ?: true,
@@ -78,24 +68,24 @@ class SettingsRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun updateLyricsColor(color: Color) {
+    override suspend fun updateLyricsColor(colorArgb: Int) {
         dataStore.edit { preferences ->
             val isDark = preferences[IS_DARK_MODE_KEY] ?: true
             if (isDark) {
-                preferences[DARK_LYRICS_COLOR_KEY] = color.toArgb()
+                preferences[DARK_LYRICS_COLOR_KEY] = colorArgb
             } else {
-                preferences[LIGHT_LYRICS_COLOR_KEY] = color.toArgb()
+                preferences[LIGHT_LYRICS_COLOR_KEY] = colorArgb
             }
         }
     }
 
-    override suspend fun updateBackgroundColor(color: Color) {
+    override suspend fun updateBackgroundColor(colorArgb: Int) {
         dataStore.edit { preferences ->
             val isDark = preferences[IS_DARK_MODE_KEY] ?: true
             if (isDark) {
-                preferences[DARK_BACKGROUND_COLOR_KEY] = color.toArgb()
+                preferences[DARK_BACKGROUND_COLOR_KEY] = colorArgb
             } else {
-                preferences[LIGHT_BACKGROUND_COLOR_KEY] = color.toArgb()
+                preferences[LIGHT_BACKGROUND_COLOR_KEY] = colorArgb
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.karaokelyrics.app.presentation.ui.components
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.karaokelyrics.app.domain.model.FontSize

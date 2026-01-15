@@ -1,15 +1,13 @@
 package com.karaokelyrics.app.domain.model
 
-import androidx.compose.ui.graphics.Color
-
 data class UserSettings(
-    // Dark theme colors
-    val darkLyricsColor: Color = Color(0xFF1DB954), // Spotify green
-    val darkBackgroundColor: Color = Color(0xFF121212), // Spotify black
+    // Dark theme colors (ARGB integers)
+    val darkLyricsColorArgb: Int = 0xFF1DB954.toInt(), // Spotify green
+    val darkBackgroundColorArgb: Int = 0xFF121212.toInt(), // Spotify black
 
-    // Light theme colors
-    val lightLyricsColor: Color = Color(0xFF1DB954), // Spotify green
-    val lightBackgroundColor: Color = Color(0xFFFFFFFF), // White
+    // Light theme colors (ARGB integers)
+    val lightLyricsColorArgb: Int = 0xFF1DB954.toInt(), // Spotify green
+    val lightBackgroundColorArgb: Int = 0xFFFFFFFF.toInt(), // White
 
     // Font
     val fontSize: FontSize = FontSize.MEDIUM,
@@ -26,11 +24,11 @@ data class UserSettings(
     val isDarkMode: Boolean = true
 ) {
     // Computed properties for current theme colors
-    val lyricsColor: Color
-        get() = if (isDarkMode) darkLyricsColor else lightLyricsColor
+    val lyricsColorArgb: Int
+        get() = if (isDarkMode) darkLyricsColorArgb else lightLyricsColorArgb
 
-    val backgroundColor: Color
-        get() = if (isDarkMode) darkBackgroundColor else lightBackgroundColor
+    val backgroundColorArgb: Int
+        get() = if (isDarkMode) darkBackgroundColorArgb else lightBackgroundColorArgb
 }
 
 enum class FontSize(val sp: Int, val displayName: String) {
@@ -40,60 +38,60 @@ enum class FontSize(val sp: Int, val displayName: String) {
     EXTRA_LARGE(46, "Extra Large")
 }
 
-// Preset color schemes
+// Preset color schemes (ARGB integers)
 object ColorPresets {
     // Core colors
-    val spotifyGreen = Color(0xFF1DB954)
-    val spotifyBlack = Color(0xFF121212)
-    val white = Color(0xFFFFFFFF)
+    val spotifyGreen = 0xFF1DB954.toInt()
+    val spotifyBlack = 0xFF121212.toInt()
+    val white = 0xFFFFFFFF.toInt()
 
     // Dark theme lyric colors
     val darkLyricColors = listOf(
         spotifyGreen,
         white,
-        Color(0xFF9B59B6), // purple
-        Color(0xFF3498DB), // blue
-        Color(0xFFE74C3C), // red
-        Color(0xFFF39C12), // orange
-        Color(0xFFE91E63), // pink
-        Color(0xFF00BCD4), // cyan
-        Color(0xFFFFEB3B)  // yellow
+        0xFF9B59B6.toInt(), // purple
+        0xFF3498DB.toInt(), // blue
+        0xFFE74C3C.toInt(), // red
+        0xFFF39C12.toInt(), // orange
+        0xFFE91E63.toInt(), // pink
+        0xFF00BCD4.toInt(), // cyan
+        0xFFFFEB3B.toInt()  // yellow
     )
 
     // Light theme lyric colors
     val lightLyricColors = listOf(
         spotifyGreen,
-        Color(0xFF1A1A1A), // dark gray for contrast
-        Color(0xFF7B1FA2), // darker purple
-        Color(0xFF1976D2), // darker blue
-        Color(0xFFD32F2F), // darker red
-        Color(0xFFFF8F00), // darker orange
-        Color(0xFFC2185B), // darker pink
-        Color(0xFF0097A7), // darker cyan
-        Color(0xFFFBC02D)  // darker yellow
+        0xFF1A1A1A.toInt(), // dark gray for contrast
+        0xFF7B1FA2.toInt(), // darker purple
+        0xFF1976D2.toInt(), // darker blue
+        0xFFD32F2F.toInt(), // darker red
+        0xFFFF8F00.toInt(), // darker orange
+        0xFFC2185B.toInt(), // darker pink
+        0xFF0097A7.toInt(), // darker cyan
+        0xFFFBC02D.toInt()  // darker yellow
     )
 
     // Dark theme background colors
     val darkBackgroundColors = listOf(
         spotifyBlack,
-        Color(0xFF2C2C2C), // dark gray
-        Color.Black,
-        Color(0xFF1A1A1A),
-        Color(0xFF2A2A2A),
-        Color(0xFF0D47A1), // dark blue
-        Color(0xFF1B5E20), // dark green
-        Color(0xFF4A148C)  // dark purple
+        0xFF2C2C2C.toInt(), // dark gray
+        0xFF000000.toInt(), // black
+        0xFF1A1A1A.toInt(),
+        0xFF2A2A2A.toInt(),
+        0xFF0D47A1.toInt(), // dark blue
+        0xFF1B5E20.toInt(), // dark green
+        0xFF4A148C.toInt()  // dark purple
     )
 
     // Light theme background colors
     val lightBackgroundColors = listOf(
         white,
-        Color(0xFFF5F5F5), // light gray
-        Color(0xFFE8F5E8), // light green
-        Color(0xFFE3F2FD), // light blue
-        Color(0xFFFFF3E0), // light orange
-        Color(0xFFF3E5F5), // light purple
-        Color(0xFFE0F2F1), // light cyan
-        Color(0xFFFFFDE7)  // light yellow
+        0xFFF5F5F5.toInt(), // light gray
+        0xFFE8F5E8.toInt(), // light green
+        0xFFE3F2FD.toInt(), // light blue
+        0xFFFFF3E0.toInt(), // light orange
+        0xFFF3E5F5.toInt(), // light purple
+        0xFFE0F2F1.toInt(), // light cyan
+        0xFFFFFDE7.toInt()  // light yellow
     )
 }

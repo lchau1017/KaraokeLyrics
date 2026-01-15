@@ -12,6 +12,7 @@ import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.presentation.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.state.LyricsUiState
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.toColorArgb
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -155,13 +156,13 @@ class LyricsViewModel @Inject constructor(
     // Settings update methods
     private fun updateLyricsColor(color: androidx.compose.ui.graphics.Color) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateLyricsColor(color)
+            updateUserSettingsUseCase.updateLyricsColor(color.toColorArgb())
         }
     }
 
     private fun updateBackgroundColor(color: androidx.compose.ui.graphics.Color) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateBackgroundColor(color)
+            updateUserSettingsUseCase.updateBackgroundColor(color.toColorArgb())
         }
     }
 

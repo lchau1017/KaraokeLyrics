@@ -14,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.app.domain.model.ColorPresets
+import androidx.compose.ui.graphics.toArgb
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.lyricsColor
+import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.backgroundColor
 import com.karaokelyrics.app.presentation.ui.core.*
 import com.karaokelyrics.app.presentation.ui.components.settings.SettingsBottomSheetViewData
 import com.karaokelyrics.app.presentation.ui.components.settings.SwitchColorsViewData
@@ -329,11 +331,64 @@ private fun ColorPicker(
     isCurrentlyDarkTheme: Boolean = true,
     borderColors: Pair<Color, Color>
 ) {
+    // Define color presets directly in presentation layer
+    val spotifyGreen = Color(0xFF1DB954)
+    val spotifyBlack = Color(0xFF121212)
+    val white = Color(0xFFFFFFFF)
+
+    val darkLyricColors = listOf(
+        spotifyGreen,
+        white,
+        Color(0xFF9B59B6), // purple
+        Color(0xFF3498DB), // blue
+        Color(0xFFE74C3C), // red
+        Color(0xFFF39C12), // orange
+        Color(0xFFE91E63), // pink
+        Color(0xFF00BCD4), // cyan
+        Color(0xFFFFEB3B)  // yellow
+    )
+
+    val lightLyricColors = listOf(
+        Color(0xFF27AE60), // green
+        Color(0xFF2C3E50), // dark gray
+        Color(0xFF8E44AD), // purple
+        Color(0xFF2980B9), // blue
+        Color(0xFFC0392B), // red
+        Color(0xFFE67E22), // orange
+        Color(0xFFD81B60), // pink
+        Color(0xFF00ACC1), // cyan
+        Color(0xFFF9A825)  // yellow
+    )
+
+    val darkBackgroundColors = listOf(
+        spotifyBlack,
+        Color(0xFF000000), // pure black
+        Color(0xFF1A1A1A), // very dark gray
+        Color(0xFF2C2C2C), // dark gray
+        Color(0xFF0D0D0D), // near black
+        Color(0xFF1E1E1E), // charcoal
+        Color(0xFF101010), // jet black
+        Color(0xFF0A0A0A), // onyx
+        Color(0xFF141414)  // dark charcoal
+    )
+
+    val lightBackgroundColors = listOf(
+        white,
+        Color(0xFFF5F5F5), // light gray
+        Color(0xFFECECEC), // very light gray
+        Color(0xFFE0E0E0), // gray
+        Color(0xFFFAFAFA), // off white
+        Color(0xFFF0F0F0), // smoke white
+        Color(0xFFF8F8F8), // ghost white
+        Color(0xFFEEEEEE), // white smoke
+        Color(0xFFFDFDFD)  // snow
+    )
+
     val colors = when {
-        isDarkColors && isCurrentlyDarkTheme -> ColorPresets.darkBackgroundColors
-        isDarkColors && !isCurrentlyDarkTheme -> ColorPresets.lightBackgroundColors
-        !isDarkColors && isCurrentlyDarkTheme -> ColorPresets.darkLyricColors
-        else -> ColorPresets.lightLyricColors
+        isDarkColors && isCurrentlyDarkTheme -> darkBackgroundColors
+        isDarkColors && !isCurrentlyDarkTheme -> lightBackgroundColors
+        !isDarkColors && isCurrentlyDarkTheme -> darkLyricColors
+        else -> lightLyricColors
     }
 
     LazyRow(

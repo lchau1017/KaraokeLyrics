@@ -3,16 +3,15 @@ package com.karaokelyrics.app.presentation.ui.manager
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
-import com.karaokelyrics.app.domain.usecase.CalculateTextLayoutUseCase
+import com.karaokelyrics.app.presentation.ui.helper.TextLayoutCalculator
 import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.LineLayout
 import javax.inject.Inject
 
 /**
- * Presentation layer manager that coordinates domain use cases for lyrics layout.
- * This follows Clean Architecture principles by delegating business logic to domain layer.
+ * Presentation layer manager that coordinates text layout calculations for lyrics.
  */
 class LyricsLayoutManager @Inject constructor(
-    private val calculateTextLayoutUseCase: CalculateTextLayoutUseCase
+    private val textLayoutCalculator: TextLayoutCalculator
 ) {
 
     /**
@@ -29,7 +28,7 @@ class LyricsLayoutManager @Inject constructor(
         enableCharacterAnimations: Boolean = true,
         isRtl: Boolean = false
     ): LineLayout {
-        return calculateTextLayoutUseCase(
+        return textLayoutCalculator.calculateLayout(
             line = line,
             textMeasurer = textMeasurer,
             textStyle = textStyle,
@@ -56,7 +55,7 @@ class LyricsLayoutManager @Inject constructor(
         // and a default line height based on text style
         val defaultLineHeight = textStyle.fontSize.value * 1.2f
 
-        return calculateTextLayoutUseCase(
+        return textLayoutCalculator.calculateLayout(
             line = line,
             textMeasurer = textMeasurer,
             textStyle = textStyle,

@@ -1,6 +1,5 @@
 package com.karaokelyrics.app.domain.usecase
 
-import androidx.compose.ui.graphics.Color
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import javax.inject.Inject
@@ -12,12 +11,12 @@ class UpdateUserSettingsUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) {
 
-    suspend fun updateLyricsColor(color: Color) {
-        settingsRepository.updateLyricsColor(color)
+    suspend fun updateLyricsColor(colorArgb: Int) {
+        settingsRepository.updateLyricsColor(colorArgb)
     }
 
-    suspend fun updateBackgroundColor(color: Color) {
-        settingsRepository.updateBackgroundColor(color)
+    suspend fun updateBackgroundColor(colorArgb: Int) {
+        settingsRepository.updateBackgroundColor(colorArgb)
     }
 
     suspend fun updateFontSize(fontSize: FontSize) {

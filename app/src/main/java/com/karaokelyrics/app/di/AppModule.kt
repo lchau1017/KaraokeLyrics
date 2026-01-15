@@ -7,10 +7,10 @@ import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import com.karaokelyrics.app.domain.usecase.CalculateTextLayoutUseCase
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
-import com.karaokelyrics.app.domain.usecase.ProcessTextCharacteristicsUseCase
+import com.karaokelyrics.app.presentation.ui.helper.TextLayoutCalculator
+import com.karaokelyrics.app.presentation.ui.helper.TextCharacteristicsProcessor
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
@@ -59,22 +59,28 @@ object AppModule {
         return DetermineAnimationTypeUseCase()
     }
 
+    // Presentation Helpers
     @Provides
-    fun provideProcessTextCharacteristicsUseCase(
+    fun provideTextCharacteristicsProcessor(
         groupSyllablesIntoWordsUseCase: GroupSyllablesIntoWordsUseCase,
         determineAnimationTypeUseCase: DetermineAnimationTypeUseCase
-    ): ProcessTextCharacteristicsUseCase {
-        return ProcessTextCharacteristicsUseCase(
+    ): TextCharacteristicsProcessor {
+        return TextCharacteristicsProcessor(
             groupSyllablesIntoWordsUseCase,
             determineAnimationTypeUseCase
         )
     }
 
     @Provides
-    fun provideCalculateTextLayoutUseCase(
-        processTextCharacteristicsUseCase: ProcessTextCharacteristicsUseCase
-    ): CalculateTextLayoutUseCase {
-        return CalculateTextLayoutUseCase(processTextCharacteristicsUseCase)
+    fun provideTextLayoutCalculator(
+        textCharacteristicsProcessor: TextCharacteristicsProcessor
+    ): TextLayoutCalculator {
+        return TextLayoutCalculator(textCharacteristicsProcessor)
+    }
+
+    @Provides
+    fun provideSyncLyricsUseCase(): SyncLyricsUseCase {
+        return SyncLyricsUseCase()
     }
 
     @Provides
@@ -104,11 +110,25 @@ object AppModule {
         return LoadLyricsUseCase(lyricsRepository, parseTtmlUseCase, processLyricsDataUseCase)
     }
 
+    @Provides
+    fun provideObserveUserSettingsUseCase(
+        settingsRepository: SettingsRepository
+    ): ObserveUserSettingsUseCase {
+        return ObserveUserSettingsUseCase(settingsRepository)
+    }
+
+    @Provides
+    fun provideUpdateUserSettingsUseCase(
+        settingsRepository: SettingsRepository
+    ): UpdateUserSettingsUseCase {
+        return UpdateUserSettingsUseCase(settingsRepository)
+    }
+
     // Presentation Managers
     @Provides
     fun provideLyricsLayoutManager(
-        calculateTextLayoutUseCase: CalculateTextLayoutUseCase
+        textLayoutCalculator: TextLayoutCalculator
     ): LyricsLayoutManager {
-        return LyricsLayoutManager(calculateTextLayoutUseCase)
+        return LyricsLayoutManager(textLayoutCalculator)
     }
 }

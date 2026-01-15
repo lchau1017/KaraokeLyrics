@@ -1,6 +1,5 @@
 package com.karaokelyrics.app.domain.repository
 
-import androidx.compose.ui.graphics.Color
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
 import kotlinx.coroutines.flow.Flow
@@ -12,14 +11,14 @@ interface SettingsRepository {
     fun getUserSettings(): Flow<UserSettings>
 
     /**
-     * Update lyrics color
+     * Update lyrics color (ARGB integer)
      */
-    suspend fun updateLyricsColor(color: Color)
+    suspend fun updateLyricsColor(colorArgb: Int)
 
     /**
-     * Update background color
+     * Update background color (ARGB integer)
      */
-    suspend fun updateBackgroundColor(color: Color)
+    suspend fun updateBackgroundColor(colorArgb: Int)
 
     /**
      * Update font size preference
