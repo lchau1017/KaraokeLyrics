@@ -56,9 +56,9 @@ class SyllableRenderer {
         // Apply blur effect for unplayed text
         if (enableBlurEffect) {
             val shadow = Shadow(
-                color = drawColor.copy(alpha = 0.4f),
+                color = drawColor.copy(alpha = 0.5f),
                 offset = Offset(0f, 0f),
-                blurRadius = 8f
+                blurRadius = 20f  // Increased from 8f for more visible blur
             )
             drawText(
                 textLayoutResult = syllableLayout.textLayoutResult,

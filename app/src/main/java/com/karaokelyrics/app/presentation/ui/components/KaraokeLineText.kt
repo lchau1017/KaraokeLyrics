@@ -88,13 +88,15 @@ fun KaraokeLineText(
         }
 
         // Measure and layout syllables
-        val syllableLayouts = remember(line.syllables, textStyle, line.isAccompaniment) {
+        // Include enableCharacterAnimations in cache key so layout recalculates when toggled
+        val syllableLayouts = remember(line.syllables, textStyle, line.isAccompaniment, enableCharacterAnimations) {
             measureSyllablesAndDetermineAnimation(
                 syllables = line.syllables,
                 textMeasurer = textMeasurer,
                 style = textStyle,
                 isAccompanimentLine = line.isAccompaniment,
-                spaceWidth = spaceWidth
+                spaceWidth = spaceWidth,
+                enableCharacterAnimations = enableCharacterAnimations
             )
         }
 
@@ -273,7 +275,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCharacterAnimat
         val yPos = syllableLayout.position.y + charBox.top + effects.floatOffset
 
         // Combine blur effects
-        val unplayedBlur = if (enableBlurEffect) 8f else 0f
+        val unplayedBlur = if (enableBlurEffect) 20f else 0f  // Increased for consistency
         val blurRadius = maxOf(effects.blurRadius, unplayedBlur)
 
         val shadow = if (blurRadius > 0) {

@@ -77,7 +77,8 @@ fun measureSyllablesAndDetermineAnimation(
     textMeasurer: TextMeasurer,
     style: TextStyle,
     isAccompanimentLine: Boolean,
-    spaceWidth: Float
+    spaceWidth: Float,
+    enableCharacterAnimations: Boolean = true
 ): List<SyllableLayout> {
     val words = groupIntoWords(syllables)
     val fastCharAnimationThresholdMs = 200f
@@ -91,8 +92,9 @@ fun measureSyllablesAndDetermineAnimation(
             0f
         }
 
-        val useAwesomeAnimation =
-            perCharDuration > fastCharAnimationThresholdMs && wordDuration >= 1000
+        // More lenient conditions for character animations
+        val useAwesomeAnimation = enableCharacterAnimations &&
+            perCharDuration > 100f && wordDuration >= 500  // Relaxed from 200ms/1000ms
                     && !wordContent.shouldUseSimpleAnimation()
                     && !isAccompanimentLine
 
