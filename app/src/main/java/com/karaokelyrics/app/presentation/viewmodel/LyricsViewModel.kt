@@ -1,18 +1,11 @@
 package com.karaokelyrics.app.presentation.viewmodel
 
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.domain.model.FontSize
-import com.karaokelyrics.app.domain.usecase.lyrics.LoadLyricsFromAssetUseCase
-import com.karaokelyrics.app.domain.usecase.lyrics.SyncLyricsWithPlaybackUseCase
-import com.karaokelyrics.app.domain.usecase.player.LoadMediaUseCase
-import com.karaokelyrics.app.domain.usecase.player.ObservePlayerStateUseCase
-import com.karaokelyrics.app.domain.usecase.player.PlayPauseUseCase
-import com.karaokelyrics.app.domain.usecase.player.SeekToPositionUseCase
-import com.karaokelyrics.app.domain.usecase.settings.ObserveUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.settings.ResetSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.settings.UpdateUserSettingsUseCase
+import com.karaokelyrics.app.data.preferences.SettingsPreferencesManager
+import com.karaokelyrics.app.domain.repository.PlayerRepository
+import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
+import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.presentation.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.state.LyricsUiState
@@ -23,21 +16,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * ViewModel for lyrics presentation
- * Orchestrates use cases to manage UI state
- */
 @HiltViewModel
 class LyricsViewModel @Inject constructor(
-    private val loadLyricsFromAssetUseCase: LoadLyricsFromAssetUseCase,
-    private val syncLyricsWithPlaybackUseCase: SyncLyricsWithPlaybackUseCase,
-    private val loadMediaUseCase: LoadMediaUseCase,
-    private val playPauseUseCase: PlayPauseUseCase,
-    private val seekToPositionUseCase: SeekToPositionUseCase,
-    private val observePlayerStateUseCase: ObservePlayerStateUseCase,
-    private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-    private val updateUserSettingsUseCase: UpdateUserSettingsUseCase,
-    private val resetSettingsUseCase: ResetSettingsUseCase
+    private val loadLyricsUseCase: LoadLyricsUseCase,
+    private val syncLyricsUseCase: SyncLyricsUseCase,
+    private val playerRepository: PlayerRepository,
+    private val settingsManager: SettingsPreferencesManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LyricsUiState())
@@ -49,7 +33,6 @@ class LyricsViewModel @Inject constructor(
     init {
         observePlaybackState()
         observeUserSettings()
-        observeLyricsSyncState()
     }
 
     fun processIntent(intent: LyricsIntent) {
@@ -76,7 +59,7 @@ class LyricsViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
 
             // Load the golden hour TTML file
-            loadLyricsFromAssetUseCase("golden-hour.ttml")
+            loadLyricsUseCase("golden-hour.ttml")
                 .onSuccess { lyrics ->
                     _state.update {
                         it.copy(
@@ -86,7 +69,7 @@ class LyricsViewModel @Inject constructor(
                         )
                     }
                     // Load the corresponding audio
-                    loadMediaUseCase("golden-hour.m4a")
+                    playerRepository.loadMedia("golden-hour.m4a")
                 }
                 .onFailure { error ->
                     Timber.e(error, "Failed to load lyrics")
@@ -106,27 +89,30 @@ class LyricsViewModel @Inject constructor(
     }
 
     private fun observePlaybackState() {
-        // Observe player state
+        // Observe playback position
         viewModelScope.launch {
-            observePlayerStateUseCase().collect { playerState ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        playbackPosition = playerState.playbackPosition,
-                        isPlaying = playerState.isPlaying,
-                        duration = playerState.duration
-                    )
-                }
-            }
-        }
-    }
-
-    private fun observeLyricsSyncState() {
-        // Observe lyrics sync state
-        viewModelScope.launch {
-            syncLyricsWithPlaybackUseCase().collect { syncState ->
-                syncState?.let {
+            combine(
+                playerRepository.observePlaybackPosition(),
+                playerRepository.observeIsPlaying()
+            ) { position, isPlaying ->
+                position to isPlaying
+            }.collect { (position, isPlaying) ->
+                val lyrics = _state.value.lyrics
+                if (lyrics != null) {
+                    val syncState = syncLyricsUseCase(lyrics, position)
                     _state.update { currentState ->
-                        currentState.copy(syncState = it)
+                        currentState.copy(
+                            syncState = syncState,
+                            playbackPosition = position,
+                            isPlaying = isPlaying
+                        )
+                    }
+                } else {
+                    _state.update { currentState ->
+                        currentState.copy(
+                            playbackPosition = position,
+                            isPlaying = isPlaying
+                        )
                     }
                 }
             }
@@ -135,7 +121,11 @@ class LyricsViewModel @Inject constructor(
 
     private fun togglePlayPause() {
         viewModelScope.launch {
-            playPauseUseCase(_state.value.isPlaying)
+            if (_state.value.isPlaying) {
+                playerRepository.pause()
+            } else {
+                playerRepository.play()
+            }
         }
     }
 
@@ -143,7 +133,7 @@ class LyricsViewModel @Inject constructor(
         viewModelScope.launch {
             val line = _state.value.lyrics?.lines?.getOrNull(lineIndex)
             line?.let {
-                seekToPositionUseCase(it.start.toLong())
+                playerRepository.seekTo(it.start.toLong())
                 _effects.send(LyricsEffect.ScrollToLine(lineIndex))
             }
         }
@@ -151,64 +141,64 @@ class LyricsViewModel @Inject constructor(
 
     private fun seekToPosition(position: Long) {
         viewModelScope.launch {
-            seekToPositionUseCase(position)
+            playerRepository.seekTo(position)
         }
     }
 
     private fun observeUserSettings() {
         viewModelScope.launch {
-            observeUserSettingsUseCase().collect { settings ->
+            settingsManager.userSettings.collect { settings ->
                 _state.update { it.copy(userSettings = settings) }
             }
         }
     }
 
     // Settings update methods
-    private fun updateLyricsColor(color: Color) {
+    private fun updateLyricsColor(color: androidx.compose.ui.graphics.Color) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateLyricsColor(color)
+            settingsManager.updateLyricsColor(color)
         }
     }
 
-    private fun updateBackgroundColor(color: Color) {
+    private fun updateBackgroundColor(color: androidx.compose.ui.graphics.Color) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateBackgroundColor(color)
+            settingsManager.updateBackgroundColor(color)
         }
     }
 
-    private fun updateFontSize(fontSize: FontSize) {
+    private fun updateFontSize(fontSize: com.karaokelyrics.app.domain.model.FontSize) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateFontSize(fontSize)
+            settingsManager.updateFontSize(fontSize)
         }
     }
 
     private fun updateAnimationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateAnimationsEnabled(enabled)
+            settingsManager.updateAnimationsEnabled(enabled)
         }
     }
 
     private fun updateBlurEffectEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateBlurEffectEnabled(enabled)
+            settingsManager.updateBlurEffectEnabled(enabled)
         }
     }
 
     private fun updateCharacterAnimationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateCharacterAnimationsEnabled(enabled)
+            settingsManager.updateCharacterAnimationsEnabled(enabled)
         }
     }
 
     private fun updateDarkMode(isDark: Boolean) {
         viewModelScope.launch {
-            updateUserSettingsUseCase.updateDarkMode(isDark)
+            settingsManager.updateDarkMode(isDark)
         }
     }
 
     private fun resetSettingsToDefaults() {
         viewModelScope.launch {
-            resetSettingsUseCase()
+            settingsManager.resetToDefaults()
         }
     }
 }

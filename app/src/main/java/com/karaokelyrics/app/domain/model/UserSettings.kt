@@ -22,13 +22,6 @@ data class UserSettings(
     // Theme
     val isDarkMode: Boolean = true
 ) {
-    companion object {
-        val DEFAULT_DARK_LYRICS_COLOR = Color(0xFF1DB954) // Spotify green
-        val DEFAULT_DARK_BACKGROUND_COLOR = Color(0xFF121212) // Spotify black
-        val DEFAULT_LIGHT_LYRICS_COLOR = Color(0xFF1DB954) // Spotify green
-        val DEFAULT_LIGHT_BACKGROUND_COLOR = Color(0xFFFFFFFF) // White
-    }
-
     // Computed properties for current theme colors
     val lyricsColor: Color
         get() = if (isDarkMode) darkLyricsColor else lightLyricsColor

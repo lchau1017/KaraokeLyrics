@@ -15,5 +15,16 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    // Repository bindings are now in DataModule
+
+    @Provides
+    @Singleton
+    fun provideLyricsRepository(
+        @ApplicationContext context: Context
+    ): LyricsRepository = LyricsRepositoryImpl(context)
+
+    @Provides
+    @Singleton
+    fun providePlayerRepository(
+        @ApplicationContext context: Context
+    ): PlayerRepository = PlayerRepositoryImpl(context)
 }

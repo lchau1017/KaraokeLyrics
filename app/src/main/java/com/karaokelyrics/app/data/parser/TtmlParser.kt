@@ -7,17 +7,11 @@ import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
-import javax.inject.Inject
-import javax.inject.Singleton
 
-/**
- * Parser for TTML (Timed Text Markup Language) format
- * Single Responsibility: Parse TTML into domain models
- */
-@Singleton
-class TtmlParser @Inject constructor() {
+class TtmlParser {
 
-    fun parse(content: String): SyncedLyrics {
+    fun parse(lines: List<String>): SyncedLyrics {
+        val content = lines.joinToString("\n")
         val factory = XmlPullParserFactory.newInstance()
         factory.isNamespaceAware = true
         val parser = factory.newPullParser()

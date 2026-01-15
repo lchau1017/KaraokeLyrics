@@ -10,8 +10,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.karaokelyrics.app.data.preferences.SettingsPreferencesManager
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.usecase.settings.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.presentation.ui.screen.LyricsScreen
 import com.karaokelyrics.app.presentation.ui.theme.KaraokeLyricsTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,13 +21,13 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var observeUserSettingsUseCase: ObserveUserSettingsUseCase
+    lateinit var settingsManager: SettingsPreferencesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val userSettings by observeUserSettingsUseCase().collectAsState(initial = UserSettings())
+            val userSettings by settingsManager.userSettings.collectAsState(initial = UserSettings())
 
             KaraokeLyricsTheme(
                 darkTheme = userSettings.isDarkMode
