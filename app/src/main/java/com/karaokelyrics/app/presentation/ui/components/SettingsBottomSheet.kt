@@ -361,27 +361,27 @@ private fun ColorPicker(
     )
 
     val darkBackgroundColors = listOf(
-        spotifyBlack,
-        Color(0xFF000000), // pure black
-        Color(0xFF1A1A1A), // very dark gray
-        Color(0xFF2C2C2C), // dark gray
-        Color(0xFF0D0D0D), // near black
-        Color(0xFF1E1E1E), // charcoal
-        Color(0xFF101010), // jet black
-        Color(0xFF0A0A0A), // onyx
-        Color(0xFF141414)  // dark charcoal
+        spotifyBlack,     // Original Spotify black
+        Color(0xFF1A0E2E), // Deep purple black
+        Color(0xFF0F2027), // Dark blue gradient base
+        Color(0xFF1C1432), // Midnight purple
+        Color(0xFF0D1929), // Navy blue black
+        Color(0xFF1B1B2F), // Space blue
+        Color(0xFF162447), // Dark royal blue
+        Color(0xFF1F3A3D), // Dark teal
+        Color(0xFF2D1B69)  // Deep violet
     )
 
     val lightBackgroundColors = listOf(
-        white,
-        Color(0xFFF5F5F5), // light gray
-        Color(0xFFECECEC), // very light gray
-        Color(0xFFE0E0E0), // gray
-        Color(0xFFFAFAFA), // off white
-        Color(0xFFF0F0F0), // smoke white
-        Color(0xFFF8F8F8), // ghost white
-        Color(0xFFEEEEEE), // white smoke
-        Color(0xFFFDFDFD)  // snow
+        white,             // Pure white
+        Color(0xFFF3E5F5), // Light purple tint
+        Color(0xFFE8F5E9), // Light green tint
+        Color(0xFFFFF3E0), // Light amber tint
+        Color(0xFFE3F2FD), // Light blue tint
+        Color(0xFFFCE4EC), // Light pink tint
+        Color(0xFFE0F2F1), // Light teal tint
+        Color(0xFFFFF9C4), // Light yellow tint
+        Color(0xFFF3E0FF)  // Light lavender tint
     )
 
     val colors = when {
