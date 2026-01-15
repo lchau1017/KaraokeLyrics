@@ -30,11 +30,12 @@ class LyricsLayoutManager @Inject constructor(
         textMeasurer: TextMeasurer,
         style: TextStyle,
         fontSize: Int,
-        isAccompanimentLine: Boolean
+        isAccompanimentLine: Boolean,
+        enableCharacterAnimations: Boolean = true
     ): LineLayout {
         val spaceWidth = textMeasurer.measure(" ", style).size.width.toFloat()
         val syllableLayouts = measureSyllablesAndDetermineAnimation(
-            line.syllables, textMeasurer, style, isAccompanimentLine, spaceWidth
+            line.syllables, textMeasurer, style, isAccompanimentLine, spaceWidth, enableCharacterAnimations
         )
 
         val wrappedLines = calculateWrappedLines(
@@ -57,7 +58,8 @@ class LyricsLayoutManager @Inject constructor(
         textMeasurer: TextMeasurer,
         style: TextStyle,
         isAccompanimentLine: Boolean,
-        spaceWidth: Float
+        spaceWidth: Float,
+        enableCharacterAnimations: Boolean = true
     ): List<SyllableLayout> {
         // Use domain use case to group syllables into words
         val words = groupSyllablesIntoWordsUseCase(syllables)
@@ -83,8 +85,12 @@ class LyricsLayoutManager @Inject constructor(
                 determineAnimationTypeUseCase(wordSyllables)
             }
 
-            val useAwesomeAnimation = animationType == AnimationType.CHARACTER_BY_CHARACTER &&
-                perCharDuration > fastCharAnimationThresholdMs && wordDuration >= 1000
+            // Relaxed conditions for character animation
+            // Was: perCharDuration > 200ms && wordDuration >= 1000ms
+            // Now: perCharDuration > 100ms && wordDuration >= 500ms
+            val useAwesomeAnimation = enableCharacterAnimations &&
+                animationType == AnimationType.CHARACTER_BY_CHARACTER &&
+                perCharDuration > 100f && wordDuration >= 500
 
             wordSyllables.map { syllable ->
                 val layoutResult = textMeasurer.measure(syllable.content, style)

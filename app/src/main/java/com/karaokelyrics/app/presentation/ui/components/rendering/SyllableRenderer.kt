@@ -12,6 +12,7 @@ import com.karaokelyrics.app.presentation.ui.components.animation.AnimationCalcu
 import com.karaokelyrics.app.presentation.ui.utils.SyllableLayout
 import com.karaokelyrics.app.presentation.ui.utils.isPunctuation
 import androidx.compose.animation.core.CubicBezierEasing
+import com.karaokelyrics.app.presentation.ui.theme.KaraokeConstants
 
 /**
  * Handles rendering of individual syllables with various effects
@@ -56,9 +57,9 @@ class SyllableRenderer {
         // Apply blur effect for unplayed text
         if (enableBlurEffect) {
             val shadow = Shadow(
-                color = drawColor.copy(alpha = 0.4f),
+                color = drawColor.copy(alpha = KaraokeConstants.SHADOW_ALPHA),
                 offset = Offset(0f, 0f),
-                blurRadius = 8f
+                blurRadius = KaraokeConstants.DEFAULT_BLUR_RADIUS
             )
             drawText(
                 textLayoutResult = syllableLayout.textLayoutResult,
