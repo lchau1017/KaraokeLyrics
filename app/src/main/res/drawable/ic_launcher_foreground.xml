@@ -1,0 +1,68 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+  <!-- Center circle (like Spotify) -->
+  <path
+      android:fillColor="#FF1DB954"
+      android:pathData="M54,24
+          A30,30 0 0,1 84,54
+          A30,30 0 0,1 54,84
+          A30,30 0 0,1 24,54
+          A30,30 0 0,1 54,24z"/>
+
+  <!-- Microphone in center -->
+  <path
+      android:fillColor="#000000"
+      android:pathData="M54,38
+          C52.34,38 51,39.34 51,41
+          L51,52
+          C51,53.66 52.34,55 54,55
+          C55.66,55 57,53.66 57,52
+          L57,41
+          C57,39.34 55.66,38 54,38z"/>
+
+  <!-- Sound waves (Spotify-style) -->
+  <!-- Small wave -->
+  <path
+      android:strokeColor="#000000"
+      android:strokeWidth="2.5"
+      android:strokeLineCap="round"
+      android:pathData="M46,50
+          C46,54.42 49.58,58 54,58
+          C58.42,58 62,54.42 62,50"/>
+
+  <!-- Medium wave -->
+  <path
+      android:strokeColor="#000000"
+      android:strokeWidth="2"
+      android:strokeLineCap="round"
+      android:pathData="M42,50
+          C42,56.63 47.37,62 54,62
+          C60.63,62 66,56.63 66,50"/>
+
+  <!-- Large wave -->
+  <path
+      android:strokeColor="#1DB954"
+      android:strokeWidth="3"
+      android:strokeLineCap="round"
+      android:pathData="M38,50
+          C38,58.84 45.16,66 54,66
+          C62.84,66 70,58.84 70,50"
+      android:strokeAlpha="0.6"/>
+
+  <!-- Mic stand base -->
+  <path
+      android:strokeColor="#000000"
+      android:strokeWidth="2.5"
+      android:strokeLineCap="round"
+      android:pathData="M54,58 L54,64"/>
+  <path
+      android:strokeColor="#000000"
+      android:strokeWidth="2.5"
+      android:strokeLineCap="round"
+      android:pathData="M49,64 L59,64"/>
+
+</vector>
