@@ -32,14 +32,13 @@ class DetermineAnimationTypeUseCase @Inject constructor() {
     }
     
     private fun hasComplexTiming(syllables: List<KaraokeSyllable>): Boolean {
-        // Business rule: For character animations on longer words
-        if (syllables.isEmpty()) return false
-
-        // Calculate total word duration
-        val totalDuration = syllables.last().end - syllables.first().start
-
-        // Enable character animation for words longer than 500ms
-        // This allows more words to have character animations
-        return totalDuration >= 500
+        // Business rule: Complex timing when syllables have very different durations
+        if (syllables.size < 2) return false
+        
+        val durations = syllables.map { it.end - it.start }
+        val avgDuration = durations.average()
+        val maxDeviation = durations.maxOf { kotlin.math.abs(it - avgDuration) }
+        
+        return maxDeviation > avgDuration * 0.5
     }
 }

@@ -19,7 +19,6 @@ import com.karaokelyrics.app.presentation.ui.components.animation.rememberAnimat
 import com.karaokelyrics.app.presentation.ui.components.rendering.GradientBrushFactory
 import com.karaokelyrics.app.presentation.ui.components.rendering.SyllableRenderer
 import com.karaokelyrics.app.presentation.ui.utils.*
-import com.karaokelyrics.app.presentation.ui.theme.KaraokeConstants
 
 /**
  * Refactored karaoke text component with better separation of concerns
@@ -30,7 +29,7 @@ fun KaraokeLineText(
     currentPosition: Int,
     textStyle: TextStyle,
     activeColor: Color = Color.White,
-    inactiveColor: Color = Color.White.copy(alpha = KaraokeConstants.INACTIVE_TEXT_ALPHA),
+    inactiveColor: Color = Color.White.copy(alpha = 0.3f),
     modifier: Modifier = Modifier,
     enableCharacterAnimations: Boolean = true,
     enableBlurEffect: Boolean = true
@@ -65,7 +64,7 @@ fun KaraokeLineText(
 
     // Clean up old animations periodically
     LaunchedEffect(currentPosition) {
-        if (currentPosition % KaraokeConstants.ANIMATION_CLEANUP_INTERVAL == 0) {
+        if (currentPosition % 5000 == 0) { // Every 5 seconds
             animationStateManager.clearOldAnimations(currentPosition)
         }
     }
@@ -73,7 +72,7 @@ fun KaraokeLineText(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = KaraokeConstants.HORIZONTAL_PADDING, vertical = KaraokeConstants.VERTICAL_PADDING),
+            .padding(horizontal = 24.dp, vertical = 8.dp),
         contentAlignment = when {
             line.alignment == KaraokeAlignment.Center -> Alignment.Center
             isRightAligned -> Alignment.CenterEnd
@@ -81,19 +80,17 @@ fun KaraokeLineText(
         }
     ) {
         val availableWidthPx = with(density) { maxWidth.toPx() }
-        val lineHeight = with(density) { (textStyle.fontSize.toPx() * KaraokeConstants.LINE_HEIGHT_MULTIPLIER) }
+        val lineHeight = with(density) { (textStyle.fontSize.toPx() * 1.5f) }
 
         // Calculate complete line layout using the new manager
-        // Note: enableCharacterAnimations is included in the key so layout recalculates when toggled
-        val lineLayout = remember(line, availableWidthPx, textStyle, textStyle.fontSize.value.toInt(), line.isAccompaniment, enableCharacterAnimations) {
+        val lineLayout = remember(line, availableWidthPx, textStyle, textStyle.fontSize.value.toInt(), line.isAccompaniment) {
             calculateLineLayout(
                 line = line,
                 availableWidthPx = availableWidthPx,
                 textMeasurer = textMeasurer,
                 style = textStyle,
                 fontSize = textStyle.fontSize.value.toInt(),
-                isAccompanimentLine = line.isAccompaniment,
-                enableCharacterAnimations = enableCharacterAnimations
+                isAccompanimentLine = line.isAccompaniment
             )
         }
 
@@ -264,12 +261,12 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCharacterAnimat
         val yPos = syllableLayout.position.y + charBox.top + effects.floatOffset
 
         // Combine blur effects
-        val unplayedBlur = if (enableBlurEffect) KaraokeConstants.DEFAULT_BLUR_RADIUS else 0f
+        val unplayedBlur = if (enableBlurEffect) 8f else 0f
         val blurRadius = maxOf(effects.blurRadius, unplayedBlur)
 
         val shadow = if (blurRadius > 0) {
             Shadow(
-                color = drawColor.copy(KaraokeConstants.SHADOW_ALPHA),
+                color = drawColor.copy(0.4f),
                 offset = Offset(0f, 0f),
                 blurRadius = blurRadius
             )

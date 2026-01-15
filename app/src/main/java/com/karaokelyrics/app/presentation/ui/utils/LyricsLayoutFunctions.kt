@@ -26,8 +26,7 @@ fun calculateLineLayout(
     textMeasurer: TextMeasurer,
     style: TextStyle,
     fontSize: Int,
-    isAccompanimentLine: Boolean,
-    enableCharacterAnimations: Boolean = true
+    isAccompanimentLine: Boolean
 ): LineLayout {
     return defaultLayoutManager.calculateLineLayout(
         line = line,
@@ -35,8 +34,7 @@ fun calculateLineLayout(
         textMeasurer = textMeasurer,
         style = style,
         fontSize = fontSize,
-        isAccompanimentLine = isAccompanimentLine,
-        enableCharacterAnimations = enableCharacterAnimations
+        isAccompanimentLine = isAccompanimentLine
     )
 }
 
