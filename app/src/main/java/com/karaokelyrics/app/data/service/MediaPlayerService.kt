@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.presentation.service
+package com.karaokelyrics.app.data.service
 
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -10,7 +10,11 @@ import androidx.media3.session.MediaSessionService
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 
-class PlaybackService : MediaSessionService() {
+/**
+ * Media player service for handling audio playback
+ * Located in data layer as infrastructure component
+ */
+class MediaPlayerService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
 
     override fun onCreate() {

@@ -82,31 +82,19 @@ fun KaraokeLineText(
         val availableWidthPx = with(density) { maxWidth.toPx() }
         val lineHeight = with(density) { (textStyle.fontSize.toPx() * 1.5f) }
 
-        // Measure space width
-        val spaceWidth = remember(textMeasurer, textStyle) {
-            textMeasurer.measure(" ", textStyle).size.width.toFloat()
-        }
-
-        // Measure and layout syllables
-        val syllableLayouts = remember(line.syllables, textStyle, line.isAccompaniment) {
-            measureSyllablesAndDetermineAnimation(
-                syllables = line.syllables,
-                textMeasurer = textMeasurer,
-                style = textStyle,
-                isAccompanimentLine = line.isAccompaniment,
-                spaceWidth = spaceWidth
-            )
-        }
-
-        // Calculate wrapped lines
-        val wrappedLines = remember(syllableLayouts, availableWidthPx) {
-            calculateGreedyWrappedLines(
-                syllableLayouts = syllableLayouts,
+        // Calculate complete line layout using the new manager
+        val lineLayout = remember(line, availableWidthPx, textStyle, textStyle.fontSize.value.toInt(), line.isAccompaniment) {
+            calculateLineLayout(
+                line = line,
                 availableWidthPx = availableWidthPx,
                 textMeasurer = textMeasurer,
-                style = textStyle
+                style = textStyle,
+                fontSize = textStyle.fontSize.value.toInt(),
+                isAccompanimentLine = line.isAccompaniment
             )
         }
+
+        val wrappedLines = lineLayout.wrappedLines
 
         // Calculate final layout with positions
         val finalLayouts = remember(wrappedLines, availableWidthPx, lineHeight, isRtl, isRightAligned) {
@@ -294,5 +282,35 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCharacterAnimat
             pivot = syllableLayout.wordPivot,
             shadow = shadow
         )
+    }
+}
+
+/**
+ * Helper function to calculate static line layout
+ */
+private fun calculateStaticLineLayout(
+    wrappedLines: List<WrappedLine>,
+    isLineRightAligned: Boolean,
+    canvasWidth: Float,
+    lineHeight: Float,
+    isRtl: Boolean
+): List<List<SyllableLayout>> {
+    return wrappedLines.mapIndexed { rowIndex, wrappedLine ->
+        val alignment = when {
+            isLineRightAligned -> KaraokeAlignment.End
+            else -> KaraokeAlignment.Center
+        }
+
+        applyAlignmentToWrappedLine(
+            wrappedLine = wrappedLine,
+            availableWidth = canvasWidth,
+            alignment = alignment
+        ).map { layout ->
+            layout.copy(
+                position = layout.position.copy(
+                    y = rowIndex * lineHeight
+                )
+            )
+        }
     }
 }

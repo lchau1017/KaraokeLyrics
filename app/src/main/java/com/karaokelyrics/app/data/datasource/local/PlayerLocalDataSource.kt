@@ -6,7 +6,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.karaokelyrics.app.presentation.service.PlaybackService
+import com.karaokelyrics.app.data.service.MediaPlayerService
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -41,7 +41,7 @@ class PlayerLocalDataSource @Inject constructor(
     init {
         val sessionToken = SessionToken(
             context,
-            ComponentName(context, PlaybackService::class.java)
+            ComponentName(context, MediaPlayerService::class.java)
         )
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         initializeController()
