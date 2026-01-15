@@ -14,6 +14,7 @@ import com.karaokelyrics.app.data.preferences.SettingsPreferencesManager
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.presentation.ui.screen.LyricsScreen
 import com.karaokelyrics.app.presentation.ui.theme.KaraokeLyricsTheme
+import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,6 +23,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var settingsManager: SettingsPreferencesManager
+
+    @Inject
+    lateinit var layoutManager: LyricsLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LyricsScreen()
+                    LyricsScreen(
+                        layoutManager = layoutManager // Test the new Clean Architecture!
+                    )
                 }
             }
         }

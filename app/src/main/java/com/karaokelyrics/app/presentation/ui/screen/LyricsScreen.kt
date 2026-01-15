@@ -16,11 +16,15 @@ import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.ui.components.*
 import com.karaokelyrics.app.presentation.viewmodel.LyricsViewModel
 import com.karaokelyrics.app.presentation.state.LyricsUiState
+import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
+import dagger.hilt.android.EntryPointAccessors
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LyricsScreen(
-    viewModel: LyricsViewModel = hiltViewModel()
+    viewModel: LyricsViewModel = hiltViewModel(),
+    layoutManager: LyricsLayoutManager? = null // Optional for testing Clean Architecture
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -81,7 +85,8 @@ fun LyricsScreen(
                     },
                     onOpenSettings = {
                         showSettings = true
-                    }
+                    },
+                    layoutManager = layoutManager // Pass the layout manager
                 )
             }
         }
@@ -130,7 +135,8 @@ private fun LyricsContent(
     onLineClicked: (com.karaokelyrics.app.domain.model.ISyncedLine) -> Unit,
     onPlayPause: () -> Unit,
     onSeek: (Long) -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    layoutManager: LyricsLayoutManager? = null
 ) {
     state.lyrics?.let { lyricsData ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -153,7 +159,8 @@ private fun LyricsContent(
                 ),
                 textColor = state.userSettings.lyricsColor,
                 useBlurEffect = state.userSettings.enableBlurEffect && state.userSettings.enableAnimations,
-                enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations
+                enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations,
+                layoutManager = layoutManager // Pass the Clean Architecture manager for testing
             )
 
             PlayerControls(

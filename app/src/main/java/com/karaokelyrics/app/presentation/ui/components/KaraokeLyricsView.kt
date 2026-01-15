@@ -32,6 +32,7 @@ import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.synced.SyncedLine
+import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,7 +55,8 @@ fun KaraokeLyricsView(
     textColor: Color = Color.White,
     useBlurEffect: Boolean = true,
     enableCharacterAnimations: Boolean = true,
-    offset: Dp = 100.dp  // Reduced from 200dp to move active line higher, closer to top bar
+    offset: Dp = 100.dp,  // Reduced from 200dp to move active line higher, closer to top bar
+    layoutManager: LyricsLayoutManager? = null // Optional for testing new Clean Architecture
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
@@ -250,7 +252,8 @@ fun KaraokeLyricsView(
                                 textColor.copy(alpha = 0.3f)
                             },
                             enableBlurEffect = useBlurEffect,
-                            enableCharacterAnimations = enableCharacterAnimations
+                            enableCharacterAnimations = enableCharacterAnimations,
+                            layoutManager = layoutManager // Pass the Clean Architecture manager
                         )
                     }
                     is SyncedLine -> {

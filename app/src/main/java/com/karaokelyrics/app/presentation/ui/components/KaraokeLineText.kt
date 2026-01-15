@@ -19,6 +19,7 @@ import com.karaokelyrics.app.presentation.ui.components.animation.rememberAnimat
 import com.karaokelyrics.app.presentation.ui.components.rendering.GradientBrushFactory
 import com.karaokelyrics.app.presentation.ui.components.rendering.SyllableRenderer
 import com.karaokelyrics.app.presentation.ui.utils.*
+import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
 
 /**
  * Refactored karaoke text component with better separation of concerns
@@ -32,7 +33,8 @@ fun KaraokeLineText(
     inactiveColor: Color = Color.White.copy(alpha = 0.3f),
     modifier: Modifier = Modifier,
     enableCharacterAnimations: Boolean = true,
-    enableBlurEffect: Boolean = true
+    enableBlurEffect: Boolean = true,
+    layoutManager: LyricsLayoutManager? = null // Optional for backward compatibility
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -82,46 +84,52 @@ fun KaraokeLineText(
         val availableWidthPx = with(density) { maxWidth.toPx() }
         val lineHeight = with(density) { (textStyle.fontSize.toPx() * 1.5f) }
 
-        // Measure space width
-        val spaceWidth = remember(textMeasurer, textStyle) {
-            textMeasurer.measure(" ", textStyle).size.width.toFloat()
-        }
-
-        // Measure and layout syllables
-        // Include enableCharacterAnimations in cache key so layout recalculates when toggled
-        val syllableLayouts = remember(line.syllables, textStyle, line.isAccompaniment, enableCharacterAnimations) {
-            measureSyllablesAndDetermineAnimation(
-                syllables = line.syllables,
+        // Use new Clean Architecture approach with fallback for compatibility
+        val lineLayout = remember(line, textStyle, availableWidthPx, lineHeight, enableCharacterAnimations) {
+            layoutManager?.calculateLineLayout(
+                line = line,
                 textMeasurer = textMeasurer,
-                style = textStyle,
-                isAccompanimentLine = line.isAccompaniment,
-                spaceWidth = spaceWidth,
-                enableCharacterAnimations = enableCharacterAnimations
-            )
-        }
-
-        // Calculate wrapped lines
-        val wrappedLines = remember(syllableLayouts, availableWidthPx) {
-            calculateGreedyWrappedLines(
-                syllableLayouts = syllableLayouts,
+                textStyle = textStyle,
                 availableWidthPx = availableWidthPx,
-                textMeasurer = textMeasurer,
-                style = textStyle
-            )
-        }
-
-        // Calculate final layout with positions
-        val finalLayouts = remember(wrappedLines, availableWidthPx, lineHeight, isRtl, isRightAligned) {
-            calculateStaticLineLayout(
-                wrappedLines = wrappedLines,
-                isLineRightAligned = isRightAligned,
-                canvasWidth = availableWidthPx,
                 lineHeight = lineHeight,
+                canvasWidth = availableWidthPx,
+                enableCharacterAnimations = enableCharacterAnimations,
                 isRtl = isRtl
-            )
+            ) ?: run {
+                // Fallback to old method for backward compatibility
+                val spaceWidth = textMeasurer.measure(" ", textStyle).size.width.toFloat()
+                val syllableLayouts = measureSyllablesAndDetermineAnimation(
+                    syllables = line.syllables,
+                    textMeasurer = textMeasurer,
+                    style = textStyle,
+                    isAccompanimentLine = line.isAccompaniment,
+                    spaceWidth = spaceWidth,
+                    enableCharacterAnimations = enableCharacterAnimations
+                )
+                val wrappedLines = calculateGreedyWrappedLines(
+                    syllableLayouts = syllableLayouts,
+                    availableWidthPx = availableWidthPx,
+                    textMeasurer = textMeasurer,
+                    style = textStyle
+                )
+                val finalLayouts = calculateStaticLineLayout(
+                    wrappedLines = wrappedLines,
+                    isLineRightAligned = isRightAligned,
+                    canvasWidth = availableWidthPx,
+                    lineHeight = lineHeight,
+                    isRtl = isRtl
+                )
+                LineLayout(
+                    line = line,
+                    wrappedLines = wrappedLines,
+                    syllableLayouts = finalLayouts,
+                    totalHeight = wrappedLines.size.toFloat() * lineHeight
+                )
+            }
         }
 
-        val totalHeight = wrappedLines.size.toFloat() * lineHeight
+        val finalLayouts = lineLayout.syllableLayouts
+        val totalHeight = lineLayout.totalHeight
 
         Canvas(
             modifier = Modifier
