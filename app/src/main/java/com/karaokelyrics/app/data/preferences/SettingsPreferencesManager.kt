@@ -39,6 +39,7 @@ class SettingsPreferencesManager @Inject constructor(
         val ENABLE_ANIMATIONS_KEY = booleanPreferencesKey("enable_animations")
         val ENABLE_BLUR_EFFECT_KEY = booleanPreferencesKey("enable_blur_effect")
         val ENABLE_CHARACTER_ANIMATIONS_KEY = booleanPreferencesKey("enable_character_animations")
+        val LYRICS_TIMING_OFFSET_MS_KEY = intPreferencesKey("lyrics_timing_offset_ms")
         val IS_DARK_MODE_KEY = booleanPreferencesKey("is_dark_mode")
     }
 
@@ -70,6 +71,7 @@ class SettingsPreferencesManager @Inject constructor(
             enableAnimations = preferences[ENABLE_ANIMATIONS_KEY] ?: true,
             enableBlurEffect = preferences[ENABLE_BLUR_EFFECT_KEY] ?: true,
             enableCharacterAnimations = preferences[ENABLE_CHARACTER_ANIMATIONS_KEY] ?: true,
+            lyricsTimingOffsetMs = preferences[LYRICS_TIMING_OFFSET_MS_KEY] ?: 200,
             isDarkMode = preferences[IS_DARK_MODE_KEY] ?: true
         )
     }
@@ -117,6 +119,12 @@ class SettingsPreferencesManager @Inject constructor(
     suspend fun updateCharacterAnimationsEnabled(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[ENABLE_CHARACTER_ANIMATIONS_KEY] = enabled
+        }
+    }
+
+    suspend fun updateLyricsTimingOffset(offsetMs: Int) {
+        dataStore.edit { preferences ->
+            preferences[LYRICS_TIMING_OFFSET_MS_KEY] = offsetMs
         }
     }
 

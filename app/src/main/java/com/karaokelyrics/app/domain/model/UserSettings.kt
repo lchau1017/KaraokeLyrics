@@ -19,6 +19,9 @@ data class UserSettings(
     val enableBlurEffect: Boolean = true,
     val enableCharacterAnimations: Boolean = true,
 
+    // Timing
+    val lyricsTimingOffsetMs: Int = 200, // Lyrics appear 200ms before audio
+
     // Theme
     val isDarkMode: Boolean = true
 ) {

@@ -99,7 +99,8 @@ class LyricsViewModel @Inject constructor(
             }.collect { (position, isPlaying) ->
                 val lyrics = _state.value.lyrics
                 if (lyrics != null) {
-                    val syncState = syncLyricsUseCase(lyrics, position)
+                    val timingOffset = _state.value.userSettings.lyricsTimingOffsetMs
+                    val syncState = syncLyricsUseCase(lyrics, position, timingOffset)
                     _state.update { currentState ->
                         currentState.copy(
                             syncState = syncState,

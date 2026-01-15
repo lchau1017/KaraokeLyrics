@@ -10,9 +10,11 @@ class SyncLyricsUseCase @Inject constructor() {
 
     operator fun invoke(
         lyrics: SyncedLyrics,
-        position: Long
+        position: Long,
+        timingOffsetMs: Int = 200
     ): LyricsSyncState {
-        val positionMs = position.toInt()
+        // Add configurable offset so lyrics appear before audio
+        val positionMs = (position + timingOffsetMs).toInt()
 
         // Find current line index
         val currentLineIndex = lyrics.lines.indexOfLast {

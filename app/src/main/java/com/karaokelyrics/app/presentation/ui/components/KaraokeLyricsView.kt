@@ -54,10 +54,11 @@ fun KaraokeLyricsView(
     textColor: Color = Color.White,
     useBlurEffect: Boolean = true,
     enableCharacterAnimations: Boolean = true,
-    offset: Dp = 200.dp
+    offset: Dp = 100.dp  // Reduced from 200dp to move active line higher, closer to top bar
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
+    // Note: Timing offset is now handled in SyncLyricsUseCase (single source of truth)
     val currentTimeMs = currentPosition().toInt()
 
     // Track if we're scrolling programmatically
