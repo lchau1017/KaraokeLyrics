@@ -27,14 +27,7 @@ class LyricsRepositoryImpl @Inject constructor(
                 val lyricsData = context.assets.open(fileName).bufferedReader().use {
                     it.readLines()
                 }
-                android.util.Log.d("LyricsRepository", "Starting to parse lyrics...")
                 val parsedLyrics = ttmlParser.parse(lyricsData)
-                android.util.Log.d("LyricsRepository", "Parsed ${parsedLyrics.lines.size} lines")
-                parsedLyrics.lines.take(5).forEach { line ->
-                    if (line is com.karaokelyrics.app.domain.model.karaoke.KaraokeLine) {
-                        android.util.Log.d("LyricsRepository", "Line: ${line.content.take(50)}, syllables: ${line.syllables.size}")
-                    }
-                }
                 _currentLyrics.value = parsedLyrics
                 parsedLyrics
             }

@@ -88,28 +88,20 @@ class PlayerRepositoryImpl @Inject constructor(
 
     override suspend fun loadMedia(assetPath: String) {
         withContext(Dispatchers.Main) {
-            android.util.Log.d("PlayerRepository", "Loading media: $assetPath")
-
             // Wait for controller to be ready
             var retries = 0
             while (mediaController == null && retries < 10) {
-                android.util.Log.d("PlayerRepository", "Waiting for MediaController... retry $retries")
                 delay(100)
                 retries++
             }
 
             val mediaItem = MediaItem.fromUri("asset:///$assetPath")
-            android.util.Log.d("PlayerRepository", "Created media item with uri: asset:///$assetPath")
 
             mediaController?.let { controller ->
-                android.util.Log.d("PlayerRepository", "MediaController exists, setting media item")
                 controller.setMediaItem(mediaItem)
                 controller.repeatMode = Player.REPEAT_MODE_ONE
                 controller.prepare()
                 controller.play()
-                android.util.Log.d("PlayerRepository", "Called prepare and play")
-            } ?: run {
-                android.util.Log.e("PlayerRepository", "MediaController is null after waiting!")
             }
         }
     }

@@ -16,8 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -231,7 +229,7 @@ fun KaraokeLyricsView(
             ) {
                 when (line) {
                     is KaraokeLine -> {
-                        KaraokeLineTextMultiLine(
+                        KaraokeLineText(
                             line = line,
                             currentPosition = currentTimeMs,
                             textStyle = if (line.isAccompaniment) {

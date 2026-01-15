@@ -12,7 +12,6 @@ class TtmlParser {
 
     fun parse(lines: List<String>): SyncedLyrics {
         val content = lines.joinToString("\n")
-        android.util.Log.d("TtmlParser", "Starting parse with ${content.length} chars")
         val factory = XmlPullParserFactory.newInstance()
         factory.isNamespaceAware = true
         val parser = factory.newPullParser()
@@ -26,17 +25,15 @@ class TtmlParser {
             // Navigate to body element
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG && parser.name == "body") {
-                    android.util.Log.d("TtmlParser", "Found body element")
                     parseBody(parser, lyricsLines)
                     break
                 }
                 eventType = parser.next()
             }
         } catch (e: Exception) {
-            android.util.Log.e("TtmlParser", "Error parsing TTML", e)
+            // Error parsing TTML
         }
 
-        android.util.Log.d("TtmlParser", "Parsed ${lyricsLines.size} lines total")
         // Sort by start time
         return SyncedLyrics(lyricsLines.sortedBy { (it as? KaraokeLine)?.start ?: 0 })
     }
@@ -74,7 +71,6 @@ class TtmlParser {
         val pEnd = parser.getAttributeValue(null, "end")
         val agent = parser.getAttributeValue("http://www.w3.org/ns/ttml#metadata", "agent")
 
-        android.util.Log.d("TtmlParser", "Parsing <p> element: begin=$pBegin, end=$pEnd, agent=$agent")
 
         if (pBegin == null || pEnd == null) {
             // Skip to end of this p element
@@ -101,7 +97,6 @@ class TtmlParser {
                     inBgSpan = true
                     if (spanBegin != null) bgStart = parseTime(spanBegin)
                     if (spanEnd != null) bgEnd = parseTime(spanEnd)
-                    android.util.Log.d("TtmlParser", "Found bg span: begin=$spanBegin, end=$spanEnd")
                 } else if (spanBegin != null && spanEnd != null) {
                     // Regular syllable span
                     val text = getElementText(parser, "span")
@@ -117,7 +112,6 @@ class TtmlParser {
                         } else {
                             mainSyllables.add(syllable)
                         }
-                        android.util.Log.d("TtmlParser", "Added syllable: '$text' (${if (inBgSpan) "bg" else "main"})")
                     }
                 } else {
                     // Skip this span
@@ -151,7 +145,6 @@ class TtmlParser {
                     isAccompaniment = false
                 )
             )
-            android.util.Log.d("TtmlParser", "Created main line with ${mainSyllables.size} syllables")
         }
 
         // Create background vocal line if exists
@@ -171,7 +164,6 @@ class TtmlParser {
                     isAccompaniment = true
                 )
             )
-            android.util.Log.d("TtmlParser", "Created bg line with ${bgSyllables.size} syllables")
         }
     }
 
