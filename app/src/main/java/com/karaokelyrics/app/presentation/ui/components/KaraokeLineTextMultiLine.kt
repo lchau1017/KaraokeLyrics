@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -48,6 +49,10 @@ fun KaraokeLineTextMultiLine(
     val isRtl = remember(line.syllables) {
         line.syllables.any { it.content.isRtl() }
     }
+
+    // Track which syllables have already started animating to prevent re-animation
+    // Use a map to track animation start time for each syllable
+    val syllableAnimationStartTimes = remember { mutableMapOf<String, Int>() }
 
     val isRightAligned = remember(line.alignment, isRtl) {
         when (line.alignment) {
@@ -130,7 +135,8 @@ fun KaraokeLineTextMultiLine(
                     activeColor = activeColor,
                     inactiveColor = inactiveColor,
                     enableCharacterAnimations = enableCharacterAnimations,
-                    enableBlurEffect = enableBlurEffect
+                    enableBlurEffect = enableBlurEffect,
+                    syllableAnimationStartTimes = syllableAnimationStartTimes
                 )
             }
         }
@@ -144,7 +150,8 @@ private fun DrawScope.drawKaraokeRow(
     activeColor: Color,
     inactiveColor: Color,
     enableCharacterAnimations: Boolean,
-    enableBlurEffect: Boolean
+    enableBlurEffect: Boolean,
+    syllableAnimationStartTimes: MutableMap<String, Int>
 ) {
     rowLayouts.forEachIndexed { index, syllableLayout ->
         val syllableProgress = syllableLayout.syllable.progress(currentTimeMs)
@@ -171,13 +178,26 @@ private fun DrawScope.drawKaraokeRow(
         when {
             // Character animation for awesome words
             enableCharacterAnimations && syllableLayout.useAwesomeAnimation && syllableLayout.wordAnimInfo != null -> {
+                // Create unique key for this syllable
+                val syllableKey = "${syllableLayout.syllable.start}-${syllableLayout.syllable.end}-${syllableLayout.syllable.content}"
+
+                // Check if this syllable has started animating
+                val animationStartTime = syllableAnimationStartTimes[syllableKey]
+                val hasStartedAnimating = animationStartTime != null
+
+                // Record when animation starts
+                if (!hasStartedAnimating && isActive) {
+                    syllableAnimationStartTimes[syllableKey] = currentTimeMs
+                }
+
                 drawCharacterAnimation(
                     syllableLayout = syllableLayout,
                     currentTimeMs = currentTimeMs,
                     drawColor = drawColor,
                     enableBlurEffect = shouldBlur,
                     isActive = isActive,
-                    parentLineActive = parentLineActive
+                    parentLineActive = parentLineActive,
+                    animationStartTime = animationStartTime ?: currentTimeMs
                 )
             }
             // Simple animation
@@ -203,7 +223,8 @@ private fun DrawScope.drawCharacterAnimation(
     drawColor: Color,
     enableBlurEffect: Boolean = false,
     isActive: Boolean = false,
-    parentLineActive: Boolean = false
+    parentLineActive: Boolean = false,
+    animationStartTime: Int
 ) {
     val wordAnimInfo = syllableLayout.wordAnimInfo ?: return
     val fastCharAnimationThresholdMs = 200f
@@ -227,35 +248,24 @@ private fun DrawScope.drawCharacterAnimation(
             0.5f
         }
 
+        // Calculate when this character should animate
         val awesomeStartTime = (earliestStartTime + (latestStartTime - earliestStartTime) * charRatio).toLong()
 
-        // Only animate if this specific character's animation window is active
-        val timeSinceStart = currentTimeMs - awesomeStartTime
+        // Use fixed animation start time to prevent re-animation
+        // The animation starts when the syllable first becomes active
+        val actualAnimationStartTime = maxOf(animationStartTime.toLong(), awesomeStartTime)
+        val timeSinceAnimStart = currentTimeMs - actualAnimationStartTime.toInt()
 
-        // Check if we're within this specific character's animation window
-        val isCharAnimationActive = timeSinceStart >= 0 && timeSinceStart <= awesomeDuration
+        // Only animate if within animation duration from the fixed start time
+        val shouldAnimate = timeSinceAnimStart >= 0 && timeSinceAnimStart.toFloat() <= awesomeDuration
 
-        // Strict check: only animate if this exact syllable is currently active or just finished
-        // This prevents other lines with similar timing from animating
-        val isSyllableActive = currentTimeMs >= syllableLayout.syllable.start &&
-                              currentTimeMs <= syllableLayout.syllable.end + 500 // Small buffer for animation completion
-
-        // Additional check: make sure we're not animating if a different word is playing
-        val isCorrectWord = wordAnimInfo.wordStartTime <= currentTimeMs &&
-                           wordAnimInfo.wordEndTime + 500 >= currentTimeMs
-
-        val shouldAnimate = isCharAnimationActive && isSyllableActive && isCorrectWord
-
-        val awesomeProgress = when {
-            shouldAnimate -> {
-                ((currentTimeMs - awesomeStartTime).toFloat() / awesomeDuration).coerceIn(0f, 1f)
-            }
-            timeSinceStart > awesomeDuration && isSyllableActive -> {
-                1f // Animation completed but syllable still active
-            }
-            else -> {
-                0f // Animation not started or wrong syllable
-            }
+        // Calculate progress from fixed start time
+        val awesomeProgress = if (shouldAnimate) {
+            (timeSinceAnimStart.toFloat() / awesomeDuration).coerceIn(0f, 1f)
+        } else if (timeSinceAnimStart.toFloat() > awesomeDuration) {
+            1f // Animation completed
+        } else {
+            0f // Not started yet
         }
 
         // Improved animation with smoother curves
