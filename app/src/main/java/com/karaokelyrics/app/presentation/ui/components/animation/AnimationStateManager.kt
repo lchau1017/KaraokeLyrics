@@ -45,6 +45,13 @@ class AnimationStateManager {
     }
 
     /**
+     * Clear all animations (useful when colors or other visual properties change)
+     */
+    fun clearAllAnimations() {
+        syllableAnimationStartTimes.clear()
+    }
+
+    /**
      * Create a unique key for a syllable
      */
     fun createSyllableKey(start: Int, end: Int, content: String): String {

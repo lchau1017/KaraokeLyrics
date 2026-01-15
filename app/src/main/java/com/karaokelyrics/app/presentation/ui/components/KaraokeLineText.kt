@@ -36,8 +36,18 @@ fun KaraokeLineText(
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
+    // Create a key that changes when colors change to force recomposition of cached states
+    val colorKey = remember(activeColor, inactiveColor) {
+        "${activeColor.value}-${inactiveColor.value}"
+    }
+
     val animationStateManager = rememberAnimationStateManager()
     val syllableRenderer = remember { SyllableRenderer() }
+
+    // Clear animations when colors change to prevent stale color caching
+    LaunchedEffect(colorKey) {
+        animationStateManager.clearAllAnimations()
+    }
 
     // Determine text direction and alignment
     val isRtl = remember(line.syllables) {

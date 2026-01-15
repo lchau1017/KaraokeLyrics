@@ -11,12 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karaokelyrics.app.presentation.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.ui.components.KaraokeLyricsView
+import com.karaokelyrics.app.presentation.ui.components.SettingsPanel
 import com.karaokelyrics.app.presentation.viewmodel.LyricsViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -88,13 +92,13 @@ fun LyricsScreen(
                     Text(
                         text = "Error loading lyrics",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = errorMessage ?: "Unknown error",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
@@ -117,23 +121,70 @@ fun LyricsScreen(
                                 viewModel.processIntent(LyricsIntent.SeekToLine(index))
                             }
                         },
-                        modifier = Modifier.fillMaxSize(),
-                        textColor = MaterialTheme.colorScheme.primary  // Use Spotify green for active lyrics
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(state.userSettings.backgroundColor),
+                        normalLineTextStyle = LocalTextStyle.current.copy(
+                            fontSize = state.userSettings.fontSize.sp.sp,
+                            fontWeight = FontWeight.Bold,
+                            textMotion = TextMotion.Animated
+                        ),
+                        accompanimentLineTextStyle = LocalTextStyle.current.copy(
+                            fontSize = (state.userSettings.fontSize.sp * 0.6f).sp,
+                            fontWeight = FontWeight.Bold,
+                            textMotion = TextMotion.Animated
+                        ),
+                        textColor = state.userSettings.lyricsColor,
+                        useBlurEffect = state.userSettings.enableBlurEffect && state.userSettings.enableAnimations,
+                        enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations
                     )
 
-                    // Playback controls
-                    PlayerControls(
-                        isPlaying = state.isPlaying,
-                        position = state.playbackPosition,
-                        duration = lyricsData.lines.lastOrNull()?.end?.toLong() ?: 0L,
-                        onPlayPause = {
-                            viewModel.processIntent(LyricsIntent.PlayPause)
-                        },
-                        onSeek = { position ->
-                            viewModel.processIntent(LyricsIntent.SeekToPosition(position))
-                        },
+                    // Controls and Settings at bottom
+                    Column(
                         modifier = Modifier.align(Alignment.BottomCenter)
-                    )
+                    ) {
+                        // Settings Panel
+                        SettingsPanel(
+                            settings = state.userSettings,
+                            onUpdateLyricsColor = { color ->
+                                viewModel.processIntent(LyricsIntent.UpdateLyricsColor(color))
+                            },
+                            onUpdateBackgroundColor = { color ->
+                                viewModel.processIntent(LyricsIntent.UpdateBackgroundColor(color))
+                            },
+                            onUpdateFontSize = { fontSize ->
+                                viewModel.processIntent(LyricsIntent.UpdateFontSize(fontSize))
+                            },
+                            onUpdateAnimationsEnabled = { enabled ->
+                                viewModel.processIntent(LyricsIntent.UpdateAnimationsEnabled(enabled))
+                            },
+                            onUpdateBlurEffectEnabled = { enabled ->
+                                viewModel.processIntent(LyricsIntent.UpdateBlurEffectEnabled(enabled))
+                            },
+                            onUpdateCharacterAnimationsEnabled = { enabled ->
+                                viewModel.processIntent(LyricsIntent.UpdateCharacterAnimationsEnabled(enabled))
+                            },
+                            onUpdateDarkMode = { isDark ->
+                                viewModel.processIntent(LyricsIntent.UpdateDarkMode(isDark))
+                            },
+                            onResetToDefaults = {
+                                viewModel.processIntent(LyricsIntent.ResetSettingsToDefaults)
+                            }
+                        )
+
+                        // Playback controls
+                        PlayerControls(
+                            isPlaying = state.isPlaying,
+                            position = state.playbackPosition,
+                            duration = lyricsData.lines.lastOrNull()?.end?.toLong() ?: 0L,
+                            onPlayPause = {
+                                viewModel.processIntent(LyricsIntent.PlayPause)
+                            },
+                            onSeek = { position ->
+                                viewModel.processIntent(LyricsIntent.SeekToPosition(position))
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -222,12 +273,12 @@ private fun PlayerControls(
             ) {
                 Text(
                     text = formatTime(position),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
                     text = formatTime(duration),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodySmall
                 )
             }

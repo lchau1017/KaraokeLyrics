@@ -53,6 +53,7 @@ fun KaraokeLyricsView(
     ),
     textColor: Color = Color.White,
     useBlurEffect: Boolean = true,
+    enableCharacterAnimations: Boolean = true,
     offset: Dp = 200.dp
 ) {
     val density = LocalDensity.current
@@ -143,7 +144,7 @@ fun KaraokeLyricsView(
     ) {
         itemsIndexed(
             items = lyrics.lines,
-            key = { index, line -> "${line.start}-${line.end}-$index" }
+            key = { index, line -> "${line.start}-${line.end}-$index-${textColor.value}" }
         ) { index, line ->
             val isCurrentLine = index in allFocusedLineIndices
 
@@ -248,7 +249,7 @@ fun KaraokeLyricsView(
                                 textColor.copy(alpha = 0.3f)
                             },
                             enableBlurEffect = useBlurEffect,
-                            enableCharacterAnimations = true
+                            enableCharacterAnimations = enableCharacterAnimations
                         )
                     }
                     is SyncedLine -> {
