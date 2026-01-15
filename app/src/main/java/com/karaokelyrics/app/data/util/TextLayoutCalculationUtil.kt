@@ -46,10 +46,11 @@ object TextLayoutCalculationUtil {
 
     @Stable
     data class LineLayout(
-        val line: com.karaokelyrics.app.domain.model.karaoke.KaraokeLine,
-        val wrappedLines: List<WrappedLine>,
         val syllableLayouts: List<List<SyllableLayout>>,
-        val totalHeight: Float
+        val totalHeight: Float,
+        val lineHeight: Float,
+        val rows: Int,
+        val totalDuration: Int = 0 // Added for progress calculations
     )
 
     /**

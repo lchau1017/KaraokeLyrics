@@ -16,8 +16,7 @@ import com.karaokelyrics.app.presentation.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.ui.components.*
 import com.karaokelyrics.app.presentation.viewmodel.LyricsViewModel
 import com.karaokelyrics.app.presentation.state.LyricsUiState
-import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
-import dagger.hilt.android.EntryPointAccessors
+// Clean architecture - no managers needed!
 import androidx.compose.ui.platform.LocalContext
 import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.backgroundColor
 import com.karaokelyrics.app.presentation.mapper.SettingsUiMapper.lyricsColor
@@ -25,8 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun LyricsScreen(
-    viewModel: LyricsViewModel = hiltViewModel(),
-    layoutManager: LyricsLayoutManager
+    viewModel: LyricsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -87,8 +85,7 @@ fun LyricsScreen(
                     },
                     onOpenSettings = {
                         showSettings = true
-                    },
-                    layoutManager = layoutManager // Pass the layout manager
+                    }
                 )
             }
         }
@@ -137,8 +134,7 @@ private fun LyricsContent(
     onLineClicked: (com.karaokelyrics.app.domain.model.ISyncedLine) -> Unit,
     onPlayPause: () -> Unit,
     onSeek: (Long) -> Unit,
-    onOpenSettings: () -> Unit,
-    layoutManager: LyricsLayoutManager
+    onOpenSettings: () -> Unit
 ) {
     state.lyrics?.let { lyricsData ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -161,8 +157,7 @@ private fun LyricsContent(
                 ),
                 textColor = state.userSettings.lyricsColor,
                 useBlurEffect = state.userSettings.enableBlurEffect && state.userSettings.enableAnimations,
-                enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations,
-                layoutManager = layoutManager // Pass the Clean Architecture manager for testing
+                enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations
             )
 
             PlayerControls(

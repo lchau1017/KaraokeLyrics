@@ -9,7 +9,6 @@ import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
-import com.karaokelyrics.app.presentation.ui.helper.TextLayoutCalculator
 import com.karaokelyrics.app.presentation.ui.helper.TextCharacteristicsProcessor
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
@@ -18,7 +17,7 @@ import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-import com.karaokelyrics.app.presentation.ui.manager.LyricsLayoutManager
+// No managers needed anymore!
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -71,12 +70,7 @@ object AppModule {
         )
     }
 
-    @Provides
-    fun provideTextLayoutCalculator(
-        textCharacteristicsProcessor: TextCharacteristicsProcessor
-    ): TextLayoutCalculator {
-        return TextLayoutCalculator(textCharacteristicsProcessor)
-    }
+    // TextLayoutCalculator no longer needed - calculations done locally in components
 
     @Provides
     fun provideSyncLyricsUseCase(): SyncLyricsUseCase {
@@ -124,11 +118,5 @@ object AppModule {
         return UpdateUserSettingsUseCase(settingsRepository)
     }
 
-    // Presentation Managers
-    @Provides
-    fun provideLyricsLayoutManager(
-        textLayoutCalculator: TextLayoutCalculator
-    ): LyricsLayoutManager {
-        return LyricsLayoutManager(textLayoutCalculator)
-    }
+    // No presentation managers needed - clean architecture!
 }
