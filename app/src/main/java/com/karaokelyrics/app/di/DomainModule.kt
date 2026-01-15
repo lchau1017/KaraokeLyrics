@@ -4,14 +4,9 @@ import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
-import com.karaokelyrics.app.domain.usecase.lyrics.CalculateTextLayoutUseCase
-import com.karaokelyrics.app.domain.usecase.lyrics.ClassifyLyricsLinesUseCase
-import com.karaokelyrics.app.domain.usecase.lyrics.DetermineAnimationTypeUseCase
-import com.karaokelyrics.app.domain.usecase.lyrics.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.lyrics.LoadLyricsFromAssetUseCase
 import com.karaokelyrics.app.domain.usecase.lyrics.LoadLyricsFromFileUseCase
 import com.karaokelyrics.app.domain.usecase.lyrics.ObserveCurrentLyricsUseCase
-import com.karaokelyrics.app.domain.usecase.lyrics.ParseTtmlUseCase
 import com.karaokelyrics.app.domain.usecase.lyrics.SyncLyricsWithPlaybackUseCase
 import com.karaokelyrics.app.domain.usecase.player.LoadMediaUseCase
 import com.karaokelyrics.app.domain.usecase.player.ObservePlaybackPositionUseCase
@@ -100,34 +95,6 @@ object DomainModule {
         playerRepository,
         syncLyricsUseCase
     )
-
-    @Provides
-    @Singleton
-    fun provideGroupSyllablesIntoWordsUseCase(): GroupSyllablesIntoWordsUseCase =
-        GroupSyllablesIntoWordsUseCase()
-
-    @Provides
-    @Singleton
-    fun provideCalculateTextLayoutUseCase(
-        groupSyllablesIntoWordsUseCase: GroupSyllablesIntoWordsUseCase
-    ): CalculateTextLayoutUseCase = CalculateTextLayoutUseCase(groupSyllablesIntoWordsUseCase)
-
-    @Provides
-    @Singleton
-    fun provideDetermineAnimationTypeUseCase(): DetermineAnimationTypeUseCase =
-        DetermineAnimationTypeUseCase()
-
-    @Provides
-    @Singleton
-    fun provideClassifyLyricsLinesUseCase(): ClassifyLyricsLinesUseCase =
-        ClassifyLyricsLinesUseCase()
-
-    @Provides
-    @Singleton
-    fun provideParseTtmlUseCase(
-        ttmlParser: com.karaokelyrics.app.data.parser.TtmlParser,
-        classifyLyricsLinesUseCase: ClassifyLyricsLinesUseCase
-    ): ParseTtmlUseCase = ParseTtmlUseCase(ttmlParser, classifyLyricsLinesUseCase)
 
     // Settings Use Cases
     @Provides

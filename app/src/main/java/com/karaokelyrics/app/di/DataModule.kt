@@ -2,6 +2,8 @@ package com.karaokelyrics.app.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.karaokelyrics.app.data.datasource.local.LyricsLocalDataSource
+import com.karaokelyrics.app.data.datasource.local.PlayerLocalDataSource
 import com.karaokelyrics.app.data.datasource.local.SettingsLocalDataSource
 import com.karaokelyrics.app.data.repository.LyricsRepositoryImpl
 import com.karaokelyrics.app.data.repository.PlayerRepositoryImpl
