@@ -3,7 +3,6 @@ package com.karaokelyrics.app.presentation.ui.components.karaoke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -102,13 +101,11 @@ fun KaraokeLineContainer(
         )
 
         // Render with full animation support
-        // Key the Canvas to force recomposition when blur setting changes
-        key(enableBlurEffect) {
-            Canvas(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(with(density) { layout.totalHeight.toDp() })
-            ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(density) { layout.totalHeight.toDp() })
+        ) {
             // Draw each row with animations
             layout.syllableLayouts.forEachIndexed { _, rowLayouts ->
                 drawKaraokeRow(
@@ -123,8 +120,7 @@ fun KaraokeLineContainer(
                     syllableRenderer = syllableRenderer
                 )
             }
-            } // End of Canvas
-        } // End of key block
+        }
     }
 }
 

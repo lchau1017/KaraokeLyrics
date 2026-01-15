@@ -232,27 +232,30 @@ fun KaraokeLyricsView(
             ) {
                 when (line) {
                     is KaraokeLine -> {
-                        KaraokeLineText(
-                            line = line,
-                            currentPosition = currentTimeMs,
-                            textStyle = if (line.isAccompaniment) {
-                                accompanimentLineTextStyle
-                            } else {
-                                normalLineTextStyle
-                            },
-                            activeColor = if (line.isAccompaniment) {
-                                textColor.copy(alpha = 0.7f)
-                            } else {
-                                textColor
-                            },
-                            inactiveColor = if (line.isAccompaniment) {
-                                textColor.copy(alpha = 0.2f)
-                            } else {
-                                textColor.copy(alpha = 0.3f)
-                            },
-                            enableBlurEffect = useBlurEffect,
-                            enableCharacterAnimations = enableCharacterAnimations
-                        )
+                        // Use key to force recomposition when visual settings change
+                        key(index, useBlurEffect, enableCharacterAnimations) {
+                            KaraokeLineText(
+                                line = line,
+                                currentPosition = currentTimeMs,
+                                textStyle = if (line.isAccompaniment) {
+                                    accompanimentLineTextStyle
+                                } else {
+                                    normalLineTextStyle
+                                },
+                                activeColor = if (line.isAccompaniment) {
+                                    textColor.copy(alpha = 0.7f)
+                                } else {
+                                    textColor
+                                },
+                                inactiveColor = if (line.isAccompaniment) {
+                                    textColor.copy(alpha = 0.2f)
+                                } else {
+                                    textColor.copy(alpha = 0.3f)
+                                },
+                                enableBlurEffect = useBlurEffect,
+                                enableCharacterAnimations = enableCharacterAnimations
+                            )
+                        }
                     }
                     is SyncedLine -> {
                         Text(
