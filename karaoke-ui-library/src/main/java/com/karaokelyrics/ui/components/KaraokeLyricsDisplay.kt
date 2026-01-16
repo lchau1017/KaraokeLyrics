@@ -45,18 +45,29 @@ fun KaraokeLyricsDisplay(
         }.takeIf { it != -1 }
     }
 
+    // Track the previous line index to detect changes
+    var previousLineIndex by remember { mutableStateOf<Int?>(null) }
+
     // Handle automatic scrolling
-    LaunchedEffect(currentLineIndex, config.behavior.scrollBehavior) {
-        if (currentLineIndex != null && config.behavior.scrollBehavior != ScrollBehavior.NONE) {
+    LaunchedEffect(currentLineIndex) {
+        if (currentLineIndex != null &&
+            currentLineIndex != previousLineIndex &&
+            config.behavior.scrollBehavior != ScrollBehavior.NONE) {
+
+            previousLineIndex = currentLineIndex
+
             val targetIndex = when (config.behavior.scrollBehavior) {
                 ScrollBehavior.SMOOTH_CENTER -> {
                     // Calculate center position considering visible items
-                    val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
+                    val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size.takeIf { it > 0 } ?: 5
                     (currentLineIndex - visibleItemsCount / 2).coerceAtLeast(0)
                 }
-                ScrollBehavior.SMOOTH_TOP -> currentLineIndex
+                ScrollBehavior.SMOOTH_TOP -> {
+                    // Scroll to make current line appear at top with some offset
+                    currentLineIndex.coerceAtLeast(0)
+                }
                 ScrollBehavior.INSTANT_CENTER -> {
-                    val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size
+                    val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size.takeIf { it > 0 } ?: 5
                     (currentLineIndex - visibleItemsCount / 2).coerceAtLeast(0)
                 }
                 ScrollBehavior.PAGED -> currentLineIndex
@@ -68,7 +79,7 @@ fun KaraokeLyricsDisplay(
                     coroutineScope.launch {
                         listState.animateScrollToItem(
                             index = targetIndex,
-                            scrollOffset = -config.behavior.scrollOffset.value.toInt()
+                            scrollOffset = 0 // Let contentPadding handle the offset
                         )
                     }
                 }
@@ -76,7 +87,7 @@ fun KaraokeLyricsDisplay(
                     coroutineScope.launch {
                         listState.scrollToItem(
                             index = targetIndex,
-                            scrollOffset = -config.behavior.scrollOffset.value.toInt()
+                            scrollOffset = 0
                         )
                     }
                 }
@@ -104,7 +115,10 @@ fun KaraokeLyricsDisplay(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(config.layout.lineSpacing),
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(vertical = 100.dp) // Space at top and bottom
+            contentPadding = PaddingValues(
+                top = config.behavior.scrollOffset,
+                bottom = 200.dp
+            ) // Space at top for scroll offset and bottom for last lines
         ) {
             itemsIndexed(
                 items = lines,

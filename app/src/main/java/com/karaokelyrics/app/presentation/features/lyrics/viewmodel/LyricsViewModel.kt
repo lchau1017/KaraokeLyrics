@@ -19,7 +19,9 @@ import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.features.lyrics.mapper.LyricsRenderMapper
+import com.karaokelyrics.app.presentation.mapper.LibraryConfigMapper
 import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsRenderState
+import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -37,7 +39,8 @@ class LyricsViewModel @Inject constructor(
     private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-    private val lyricsRenderMapper: LyricsRenderMapper
+    private val lyricsRenderMapper: LyricsRenderMapper,
+    private val libraryConfigMapper: LibraryConfigMapper
 ) : ViewModel() {
 
     data class LyricsState(
@@ -59,7 +62,8 @@ class LyricsViewModel @Inject constructor(
             fontWeight = FontWeight.Bold,
             textMotion = TextMotion.Animated
         ),
-        val config: KaraokeConfig = KaraokeConfig.Default
+        val config: KaraokeConfig = KaraokeConfig.Default,
+        val libraryConfig: KaraokeLibraryConfig = KaraokeLibraryConfig.Default
     )
 
     private val _state = MutableStateFlow(LyricsState())
@@ -179,7 +183,13 @@ class LyricsViewModel @Inject constructor(
     private fun observeUserSettings() {
         viewModelScope.launch {
             observeUserSettingsUseCase().collect { settings ->
-                _state.update { it.copy(userSettings = settings) }
+                val libraryConfig = libraryConfigMapper.mapToLibraryConfig(settings)
+                _state.update {
+                    it.copy(
+                        userSettings = settings,
+                        libraryConfig = libraryConfig
+                    )
+                }
             }
         }
     }
