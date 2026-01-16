@@ -171,26 +171,39 @@ private fun KaraokeSyllableRenderer(
         )
     }
 
+    // Calculate how many lines we need based on actual screen width
+    val wrappedContent = remember(fullText, textStyle, density) {
+        calculateWrappedContent(line, textMeasurer, textStyle, density)
+    }
+
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
-            .height(with(density) { textLayoutResult.size.height.toDp() })
+            .height(with(density) { (wrappedContent.lineCount * textLayoutResult.size.height).toDp() })
     ) {
-        // Create gradient for character-by-character progression
-        val gradient = createKaraokeGradient(
-            line = line,
-            currentTimeMs = currentTimeMs,
-            width = size.width,
-            activeColor = config.visual.playingTextColor,
-            inactiveColor = baseColor
-        )
+        val lineHeight = textLayoutResult.size.height.toFloat()
+        val availableWidth = size.width
 
-        var xOffset = 0f
+        var currentX = 0f
+        var currentY = 0f
+        var currentLine = 1
+
         line.syllables.forEach { syllable ->
             // For each syllable, render its characters
             val syllableDuration = syllable.end - syllable.start
             val charCount = syllable.content.length
             val charDuration = if (charCount > 0) syllableDuration.toFloat() / charCount else 0f
+
+            // Check if entire syllable fits on current line, if not wrap before syllable
+            val syllableText = syllable.content
+            val syllableLayout = textMeasurer.measure(syllableText, textStyle)
+
+            if (currentX + syllableLayout.size.width > availableWidth && currentX > 0) {
+                // Wrap to next line before syllable
+                currentX = 0f
+                currentY += lineHeight
+                currentLine++
+            }
 
             syllable.content.forEachIndexed { charIndex, char ->
                 val charStartTime = syllable.start + (charIndex * charDuration).toInt()
@@ -243,16 +256,16 @@ private fun KaraokeSyllableRenderer(
                     drawIntoCanvas {
                         drawScale(
                             scale = animState.scale,
-                            pivot = Offset(xOffset + charLayout.size.width / 2f, charLayout.size.height / 2f)
+                            pivot = Offset(currentX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
                         ) {
                             rotate(
                                 degrees = animState.rotation,
-                                pivot = Offset(xOffset + charLayout.size.width / 2f, charLayout.size.height / 2f)
+                                pivot = Offset(currentX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
                             ) {
                                 drawText(
                                     textLayoutResult = charLayout,
                                     color = charColor,
-                                    topLeft = Offset(xOffset + animState.offset.x, animState.offset.y)
+                                    topLeft = Offset(currentX + animState.offset.x, currentY + animState.offset.y)
                                 )
                             }
                         }
@@ -262,14 +275,65 @@ private fun KaraokeSyllableRenderer(
                     drawText(
                         textLayoutResult = charLayout,
                         color = charColor,
-                        topLeft = Offset(xOffset, 0f)
+                        topLeft = Offset(currentX, currentY)
                     )
                 }
 
-                xOffset += charLayout.size.width
+                currentX += charLayout.size.width
+            }
+
+            // Add space after syllable if not the last one
+            if (syllable != line.syllables.last()) {
+                val spaceLayout = textMeasurer.measure(" ", textStyle)
+                currentX += spaceLayout.size.width
             }
         }
     }
+}
+
+/**
+ * Data class to hold wrapped content information.
+ */
+private data class WrappedContent(
+    val lineCount: Int
+)
+
+/**
+ * Calculate wrapped content based on screen width and font size.
+ */
+private fun calculateWrappedContent(
+    line: KaraokeLine,
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    textStyle: TextStyle,
+    density: androidx.compose.ui.unit.Density
+): WrappedContent {
+    // Use actual screen width from density
+    val screenWidthDp = 400.dp // Conservative estimate for mobile
+    val availableWidth = with(density) { screenWidthDp.toPx() }
+
+    var lineCount = 1
+    var currentX = 0f
+
+    line.syllables.forEach { syllable ->
+        val syllableText = syllable.content
+        val syllableLayout = textMeasurer.measure(syllableText, textStyle)
+
+        // Check if syllable fits on current line
+        if (currentX + syllableLayout.size.width > availableWidth && currentX > 0) {
+            lineCount++
+            currentX = 0f
+        }
+
+        currentX += syllableLayout.size.width
+
+        // Add space after syllable if not last
+        if (syllable != line.syllables.last()) {
+            val spaceLayout = textMeasurer.measure(" ", textStyle)
+            currentX += spaceLayout.size.width
+        }
+    }
+
+    return WrappedContent(lineCount)
 }
 
 /**
