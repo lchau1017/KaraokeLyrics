@@ -21,11 +21,6 @@ import com.karaokelyrics.app.domain.usecase.animation.DetermineAnimationConfigUs
 import com.karaokelyrics.app.data.parser.TtmlXmlParser
 import com.karaokelyrics.app.data.parser.TimeFormatParser
 import com.karaokelyrics.app.data.factory.LyricsFactory
-import com.karaokelyrics.app.presentation.features.lyrics.handler.LyricsHandler
-import com.karaokelyrics.app.presentation.features.lyrics.handler.PlayerHandler
-import com.karaokelyrics.app.presentation.features.lyrics.handler.SettingsHandler
-import com.karaokelyrics.app.presentation.animation.AnimationStrategyRegistry
-import com.karaokelyrics.app.presentation.animation.strategy.*
 // No managers needed anymore!
 import dagger.Module
 import dagger.Provides
@@ -146,72 +141,6 @@ object AppModule {
     @Provides
     fun provideDetermineAnimationConfigUseCase(): DetermineAnimationConfigUseCase {
         return DetermineAnimationConfigUseCase()
-    }
-
-    // Presentation Handlers
-    @Provides
-    fun provideLyricsHandler(
-        loadLyricsUseCase: LoadLyricsUseCase,
-        syncLyricsUseCase: SyncLyricsUseCase
-    ): LyricsHandler {
-        return LyricsHandler(loadLyricsUseCase, syncLyricsUseCase)
-    }
-
-    @Provides
-    fun providePlayerHandler(
-        playerRepository: PlayerRepository
-    ): PlayerHandler {
-        return PlayerHandler(playerRepository)
-    }
-
-    @Provides
-    fun provideSettingsHandler(
-        observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-        updateUserSettingsUseCase: UpdateUserSettingsUseCase,
-        getCurrentThemeColorsUseCase: GetCurrentThemeColorsUseCase
-    ): SettingsHandler {
-        return SettingsHandler(
-            observeUserSettingsUseCase,
-            updateUserSettingsUseCase,
-            getCurrentThemeColorsUseCase
-        )
-    }
-
-    // Animation Strategies
-    @Provides
-    fun provideBounceAnimationStrategy(): BounceAnimationStrategy {
-        return BounceAnimationStrategy()
-    }
-
-    @Provides
-    fun provideSwellAnimationStrategy(): SwellAnimationStrategy {
-        return SwellAnimationStrategy()
-    }
-
-    @Provides
-    fun provideDipAndRiseAnimationStrategy(): DipAndRiseAnimationStrategy {
-        return DipAndRiseAnimationStrategy()
-    }
-
-    @Provides
-    fun provideSimpleAnimationStrategy(): SimpleAnimationStrategy {
-        return SimpleAnimationStrategy()
-    }
-
-    @Provides
-    @Singleton
-    fun provideAnimationStrategyRegistry(
-        bounceStrategy: BounceAnimationStrategy,
-        swellStrategy: SwellAnimationStrategy,
-        dipAndRiseStrategy: DipAndRiseAnimationStrategy,
-        simpleStrategy: SimpleAnimationStrategy
-    ): AnimationStrategyRegistry {
-        return AnimationStrategyRegistry(
-            bounceStrategy,
-            swellStrategy,
-            dipAndRiseStrategy,
-            simpleStrategy
-        )
     }
 
     // No presentation managers needed - clean architecture!
