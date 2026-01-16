@@ -4,7 +4,7 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
-import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
+import com.karaokelyrics.app.presentation.shared.animation.AnimationDecisionCalculator
 import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
  */
 class TextCharacteristicsProcessor @Inject constructor(
     private val groupSyllablesIntoWordsUseCase: GroupSyllablesIntoWordsUseCase,
-    private val determineAnimationTypeUseCase: DetermineAnimationTypeUseCase
+    private val determineAnimationTypeUseCase: AnimationDecisionCalculator
 ) {
 
     fun processSyllables(

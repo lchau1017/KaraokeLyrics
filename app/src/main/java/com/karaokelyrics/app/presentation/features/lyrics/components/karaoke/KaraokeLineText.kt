@@ -63,9 +63,10 @@ fun KaraokeLineText(
         animationStateManager.clearAllAnimations()
     }
 
-    // Resolve alignment
-    val alignment = remember(line.alignment, isRtl) {
-        KaraokeAlignmentResolver.resolveAlignment(line.alignment, isRtl)
+    // Resolve alignment from metadata
+    val alignmentStr = line.metadata["alignment"] ?: "Center"
+    val alignment = remember(alignmentStr, isRtl) {
+        KaraokeAlignmentResolver.resolveAlignment(alignmentStr, isRtl)
     }
 
     // Clean up old animations periodically based on config

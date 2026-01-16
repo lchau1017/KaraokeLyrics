@@ -6,9 +6,8 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil
 import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.LineLayout
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
-import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
+import com.karaokelyrics.app.presentation.shared.animation.AnimationDecisionCalculator
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.presentation.shared.helper.TextCharacteristicsProcessor
 
@@ -29,7 +28,7 @@ object KaraokeLayoutCalculator {
     ): LineLayout {
         // Create use cases locally - they're stateless
         val groupSyllablesUseCase = GroupSyllablesIntoWordsUseCase()
-        val determineAnimationUseCase = DetermineAnimationTypeUseCase()
+        val determineAnimationUseCase = AnimationDecisionCalculator()
         val textProcessor = TextCharacteristicsProcessor(
             groupSyllablesUseCase,
             determineAnimationUseCase
@@ -52,10 +51,11 @@ object KaraokeLayoutCalculator {
             style = textStyle
         )
 
-        // Calculate final positions
-        val isRightAligned = when (line.alignment) {
-            KaraokeAlignment.Start -> isRtl
-            KaraokeAlignment.End -> !isRtl
+        // Calculate final positions from metadata
+        val alignmentStr = line.metadata["alignment"] ?: "Center"
+        val isRightAligned = when (alignmentStr) {
+            "Start" -> isRtl
+            "End" -> !isRtl
             else -> false
         }
 

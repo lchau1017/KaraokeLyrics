@@ -7,7 +7,7 @@ import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
+import com.karaokelyrics.app.presentation.shared.animation.AnimationDecisionCalculator
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
@@ -53,8 +53,8 @@ object AppModule {
     }
 
     @Provides
-    fun provideDetermineAnimationTypeUseCase(): DetermineAnimationTypeUseCase {
-        return DetermineAnimationTypeUseCase()
+    fun provideAnimationDecisionCalculator(): AnimationDecisionCalculator {
+        return AnimationDecisionCalculator()
     }
 
     // Presentation Helpers removed - now created locally in components

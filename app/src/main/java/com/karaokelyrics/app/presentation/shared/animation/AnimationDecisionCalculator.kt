@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.domain.usecase
+package com.karaokelyrics.app.presentation.shared.animation
 
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import javax.inject.Inject
@@ -17,7 +17,7 @@ data class AnimationDecision(
  * Domain use case for determining the appropriate animation type for karaoke words.
  * Encapsulates business rules for animation selection.
  */
-class DetermineAnimationTypeUseCase @Inject constructor() {
+class AnimationDecisionCalculator @Inject constructor() {
 
     // Business rule constants - these define the animation thresholds
     private val fastCharAnimationThresholdMs = 100f  // Relaxed from 200ms

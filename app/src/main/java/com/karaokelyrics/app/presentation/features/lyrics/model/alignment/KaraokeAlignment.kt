@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.domain.model.karaoke
+package com.karaokelyrics.app.presentation.features.lyrics.model.alignment
 
 enum class KaraokeAlignment {
     Start,

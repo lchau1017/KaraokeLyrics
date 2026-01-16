@@ -2,7 +2,7 @@ package com.karaokelyrics.app.data.parser
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
+// KaraokeAlignment removed - using metadata map instead
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import org.xmlpull.v1.XmlPullParser
@@ -141,7 +141,7 @@ class TtmlParser {
                     syllables = mainSyllables,
                     start = parseTime(pBegin),
                     end = parseTime(pEnd),
-                    alignment = KaraokeAlignment.Center,
+                    metadata = mapOf("alignment" to "Center"),
                     isAccompaniment = false
                 )
             )
@@ -160,7 +160,7 @@ class TtmlParser {
                     syllables = bgSyllables,
                     start = bgStart ?: bgSyllables.first().start,
                     end = bgEnd ?: bgSyllables.last().end,
-                    alignment = KaraokeAlignment.Center,
+                    metadata = mapOf("alignment" to "Center"),
                     isAccompaniment = true
                 )
             )

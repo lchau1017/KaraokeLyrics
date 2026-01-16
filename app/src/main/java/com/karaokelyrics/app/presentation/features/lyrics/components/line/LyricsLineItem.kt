@@ -14,7 +14,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
+import com.karaokelyrics.app.presentation.features.lyrics.model.alignment.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.synced.SyncedLine
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.KaraokeLineText
@@ -100,11 +100,14 @@ fun LyricsLineItem(
  */
 fun getLineAlignment(line: ISyncedLine): Alignment {
     return when (line) {
-        is KaraokeLine -> when (line.alignment) {
-            KaraokeAlignment.Center -> Alignment.Center
-            KaraokeAlignment.Start -> Alignment.CenterStart
-            KaraokeAlignment.End -> Alignment.CenterEnd
-            else -> Alignment.Center
+        is KaraokeLine -> {
+            // Extract alignment from metadata if present
+            val alignmentStr = line.metadata["alignment"] ?: "Center"
+            when (alignmentStr) {
+                "Start" -> Alignment.CenterStart
+                "End" -> Alignment.CenterEnd
+                else -> Alignment.Center
+            }
         }
         else -> Alignment.Center
     }

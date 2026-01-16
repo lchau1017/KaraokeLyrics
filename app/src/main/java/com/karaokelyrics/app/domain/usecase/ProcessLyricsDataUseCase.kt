@@ -105,9 +105,9 @@ class ProcessLyricsDataUseCase @Inject constructor() {
     }
 
     private fun shouldMergeLines(line1: KaraokeLine, line2: KaraokeLine): Boolean {
-        // Business rule: Merge if lines overlap and have same alignment
+        // Business rule: Merge if lines overlap and have same metadata
         return line1.end > line2.start &&
-               line1.alignment == line2.alignment &&
+               line1.metadata == line2.metadata &&
                line1.isAccompaniment == line2.isAccompaniment
     }
 
@@ -116,7 +116,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
             syllables = line1.syllables + line2.syllables,
             start = line1.start,
             end = maxOf(line1.end, line2.end),
-            alignment = line1.alignment,
+            metadata = line1.metadata,
             isAccompaniment = line1.isAccompaniment
         )
     }
