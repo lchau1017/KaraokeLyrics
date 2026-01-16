@@ -8,7 +8,6 @@ import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.CoordinatePlaybackSyncUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.theme.GetCurrentThemeColorsUseCase
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.state.LyricsIntent
@@ -28,8 +27,7 @@ class LyricsViewModel @Inject constructor(
     private val coordinatePlaybackSyncUseCase: CoordinatePlaybackSyncUseCase,
     private val playerRepository: PlayerRepository,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-    private val updateUserSettingsUseCase: UpdateUserSettingsUseCase,
-    private val getCurrentThemeColorsUseCase: GetCurrentThemeColorsUseCase
+    private val updateUserSettingsUseCase: UpdateUserSettingsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LyricsUiState())
@@ -150,13 +148,7 @@ class LyricsViewModel @Inject constructor(
     private fun observeUserSettings() {
         viewModelScope.launch {
             observeUserSettingsUseCase().collect { settings ->
-                val themeColors = getCurrentThemeColorsUseCase(settings)
-                _state.update {
-                    it.copy(
-                        userSettings = settings,
-                        themeColors = themeColors
-                    )
-                }
+                _state.update { it.copy(userSettings = settings) }
             }
         }
     }

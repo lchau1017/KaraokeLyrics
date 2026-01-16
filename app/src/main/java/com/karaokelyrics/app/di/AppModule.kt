@@ -16,11 +16,6 @@ import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.theme.GetCurrentThemeColorsUseCase
-import com.karaokelyrics.app.domain.usecase.animation.DetermineAnimationConfigUseCase
-import com.karaokelyrics.app.data.parser.TtmlXmlParser
-import com.karaokelyrics.app.data.parser.TimeFormatParser
-import com.karaokelyrics.app.data.factory.LyricsFactory
 // No managers needed anymore!
 import dagger.Module
 import dagger.Provides
@@ -78,30 +73,9 @@ object AppModule {
         return CoordinatePlaybackSyncUseCase(playerRepository, syncLyricsUseCase)
     }
 
-    // Parser components
     @Provides
-    fun provideTimeFormatParser(): TimeFormatParser {
-        return TimeFormatParser()
-    }
-
-    @Provides
-    fun provideTtmlXmlParser(
-        timeFormatParser: TimeFormatParser
-    ): TtmlXmlParser {
-        return TtmlXmlParser(timeFormatParser)
-    }
-
-    @Provides
-    fun provideLyricsFactory(): LyricsFactory {
-        return LyricsFactory()
-    }
-
-    @Provides
-    fun provideParseTtmlUseCase(
-        ttmlXmlParser: TtmlXmlParser,
-        lyricsFactory: LyricsFactory
-    ): ParseTtmlUseCase {
-        return ParseTtmlUseCase(ttmlXmlParser, lyricsFactory)
+    fun provideParseTtmlUseCase(): ParseTtmlUseCase {
+        return ParseTtmlUseCase()
     }
 
     @Provides
@@ -130,17 +104,6 @@ object AppModule {
         settingsRepository: SettingsRepository
     ): UpdateUserSettingsUseCase {
         return UpdateUserSettingsUseCase(settingsRepository)
-    }
-
-    // Theme and animation use cases
-    @Provides
-    fun provideGetCurrentThemeColorsUseCase(): GetCurrentThemeColorsUseCase {
-        return GetCurrentThemeColorsUseCase()
-    }
-
-    @Provides
-    fun provideDetermineAnimationConfigUseCase(): DetermineAnimationConfigUseCase {
-        return DetermineAnimationConfigUseCase()
     }
 
     // No presentation managers needed - clean architecture!

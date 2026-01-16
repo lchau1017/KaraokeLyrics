@@ -3,11 +3,9 @@ package com.karaokelyrics.app.presentation.features.settings.mapper
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.model.theme.ThemeColors
 
 /**
  * Maps between domain UserSettings (with ARGB integers) and UI layer (with Compose Color)
- * This follows SRP by only handling UI-Domain mapping, not business logic.
  */
 object SettingsUiMapper {
 
@@ -26,13 +24,10 @@ object SettingsUiMapper {
     val UserSettings.lightBackgroundColor: Color
         get() = Color(lightBackgroundColorArgb)
 
-    /**
-     * Extension to get Compose Colors from ThemeColors
-     */
-    val ThemeColors.lyricsColor: Color
+    val UserSettings.lyricsColor: Color
         get() = Color(lyricsColorArgb)
 
-    val ThemeColors.backgroundColor: Color
+    val UserSettings.backgroundColor: Color
         get() = Color(backgroundColorArgb)
 
     /**
