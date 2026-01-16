@@ -3,7 +3,7 @@ package com.karaokelyrics.app.presentation.shared.rendering
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 
 /**
  * Factory for creating gradient brushes for karaoke effects

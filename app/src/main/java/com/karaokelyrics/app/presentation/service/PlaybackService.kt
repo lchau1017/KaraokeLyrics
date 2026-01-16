@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.data.service
+package com.karaokelyrics.app.presentation.service
 
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C

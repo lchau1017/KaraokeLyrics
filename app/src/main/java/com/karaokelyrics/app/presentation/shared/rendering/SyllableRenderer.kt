@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.drawText
 import com.karaokelyrics.app.presentation.shared.animation.AnimationCalculator
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 import com.karaokelyrics.app.presentation.shared.utils.TextUtils.isPunctuation
 import androidx.compose.animation.core.CubicBezierEasing
 

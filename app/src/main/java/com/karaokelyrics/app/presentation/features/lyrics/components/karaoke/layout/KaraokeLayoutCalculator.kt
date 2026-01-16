@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.LineLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.LineLayout
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase

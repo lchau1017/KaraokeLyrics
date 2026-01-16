@@ -1,7 +1,7 @@
 package com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.syllable
 
 import androidx.compose.ui.graphics.Color
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 
 /**
  * Calculates state for individual syllables.

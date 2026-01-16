@@ -4,7 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.animation.CharacterAnimationCalculator
 import com.karaokelyrics.app.presentation.shared.rendering.SyllableRenderer
 

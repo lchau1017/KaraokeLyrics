@@ -1,6 +1,6 @@
 package com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.animation
 
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 import com.karaokelyrics.app.presentation.shared.animation.AnimationCalculator
 
 /**

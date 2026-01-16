@@ -2,7 +2,7 @@ package com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.re
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.animation.CharacterAnimationCalculator
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.syllable.SyllableStateCalculator
 import com.karaokelyrics.app.presentation.shared.animation.AnimationStateManager

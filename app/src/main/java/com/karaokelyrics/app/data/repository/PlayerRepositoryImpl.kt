@@ -7,7 +7,7 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.karaokelyrics.app.domain.repository.PlayerRepository
-import com.karaokelyrics.app.data.service.PlaybackService
+import com.karaokelyrics.app.presentation.service.PlaybackService
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -82,22 +82,20 @@ class PlayerRepositoryImpl @Inject constructor(
     }
 
     override suspend fun loadMedia(assetPath: String) {
-        withContext(Dispatchers.Main) {
-            // Wait for controller to be ready
-            var retries = 0
-            while (mediaController == null && retries < 10) {
-                delay(100)
-                retries++
-            }
+        // Wait for controller to be ready
+        var retries = 0
+        while (mediaController == null && retries < 10) {
+            delay(100)
+            retries++
+        }
 
-            val mediaItem = MediaItem.fromUri("asset:///$assetPath")
+        val mediaItem = MediaItem.fromUri("asset:///$assetPath")
 
-            mediaController?.let { controller ->
-                controller.setMediaItem(mediaItem)
-                controller.repeatMode = Player.REPEAT_MODE_ONE
-                controller.prepare()
-                controller.play()
-            }
+        mediaController?.let { controller ->
+            controller.setMediaItem(mediaItem)
+            controller.repeatMode = Player.REPEAT_MODE_ONE
+            controller.prepare()
+            controller.play()
         }
     }
 }

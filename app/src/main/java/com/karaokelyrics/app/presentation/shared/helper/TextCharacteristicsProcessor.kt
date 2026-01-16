@@ -5,7 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.DetermineAnimationTypeUseCase
-import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.shared.layout.TextLayoutCalculationUtil.SyllableLayout
 import javax.inject.Inject
 
 /**

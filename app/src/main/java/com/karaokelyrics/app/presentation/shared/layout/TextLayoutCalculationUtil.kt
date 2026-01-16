@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.data.util
+package com.karaokelyrics.app.presentation.shared.layout
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
