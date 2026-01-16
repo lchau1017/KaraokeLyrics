@@ -17,7 +17,7 @@ import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.synced.SyncedLine
-import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.KaraokeLineContainer
+import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.KaraokeLineText
 
 /**
  * Renders a single lyrics line item.
@@ -57,7 +57,7 @@ fun LyricsLineItem(
     ) {
         when (line) {
             is KaraokeLine -> {
-                KaraokeLineContainer(
+                KaraokeLineText(
                     line = line,
                     currentTimeMs = currentTimeMs,
                     textStyle = textStyle,

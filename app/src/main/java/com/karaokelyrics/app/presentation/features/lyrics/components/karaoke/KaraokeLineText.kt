@@ -23,7 +23,7 @@ import com.karaokelyrics.app.presentation.shared.rendering.SyllableRenderer
  * Delegates responsibilities to specialized components.
  */
 @Composable
-fun KaraokeLineContainer(
+fun KaraokeLineText(
     line: KaraokeLine,
     currentTimeMs: Int,
     textStyle: TextStyle,

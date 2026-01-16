@@ -3,6 +3,7 @@ package com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.re
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.karaokelyrics.app.data.util.TextLayoutCalculationUtil.SyllableLayout
+import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.animation.CharacterAnimationCalculator
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.syllable.SyllableStateCalculator
 import com.karaokelyrics.app.presentation.shared.animation.AnimationStateManager
 import com.karaokelyrics.app.presentation.shared.rendering.GradientBrushFactory
@@ -16,6 +17,10 @@ class KaraokeRowRenderer(
     private val syllableRenderer: SyllableRenderer,
     private val animationStateManager: AnimationStateManager
 ) {
+    private val characterAnimationRenderer = CharacterAnimationRenderer(
+        syllableRenderer,
+        CharacterAnimationCalculator()
+    )
 
     fun DrawScope.renderRow(
         rowLayouts: List<SyllableLayout>,
@@ -82,18 +87,15 @@ class KaraokeRowRenderer(
             enableCharacterAnimations &&
             syllableLayout.useAwesomeAnimation &&
             syllableLayout.wordAnimInfo != null -> {
-                // For character animations, we'll use the existing drawSimpleSyllable
-                // The character animation logic should be refactored later
-                syllableRenderer.drawSimpleSyllable(
-                    scope = this,
-                    syllableLayout = syllableLayout,
-                    currentTimeMs = currentTimeMs,
-                    drawColor = syllableState.drawColor,
-                    rowLayouts = rowLayouts,
-                    index = index,
-                    enableBlurEffect = syllableState.shouldBlur,
-                    animationStartTime = animationStartTime
-                )
+                with(characterAnimationRenderer) {
+                    renderCharacterAnimation(
+                        syllableLayout = syllableLayout,
+                        currentTimeMs = currentTimeMs,
+                        drawColor = syllableState.drawColor,
+                        enableBlurEffect = syllableState.shouldBlur,
+                        animationStartTime = animationStartTime
+                    )
+                }
             }
             // Simple animation
             else -> {
