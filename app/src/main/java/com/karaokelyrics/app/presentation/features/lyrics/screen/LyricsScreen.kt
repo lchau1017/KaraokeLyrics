@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.sp
@@ -22,8 +23,7 @@ import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
 import com.karaokelyrics.app.presentation.features.player.viewmodel.PlayerViewModel
 import com.karaokelyrics.app.presentation.features.settings.components.SettingsBottomSheet
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
-import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
-import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
+// Removed unused imports
 import com.karaokelyrics.app.presentation.features.settings.viewmodel.SettingsViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -95,7 +95,7 @@ fun LyricsScreen(
                     }
                 )
             }
-            lyricsState.lyrics != null -> {
+            lyricsState.uiState != null -> {
                 LyricsContent(
                     lyricsState = lyricsState,
                     playerState = playerState,
@@ -165,30 +165,19 @@ private fun LyricsContent(
     onSettingsClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        lyricsState.lyrics?.let { lyricsData ->
+        // Use pre-calculated UI state instead of raw lyrics
+        lyricsState.uiState?.let { uiState ->
             KaraokeLyricsView(
-                lyrics = lyricsData,
-                currentPosition = { playerState.currentPosition },
+                uiState = uiState,
                 onLineClicked = { line ->
-                    val index = lyricsData.lines.indexOf(line)
+                    val index = uiState.lines.indexOfFirst { it.line == line }
                     if (index >= 0) onLineClicked(index)
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(settings.backgroundColor),
-                normalLineTextStyle = LocalTextStyle.current.copy(
-                    fontSize = settings.fontSize.sp.sp,
-                    fontWeight = FontWeight.Bold,
-                    textMotion = TextMotion.Animated
-                ),
-                accompanimentLineTextStyle = LocalTextStyle.current.copy(
-                    fontSize = (settings.fontSize.sp * 0.6f).sp,
-                    fontWeight = FontWeight.Bold,
-                    textMotion = TextMotion.Animated
-                ),
-                textColor = settings.lyricsColor,
-                useBlurEffect = settings.enableBlurEffect && settings.enableAnimations,
-                enableCharacterAnimations = settings.enableCharacterAnimations && settings.enableAnimations
+                    .background(Color(settings.backgroundColorArgb)),
+                enableCharacterAnimations = settings.enableCharacterAnimations && settings.enableAnimations,
+                config = lyricsState.config
             )
 
             PlayerControls(

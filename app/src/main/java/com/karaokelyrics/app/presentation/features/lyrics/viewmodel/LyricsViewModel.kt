@@ -1,5 +1,11 @@
 package com.karaokelyrics.app.presentation.features.lyrics.viewmodel
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextMotion
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.model.LyricsSyncState
@@ -9,8 +15,11 @@ import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
+import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
+import com.karaokelyrics.app.presentation.features.lyrics.mapper.LyricsUiMapper
+import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -27,7 +36,8 @@ class LyricsViewModel @Inject constructor(
     private val loadLyricsUseCase: LoadLyricsUseCase,
     private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerRepository: PlayerRepository,
-    private val observeUserSettingsUseCase: ObserveUserSettingsUseCase
+    private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
+    private val lyricsUiMapper: LyricsUiMapper
 ) : ViewModel() {
 
     data class LyricsState(
@@ -35,7 +45,21 @@ class LyricsViewModel @Inject constructor(
         val syncState: LyricsSyncState = LyricsSyncState(),
         val isLoading: Boolean = false,
         val error: String? = null,
-        val userSettings: UserSettings = UserSettings()
+        val userSettings: UserSettings = UserSettings(),
+        val uiState: LyricsUiState? = null,
+        val currentTimeMs: Int = 0,
+        val textColor: Color = Color.White,
+        val normalTextStyle: TextStyle = TextStyle(
+            fontSize = 34.sp,
+            fontWeight = FontWeight.Bold,
+            textMotion = TextMotion.Animated
+        ),
+        val accompanimentTextStyle: TextStyle = TextStyle(
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            textMotion = TextMotion.Animated
+        ),
+        val config: KaraokeConfig = KaraokeConfig.Default
     )
 
     private val _state = MutableStateFlow(LyricsState())
@@ -124,7 +148,33 @@ class LyricsViewModel @Inject constructor(
                         position,
                         userSettings.lyricsTimingOffsetMs
                     )
-                    _state.update { it.copy(syncState = syncState) }
+
+                    // Map to UI state with all pre-calculated values
+                    val currentTimeMs = (position + userSettings.lyricsTimingOffsetMs).toInt()
+
+                    // Use color from user settings
+                    val textColor = Color(userSettings.lyricsColorArgb)
+
+                    val uiState = lyricsUiMapper.mapToUiState(
+                        lyrics = lyrics,
+                        currentTimeMs = currentTimeMs,
+                        textColor = textColor,
+                        normalTextStyle = _state.value.normalTextStyle.copy(
+                            fontSize = userSettings.fontSize.sp.sp
+                        ),
+                        accompanimentTextStyle = _state.value.accompanimentTextStyle.copy(
+                            fontSize = (userSettings.fontSize.sp * 0.6f).sp
+                        ),
+                        config = _state.value.config
+                    )
+
+                    _state.update {
+                        it.copy(
+                            syncState = syncState,
+                            uiState = uiState,
+                            currentTimeMs = currentTimeMs
+                        )
+                    }
                 }
             }
         }
