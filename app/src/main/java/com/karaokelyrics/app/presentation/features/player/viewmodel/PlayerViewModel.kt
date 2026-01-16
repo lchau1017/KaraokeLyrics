@@ -3,14 +3,17 @@ package com.karaokelyrics.app.presentation.features.player.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.repository.PlayerRepository
+import com.karaokelyrics.app.presentation.features.player.effect.PlayerEffect
+import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel for Player controls.
- * Single Responsibility: Only manages playback controls.
+ * MVI ViewModel for Player controls following Clean Architecture.
+ * Single Responsibility: Manages playback state and handles intents.
  */
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -26,47 +29,54 @@ class PlayerViewModel @Inject constructor(
     private val _state = MutableStateFlow(PlayerState())
     val state: StateFlow<PlayerState> = _state.asStateFlow()
 
+    private val _effects = Channel<PlayerEffect>(Channel.BUFFERED)
+    val effects: Flow<PlayerEffect> = _effects.receiveAsFlow()
+
+    private val _intents = Channel<PlayerIntent>(Channel.BUFFERED)
+
     init {
         observePlaybackState()
+        processIntents()
     }
 
-    fun play() {
+    fun handleIntent(intent: PlayerIntent) {
         viewModelScope.launch {
-            playerRepository.play()
+            _intents.send(intent)
         }
     }
 
-    fun pause() {
+    private fun processIntents() {
         viewModelScope.launch {
-            playerRepository.pause()
-        }
-    }
-
-    fun togglePlayPause() {
-        viewModelScope.launch {
-            if (_state.value.isPlaying) {
-                playerRepository.pause()
-            } else {
-                playerRepository.play()
+            _intents.receiveAsFlow().collect { intent ->
+                when (intent) {
+                    is PlayerIntent.PlayPause -> togglePlayPause()
+                    is PlayerIntent.SeekToPosition -> seekTo(intent.position)
+                    is PlayerIntent.LoadMedia -> loadMedia(intent.fileName)
+                }
             }
         }
     }
 
-    fun seekTo(position: Long) {
-        viewModelScope.launch {
-            playerRepository.seekTo(position)
+    private suspend fun togglePlayPause() {
+        if (_state.value.isPlaying) {
+            playerRepository.pause()
+            _effects.send(PlayerEffect.PlaybackPaused)
+        } else {
+            playerRepository.play()
+            _effects.send(PlayerEffect.PlaybackStarted)
         }
     }
 
-    fun seekToLine(lineStartMs: Int) {
-        viewModelScope.launch {
-            playerRepository.seekTo(lineStartMs.toLong())
-        }
+    private suspend fun seekTo(position: Long) {
+        playerRepository.seekTo(position)
+        _effects.send(PlayerEffect.SeekCompleted(position))
     }
 
-    fun loadMedia(fileName: String) {
-        viewModelScope.launch {
+    private suspend fun loadMedia(fileName: String) {
+        try {
             playerRepository.loadMedia(fileName)
+        } catch (e: Exception) {
+            _effects.send(PlayerEffect.ShowError(e.message ?: "Failed to load media"))
         }
     }
 

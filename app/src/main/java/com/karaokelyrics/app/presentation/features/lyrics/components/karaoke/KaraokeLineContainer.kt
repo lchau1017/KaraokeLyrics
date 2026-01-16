@@ -28,7 +28,8 @@ import com.karaokelyrics.app.presentation.shared.rendering.GradientBrushFactory
 import com.karaokelyrics.app.presentation.shared.rendering.SyllableRenderer
 
 /**
- * STATEFUL container for karaoke line with full animation support.
+ * Container for karaoke line with animation support.
+ * Refactored for better separation of concerns.
  */
 @Composable
 fun KaraokeLineContainer(
@@ -100,13 +101,13 @@ fun KaraokeLineContainer(
             isRtl = isRtl
         )
 
-        // Render with full animation support
+        // Render with animation support
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(density) { layout.totalHeight.toDp() })
         ) {
-            // Draw each row with animations
+            // Delegate rendering
             layout.syllableLayouts.forEachIndexed { _, rowLayouts ->
                 drawKaraokeRow(
                     rowLayouts = rowLayouts,

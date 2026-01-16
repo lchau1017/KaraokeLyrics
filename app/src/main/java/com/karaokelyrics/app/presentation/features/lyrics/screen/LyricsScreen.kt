@@ -15,10 +15,13 @@ import com.karaokelyrics.app.presentation.features.common.components.ErrorScreen
 import com.karaokelyrics.app.presentation.features.common.components.LoadingScreen
 import com.karaokelyrics.app.presentation.features.lyrics.components.KaraokeLyricsView
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
+import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.features.lyrics.viewmodel.LyricsViewModel
 import com.karaokelyrics.app.presentation.features.player.components.PlayerControls
+import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
 import com.karaokelyrics.app.presentation.features.player.viewmodel.PlayerViewModel
 import com.karaokelyrics.app.presentation.features.settings.components.SettingsBottomSheet
+import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 import com.karaokelyrics.app.presentation.features.settings.viewmodel.SettingsViewModel
@@ -39,7 +42,7 @@ fun LyricsScreen(
 ) {
     val lyricsState by lyricsViewModel.state.collectAsStateWithLifecycle()
     val playerState by playerViewModel.state.collectAsStateWithLifecycle()
-    val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
+    val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var showSettings by remember { mutableStateOf(false) }
@@ -58,9 +61,11 @@ fun LyricsScreen(
         }
     }
 
-    // Load initial lyrics
+    // Load initial lyrics using MVI intent
     LaunchedEffect(Unit) {
-        lyricsViewModel.loadLyrics("golden-hour.ttml", "golden-hour.m4a")
+        lyricsViewModel.handleIntent(
+            LyricsIntent.LoadLyrics("golden-hour.ttml", "golden-hour.m4a")
+        )
     }
 
     // Set duration when lyrics are loaded
@@ -84,7 +89,9 @@ fun LyricsScreen(
                 ErrorScreen(
                     errorMessage = lyricsState.error,
                     onRetry = {
-                        lyricsViewModel.loadLyrics("golden-hour.ttml", "golden-hour.m4a")
+                        lyricsViewModel.handleIntent(
+                            LyricsIntent.LoadLyrics("golden-hour.ttml", "golden-hour.m4a")
+                        )
                     }
                 )
             }
@@ -92,15 +99,15 @@ fun LyricsScreen(
                 LyricsContent(
                     lyricsState = lyricsState,
                     playerState = playerState,
-                    settings = settings,
+                    settings = settingsState.settings,
                     onLineClicked = { lineIndex ->
-                        lyricsViewModel.onLineClicked(lineIndex)
+                        lyricsViewModel.handleIntent(LyricsIntent.SeekToLine(lineIndex))
                     },
                     onPlayPauseClick = {
-                        playerViewModel.togglePlayPause()
+                        playerViewModel.handleIntent(PlayerIntent.PlayPause)
                     },
                     onSeekTo = { position ->
-                        playerViewModel.seekTo(position)
+                        playerViewModel.handleIntent(PlayerIntent.SeekToPosition(position))
                     },
                     onSettingsClick = {
                         showSettings = true
@@ -114,26 +121,42 @@ fun LyricsScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
 
-        // Settings Bottom Sheet - uses SettingsViewModel
+        // Settings Bottom Sheet - uses MVI intents
         SettingsBottomSheet(
             isVisible = showSettings,
-            settings = settings,
+            settings = settingsState.settings,
             onDismiss = { showSettings = false },
-            onUpdateLyricsColor = settingsViewModel::updateLyricsColor,
-            onUpdateBackgroundColor = settingsViewModel::updateBackgroundColor,
-            onUpdateFontSize = settingsViewModel::updateFontSize,
-            onUpdateAnimationsEnabled = settingsViewModel::updateAnimationsEnabled,
-            onUpdateBlurEffectEnabled = settingsViewModel::updateBlurEffectEnabled,
-            onUpdateCharacterAnimationsEnabled = settingsViewModel::updateCharacterAnimationsEnabled,
-            onUpdateDarkMode = settingsViewModel::updateDarkMode,
-            onResetToDefaults = settingsViewModel::resetToDefaults
+            onUpdateLyricsColor = { color ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateLyricsColor(color))
+            },
+            onUpdateBackgroundColor = { color ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateBackgroundColor(color))
+            },
+            onUpdateFontSize = { fontSize ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateFontSize(fontSize))
+            },
+            onUpdateAnimationsEnabled = { enabled ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateAnimationsEnabled(enabled))
+            },
+            onUpdateBlurEffectEnabled = { enabled ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateBlurEffectEnabled(enabled))
+            },
+            onUpdateCharacterAnimationsEnabled = { enabled ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateCharacterAnimationsEnabled(enabled))
+            },
+            onUpdateDarkMode = { isDark ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateDarkMode(isDark))
+            },
+            onResetToDefaults = {
+                settingsViewModel.handleIntent(SettingsIntent.ResetToDefaults)
+            }
         )
     }
 }
 
 @Composable
 private fun LyricsContent(
-    lyricsState: LyricsViewModel.LyricsDisplayState,
+    lyricsState: LyricsViewModel.LyricsState,
     playerState: PlayerViewModel.PlayerState,
     settings: com.karaokelyrics.app.domain.model.UserSettings,
     onLineClicked: (Int) -> Unit,

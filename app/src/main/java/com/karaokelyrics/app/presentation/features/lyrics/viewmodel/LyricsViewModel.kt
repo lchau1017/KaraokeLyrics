@@ -10,6 +10,7 @@ import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
+import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -18,9 +19,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel for Lyrics display.
- * Single Responsibility: Only manages lyrics display and synchronization.
- * Player controls and settings are handled by their own ViewModels.
+ * MVI ViewModel for Lyrics display following Clean Architecture.
+ * Single Responsibility: Manages lyrics display state and handles intents.
  */
 @HiltViewModel
 class LyricsViewModel @Inject constructor(
@@ -30,7 +30,7 @@ class LyricsViewModel @Inject constructor(
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase
 ) : ViewModel() {
 
-    data class LyricsDisplayState(
+    data class LyricsState(
         val lyrics: SyncedLyrics? = null,
         val syncState: LyricsSyncState = LyricsSyncState(),
         val isLoading: Boolean = false,
@@ -38,58 +38,78 @@ class LyricsViewModel @Inject constructor(
         val userSettings: UserSettings = UserSettings()
     )
 
-    private val _state = MutableStateFlow(LyricsDisplayState())
-    val state: StateFlow<LyricsDisplayState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(LyricsState())
+    val state: StateFlow<LyricsState> = _state.asStateFlow()
 
     private val _effects = Channel<LyricsEffect>(Channel.BUFFERED)
     val effects: Flow<LyricsEffect> = _effects.receiveAsFlow()
 
+    private val _intents = Channel<LyricsIntent>(Channel.BUFFERED)
+
     init {
         observeLyricsSync()
         observeUserSettings()
+        processIntents()
     }
 
-    fun loadLyrics(fileName: String, audioFileName: String) {
+    fun handleIntent(intent: LyricsIntent) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-
-            loadLyricsUseCase(fileName)
-                .onSuccess { lyrics ->
-                    _state.update {
-                        it.copy(
-                            lyrics = lyrics,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                    // Also load the audio file
-                    playerRepository.loadMedia(audioFileName)
-                }
-                .onFailure { error ->
-                    Timber.e(error, "Failed to load lyrics")
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            error = error.message ?: "Failed to load lyrics"
-                        )
-                    }
-                    _effects.send(
-                        LyricsEffect.ShowError(
-                            error.message ?: "Failed to load lyrics"
-                        )
-                    )
-                }
+            _intents.send(intent)
         }
     }
 
-    fun onLineClicked(lineIndex: Int) {
+    private fun processIntents() {
         viewModelScope.launch {
-            val line = _state.value.lyrics?.lines?.getOrNull(lineIndex)
-            line?.let {
-                playerRepository.seekTo(it.start.toLong())
-                _effects.send(LyricsEffect.ScrollToLine(lineIndex))
+            _intents.receiveAsFlow().collect { intent ->
+                when (intent) {
+                    is LyricsIntent.LoadLyrics -> loadLyrics(intent.fileName, intent.audioFileName)
+                    is LyricsIntent.SeekToLine -> seekToLine(intent.lineIndex)
+                    is LyricsIntent.UpdateCurrentPosition -> updatePosition(intent.position)
+                }
             }
         }
+    }
+
+    private suspend fun loadLyrics(fileName: String, audioFileName: String) {
+        _state.update { it.copy(isLoading = true) }
+
+        loadLyricsUseCase(fileName)
+            .onSuccess { lyrics ->
+                _state.update {
+                    it.copy(
+                        lyrics = lyrics,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+                playerRepository.loadMedia(audioFileName)
+            }
+            .onFailure { error ->
+                Timber.e(error, "Failed to load lyrics")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to load lyrics"
+                    )
+                }
+                _effects.send(
+                    LyricsEffect.ShowError(
+                        error.message ?: "Failed to load lyrics"
+                    )
+                )
+            }
+    }
+
+    private suspend fun seekToLine(lineIndex: Int) {
+        val line = _state.value.lyrics?.lines?.getOrNull(lineIndex)
+        line?.let {
+            playerRepository.seekTo(it.start.toLong())
+            _effects.send(LyricsEffect.ScrollToLine(lineIndex))
+        }
+    }
+
+    private fun updatePosition(position: Long) {
+        // Position updates are handled by observeLyricsSync
     }
 
     private fun observeLyricsSync() {
