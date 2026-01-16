@@ -3,6 +3,7 @@ package com.karaokelyrics.ui.components
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,7 +51,8 @@ fun KaraokeLineDisplay(
     modifier: Modifier = Modifier,
     onLineClick: ((ISyncedLine) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationStateManager() }
+    // Reset animation manager when config changes
+    val animationManager = remember(config.animation) { AnimationStateManager() }
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
 
@@ -119,7 +121,11 @@ fun KaraokeLineDisplay(
                     Modifier
                 }
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = when (config.visual.textAlign) {
+            TextAlign.Start, TextAlign.Left -> Alignment.CenterStart
+            TextAlign.End, TextAlign.Right -> Alignment.CenterEnd
+            else -> Alignment.Center
+        }
     ) {
         when (line) {
             is KaraokeLine -> {
@@ -159,263 +165,302 @@ private fun KaraokeSyllableRenderer(
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
-    val animationManager = remember { AnimationStateManager() }
-    val characterAnimator = remember { CharacterAnimationCalculator() }
+    // Reset animation managers when config changes
+    val animationManager = remember(config.animation) { AnimationStateManager() }
+    val characterAnimator = remember(config.animation) { CharacterAnimationCalculator() }
 
-    // Calculate the total text to get dimensions
-    val fullText = line.syllables.joinToString("") { it.content }
-    val textLayoutResult = remember(fullText, textStyle) {
-        textMeasurer.measure(
-            text = fullText,
-            style = textStyle
-        )
-    }
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val maxWidthPx = with(density) { maxWidth.toPx() }
 
-    // Calculate how many lines we need based on actual screen width
-    val wrappedContent = remember(fullText, textStyle, density) {
-        calculateWrappedContent(line, textMeasurer, textStyle, density)
-    }
+        // Calculate the total text to get dimensions
+        val fullText = line.syllables.joinToString("") { it.content }
 
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(with(density) { (wrappedContent.lineCount * textLayoutResult.size.height).toDp() })
+        // Calculate how many lines we need based on actual available width
+        val wrappedContent = remember(fullText, textStyle, maxWidthPx) {
+            calculateWrappedContentWithMaxWidth(line, textMeasurer, textStyle, maxWidthPx.toInt())
+        }
+
+        val textLayoutResult = remember(fullText, textStyle) {
+            textMeasurer.measure(
+                text = fullText,
+                style = textStyle
+            )
+        }
+
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(with(density) {
+                    val lineHeight = textLayoutResult.size.height
+                    (wrappedContent.lineCount * lineHeight * 1.2f).toDp()
+                })
     ) {
         val lineHeight = textLayoutResult.size.height.toFloat()
         val availableWidth = size.width
 
-        var currentX = 0f
-        var currentY = 0f
-        var currentLine = 1
+        // Calculate lines first to handle alignment
+        val lines = mutableListOf<List<Pair<com.karaokelyrics.ui.core.models.KaraokeSyllable, Float>>>()
+        var currentLineContent = mutableListOf<Pair<com.karaokelyrics.ui.core.models.KaraokeSyllable, Float>>()
+        var currentLineWidth = 0f
 
         line.syllables.forEach { syllable ->
-            // For each syllable, render its characters
-            val syllableDuration = syllable.end - syllable.start
-            val charCount = syllable.content.length
-            val charDuration = if (charCount > 0) syllableDuration.toFloat() / charCount else 0f
+            val syllableLayout = textMeasurer.measure(syllable.content, textStyle)
+            val syllableWidth = syllableLayout.size.width
 
-            // Check if entire syllable fits on current line, if not wrap before syllable
-            val syllableText = syllable.content
-            val syllableLayout = textMeasurer.measure(syllableText, textStyle)
-
-            if (currentX + syllableLayout.size.width > availableWidth && currentX > 0) {
-                // Wrap to next line before syllable
-                currentX = 0f
-                currentY += lineHeight
-                currentLine++
+            if (currentLineWidth + syllableWidth > availableWidth && currentLineContent.isNotEmpty()) {
+                lines.add(currentLineContent)
+                currentLineContent = mutableListOf()
+                currentLineWidth = 0f
             }
 
-            syllable.content.forEachIndexed { charIndex, char ->
-                val charStartTime = syllable.start + (charIndex * charDuration).toInt()
-                val charEndTime = syllable.start + ((charIndex + 1) * charDuration).toInt()
+            currentLineContent.add(syllable to currentLineWidth)
+            currentLineWidth += syllableWidth
 
-                // Determine character state
-                val hasCharPlayed = currentTimeMs > charEndTime
-                val isCharActive = currentTimeMs >= charStartTime &&
-                    currentTimeMs <= (charEndTime + config.animation.characterAnimationDuration.toInt())
+            if (syllable != line.syllables.last()) {
+                val spaceLayout = textMeasurer.measure(" ", textStyle)
+                currentLineWidth += spaceLayout.size.width
+            }
+        }
+        if (currentLineContent.isNotEmpty()) {
+            lines.add(currentLineContent)
+        }
 
-                // Measure this character
-                val charText = char.toString()
-                val charLayout = textMeasurer.measure(
-                    text = charText,
-                    style = textStyle
-                )
+        // Now render with proper alignment
+        var currentY = 0f
 
-                // Get character color based on precise timing
-                val charColor = when {
-                    currentTimeMs > charEndTime -> {
-                        // Character has been fully played
-                        config.visual.playingTextColor
-                    }
-                    currentTimeMs >= charStartTime -> {
-                        // Character is currently playing - interpolate
-                        val progress = if (charEndTime > charStartTime) {
-                            ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
-                                .coerceIn(0f, 1f)
-                        } else 1f
-                        lerpColor(baseColor, config.visual.playingTextColor, progress)
-                    }
-                    else -> {
-                        // Character hasn't started yet
-                        baseColor
-                    }
-                }
+        lines.forEach { lineContent ->
+            val totalLineWidth = lineContent.lastOrNull()?.let { (syl, offset) ->
+                val syllableLayout = textMeasurer.measure(syl.content, textStyle)
+                offset + syllableLayout.size.width
+            } ?: 0f
 
-                // Apply character animations if enabled
-                if (config.animation.enableCharacterAnimations && isCharActive) {
-                    val animState = characterAnimator.calculateCharacterAnimation(
-                        characterStartTime = charStartTime,
-                        characterEndTime = charEndTime,
-                        currentTime = currentTimeMs,
-                        animationDuration = config.animation.characterAnimationDuration,
-                        maxScale = config.animation.characterMaxScale,
-                        floatOffset = config.animation.characterFloatOffset,
-                        rotationDegrees = config.animation.characterRotationDegrees
+            // Calculate starting X based on text alignment
+            val startX = when (textStyle.textAlign) {
+                TextAlign.Center -> (availableWidth - totalLineWidth) / 2f
+                TextAlign.End, TextAlign.Right -> availableWidth - totalLineWidth
+                else -> 0f
+            }
+
+            lineContent.forEach { (syllable, offsetInLine) ->
+                var charX = startX + offsetInLine
+
+                // For each syllable, render its characters
+                val syllableDuration = syllable.end - syllable.start
+                val charCount = syllable.content.length
+                val charDuration = if (charCount > 0) syllableDuration.toFloat() / charCount else 0f
+
+                syllable.content.forEachIndexed { charIndex, char ->
+                    val charStartTime = syllable.start + (charIndex * charDuration).toInt()
+                    val charEndTime = syllable.start + ((charIndex + 1) * charDuration).toInt()
+
+                    // Determine character state
+                    val hasCharPlayed = currentTimeMs > charEndTime
+                    val isCharActive = currentTimeMs >= charStartTime &&
+                        currentTimeMs <= (charEndTime + config.animation.characterAnimationDuration.toInt())
+
+                    // Measure this character
+                    val charText = char.toString()
+                    val charLayout = textMeasurer.measure(
+                        text = charText,
+                        style = textStyle
                     )
 
-                    drawIntoCanvas {
-                        drawScale(
-                            scale = animState.scale,
-                            pivot = Offset(currentX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
-                        ) {
-                            rotate(
-                                degrees = animState.rotation,
-                                pivot = Offset(currentX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
+                    // Get character color based on precise timing
+                    val charColor = when {
+                        currentTimeMs > charEndTime -> {
+                            // Character has been fully played
+                            config.visual.playingTextColor
+                        }
+                        currentTimeMs >= charStartTime -> {
+                            // Character is currently playing - interpolate
+                            val progress = if (charEndTime > charStartTime) {
+                                ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
+                                    .coerceIn(0f, 1f)
+                            } else 1f
+                            com.karaokelyrics.ui.components.lerpColor(baseColor, config.visual.playingTextColor, progress)
+                        }
+                        else -> {
+                            // Character hasn't started yet
+                            baseColor
+                        }
+                    }
+
+                    // Apply character animations if enabled
+                    if (config.animation.enableCharacterAnimations && isCharActive) {
+                        val animState = characterAnimator.calculateCharacterAnimation(
+                            characterStartTime = charStartTime,
+                            characterEndTime = charEndTime,
+                            currentTime = currentTimeMs,
+                            animationDuration = config.animation.characterAnimationDuration,
+                            maxScale = config.animation.characterMaxScale,
+                            floatOffset = config.animation.characterFloatOffset,
+                            rotationDegrees = config.animation.characterRotationDegrees
+                        )
+
+                        drawIntoCanvas {
+                            drawScale(
+                                scale = animState.scale,
+                                pivot = Offset(charX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
                             ) {
-                                // Draw shadow if enabled
-                                if (config.visual.shadowEnabled) {
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        color = config.visual.shadowColor.copy(alpha = 0.3f),
-                                        topLeft = Offset(
-                                            currentX + animState.offset.x + config.visual.shadowOffset.x,
-                                            currentY + animState.offset.y + config.visual.shadowOffset.y
+                                rotate(
+                                    degrees = animState.rotation,
+                                    pivot = Offset(charX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
+                                ) {
+                                    // Draw shadow if enabled
+                                    if (config.visual.shadowEnabled) {
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            color = config.visual.shadowColor.copy(alpha = 0.3f),
+                                            topLeft = Offset(
+                                                charX + animState.offset.x + config.visual.shadowOffset.x,
+                                                currentY + animState.offset.y + config.visual.shadowOffset.y
+                                            )
                                         )
-                                    )
-                                }
+                                    }
 
-                                // Calculate character progress for effects
-                                val charProgress = if (charEndTime > charStartTime && currentTimeMs >= charStartTime) {
-                                    ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
-                                        .coerceIn(0f, 1f)
-                                } else 0f
+                                    // Calculate character progress for effects
+                                    val charProgress = if (charEndTime > charStartTime && currentTimeMs >= charStartTime) {
+                                        ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
+                                            .coerceIn(0f, 1f)
+                                    } else 0f
 
-                                // Draw glow layers if enabled
-                                if (config.visual.glowEnabled && charProgress > 0f) {
-                                    // Draw multiple layers for glow effect
-                                    val glowColor = config.visual.glowColor
-                                    // Outer glow layer
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        color = glowColor.copy(alpha = 0.2f),
-                                        topLeft = Offset(
-                                            currentX + animState.offset.x - 2,
-                                            currentY + animState.offset.y - 2
+                                    // Draw glow layers if enabled
+                                    if (config.visual.glowEnabled && charProgress > 0f) {
+                                        // Draw multiple layers for glow effect
+                                        val glowColor = config.visual.glowColor
+                                        // Outer glow layer
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            color = glowColor.copy(alpha = 0.2f),
+                                            topLeft = Offset(
+                                                charX + animState.offset.x - 2,
+                                                currentY + animState.offset.y - 2
+                                            )
                                         )
-                                    )
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        color = glowColor.copy(alpha = 0.2f),
-                                        topLeft = Offset(
-                                            currentX + animState.offset.x + 2,
-                                            currentY + animState.offset.y + 2
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            color = glowColor.copy(alpha = 0.2f),
+                                            topLeft = Offset(
+                                                charX + animState.offset.x + 2,
+                                                currentY + animState.offset.y + 2
+                                            )
                                         )
-                                    )
-                                    // Middle glow layer
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        color = glowColor.copy(alpha = 0.3f),
-                                        topLeft = Offset(
-                                            currentX + animState.offset.x - 1,
-                                            currentY + animState.offset.y - 1
+                                        // Middle glow layer
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            color = glowColor.copy(alpha = 0.3f),
+                                            topLeft = Offset(
+                                                charX + animState.offset.x - 1,
+                                                currentY + animState.offset.y - 1
+                                            )
                                         )
-                                    )
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        color = glowColor.copy(alpha = 0.3f),
-                                        topLeft = Offset(
-                                            currentX + animState.offset.x + 1,
-                                            currentY + animState.offset.y + 1
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            color = glowColor.copy(alpha = 0.3f),
+                                            topLeft = Offset(
+                                                charX + animState.offset.x + 1,
+                                                currentY + animState.offset.y + 1
+                                            )
                                         )
-                                    )
-                                }
+                                    }
 
-                                // Apply gradient if enabled for active characters
-                                if (config.visual.gradientEnabled && charProgress > 0f) {
-                                    val gradient = GradientFactory.createLinearGradient(
-                                        colors = listOf(
-                                            config.visual.colors.active,
-                                            config.visual.colors.sung
-                                        ),
-                                        angle = config.visual.gradientAngle,
-                                        width = charLayout.size.width.toFloat(),
-                                        height = charLayout.size.height.toFloat()
-                                    )
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        brush = gradient,
-                                        topLeft = Offset(currentX + animState.offset.x, currentY + animState.offset.y)
-                                    )
-                                } else {
-                                    drawText(
-                                        textLayoutResult = charLayout,
-                                        color = charColor,
-                                        topLeft = Offset(currentX + animState.offset.x, currentY + animState.offset.y)
-                                    )
+                                    // Apply gradient if enabled for active characters
+                                    if (config.visual.gradientEnabled && charProgress > 0f) {
+                                        val gradient = GradientFactory.createLinearGradient(
+                                            colors = listOf(
+                                                config.visual.colors.active,
+                                                config.visual.colors.sung
+                                            ),
+                                            angle = config.visual.gradientAngle,
+                                            width = charLayout.size.width.toFloat(),
+                                            height = charLayout.size.height.toFloat()
+                                        )
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            brush = gradient,
+                                            topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
+                                        )
+                                    } else {
+                                        drawText(
+                                            textLayoutResult = charLayout,
+                                            color = charColor,
+                                            topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
-                } else {
-                    // Draw without animation but with effects if enabled
-
-                    // Draw shadow if enabled
-                    if (config.visual.shadowEnabled) {
-                        drawText(
-                            textLayoutResult = charLayout,
-                            color = config.visual.shadowColor.copy(alpha = 0.3f),
-                            topLeft = Offset(
-                                currentX + config.visual.shadowOffset.x,
-                                currentY + config.visual.shadowOffset.y
-                            )
-                        )
-                    }
-
-                    // Calculate character progress for effects
-                    val charProgress = if (charEndTime > charStartTime && currentTimeMs >= charStartTime) {
-                        ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
-                            .coerceIn(0f, 1f)
-                    } else 0f
-
-                    // Draw glow if enabled
-                    if (config.visual.glowEnabled && charProgress > 0f) {
-                        val glowColor = config.visual.glowColor
-                        drawText(
-                            textLayoutResult = charLayout,
-                            color = glowColor.copy(alpha = 0.2f),
-                            topLeft = Offset(currentX - 2, currentY - 2)
-                        )
-                        drawText(
-                            textLayoutResult = charLayout,
-                            color = glowColor.copy(alpha = 0.2f),
-                            topLeft = Offset(currentX + 2, currentY + 2)
-                        )
-                    }
-
-                    // Draw main text with gradient if enabled
-                    if (config.visual.gradientEnabled && charProgress > 0f) {
-                        val gradient = GradientFactory.createLinearGradient(
-                            colors = listOf(
-                                config.visual.colors.active,
-                                config.visual.colors.sung
-                            ),
-                            angle = config.visual.gradientAngle,
-                            width = charLayout.size.width.toFloat(),
-                            height = charLayout.size.height.toFloat()
-                        )
-                        drawText(
-                            textLayoutResult = charLayout,
-                            brush = gradient,
-                            topLeft = Offset(currentX, currentY)
-                        )
                     } else {
-                        drawText(
-                            textLayoutResult = charLayout,
-                            color = charColor,
-                            topLeft = Offset(currentX, currentY)
-                        )
+                        // Draw without animation but with effects if enabled
+
+                        // Draw shadow if enabled
+                        if (config.visual.shadowEnabled) {
+                            drawText(
+                                textLayoutResult = charLayout,
+                                color = config.visual.shadowColor.copy(alpha = 0.3f),
+                                topLeft = Offset(
+                                    charX + config.visual.shadowOffset.x,
+                                    currentY + config.visual.shadowOffset.y
+                                )
+                            )
+                        }
+
+                        // Calculate character progress for effects
+                        val charProgress = if (charEndTime > charStartTime && currentTimeMs >= charStartTime) {
+                            ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
+                                .coerceIn(0f, 1f)
+                        } else 0f
+
+                        // Draw glow if enabled
+                        if (config.visual.glowEnabled && charProgress > 0f) {
+                            val glowColor = config.visual.glowColor
+                            drawText(
+                                textLayoutResult = charLayout,
+                                color = glowColor.copy(alpha = 0.2f),
+                                topLeft = Offset(charX - 2, currentY - 2)
+                            )
+                            drawText(
+                                textLayoutResult = charLayout,
+                                color = glowColor.copy(alpha = 0.2f),
+                                topLeft = Offset(charX + 2, currentY + 2)
+                            )
+                        }
+
+                        // Draw main text with gradient if enabled
+                        if (config.visual.gradientEnabled && charProgress > 0f) {
+                            val gradient = GradientFactory.createLinearGradient(
+                                colors = listOf(
+                                    config.visual.colors.active,
+                                    config.visual.colors.sung
+                                ),
+                                angle = config.visual.gradientAngle,
+                                width = charLayout.size.width.toFloat(),
+                                height = charLayout.size.height.toFloat()
+                            )
+                            drawText(
+                                textLayoutResult = charLayout,
+                                brush = gradient,
+                                topLeft = Offset(charX, currentY)
+                            )
+                        } else {
+                            drawText(
+                                textLayoutResult = charLayout,
+                                color = charColor,
+                                topLeft = Offset(charX, currentY)
+                            )
+                        }
                     }
+
+                    charX += charLayout.size.width
                 }
-
-                currentX += charLayout.size.width
             }
 
-            // Add space after syllable if not the last one
-            if (syllable != line.syllables.last()) {
-                val spaceLayout = textMeasurer.measure(" ", textStyle)
-                currentX += spaceLayout.size.width
-            }
+            // Move to next line
+            currentY += lineHeight
         }
+    }
     }
 }
 
@@ -427,7 +472,44 @@ private data class WrappedContent(
 )
 
 /**
+ * Calculate wrapped content based on actual available width.
+ */
+private fun calculateWrappedContentWithMaxWidth(
+    line: KaraokeLine,
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    textStyle: TextStyle,
+    maxWidth: Int
+): WrappedContent {
+    val availableWidth = maxWidth.toFloat()
+
+    var lineCount = 1
+    var currentX = 0f
+
+    line.syllables.forEach { syllable ->
+        val syllableText = syllable.content
+        val syllableLayout = textMeasurer.measure(syllableText, textStyle)
+
+        // Check if syllable fits on current line
+        if (currentX + syllableLayout.size.width > availableWidth && currentX > 0) {
+            lineCount++
+            currentX = 0f
+        }
+
+        currentX += syllableLayout.size.width
+
+        // Add space after syllable if not last
+        if (syllable != line.syllables.last()) {
+            val spaceLayout = textMeasurer.measure(" ", textStyle)
+            currentX += spaceLayout.size.width
+        }
+    }
+
+    return WrappedContent(lineCount)
+}
+
+/**
  * Calculate wrapped content based on screen width and font size.
+ * @deprecated Use calculateWrappedContentWithMaxWidth instead
  */
 private fun calculateWrappedContent(
     line: KaraokeLine,

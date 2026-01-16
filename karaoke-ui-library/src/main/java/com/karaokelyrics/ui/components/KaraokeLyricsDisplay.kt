@@ -1,5 +1,6 @@
 package com.karaokelyrics.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
  * @param onLineClick Optional callback when a line is clicked
  * @param onLineLongPress Optional callback when a line is long-pressed
  */
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun KaraokeLyricsDisplay(
     lines: List<ISyncedLine>,
