@@ -38,5 +38,18 @@ data class VisualConfig(
         Color(0xFF00BCD4), // Cyan
         Color(0xFFE91E63)  // Pink
     ),
-    val gradientAngle: Float = 45f
+    val gradientAngle: Float = 45f,
+    val gradientEnabled: Boolean = false,
+
+    // Shadow Configuration
+    val shadowEnabled: Boolean = false,
+    val shadowColor: Color = Color.Black.copy(alpha = 0.3f),
+    val shadowOffset: androidx.compose.ui.geometry.Offset = androidx.compose.ui.geometry.Offset(2f, 2f),
+
+    // Glow Configuration
+    val glowEnabled: Boolean = false,
+    val glowColor: Color = Color.Yellow.copy(alpha = 0.5f),
+
+    // Colors for gradient
+    val colors: ColorConfig = ColorConfig()
 )

@@ -262,21 +262,149 @@ private fun KaraokeSyllableRenderer(
                                 degrees = animState.rotation,
                                 pivot = Offset(currentX + charLayout.size.width / 2f, currentY + charLayout.size.height / 2f)
                             ) {
-                                drawText(
-                                    textLayoutResult = charLayout,
-                                    color = charColor,
-                                    topLeft = Offset(currentX + animState.offset.x, currentY + animState.offset.y)
-                                )
+                                // Draw shadow if enabled
+                                if (config.visual.shadowEnabled) {
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        color = config.visual.shadowColor.copy(alpha = 0.3f),
+                                        topLeft = Offset(
+                                            currentX + animState.offset.x + config.visual.shadowOffset.x,
+                                            currentY + animState.offset.y + config.visual.shadowOffset.y
+                                        )
+                                    )
+                                }
+
+                                // Calculate character progress for effects
+                                val charProgress = if (charEndTime > charStartTime && currentTimeMs >= charStartTime) {
+                                    ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
+                                        .coerceIn(0f, 1f)
+                                } else 0f
+
+                                // Draw glow layers if enabled
+                                if (config.visual.glowEnabled && charProgress > 0f) {
+                                    // Draw multiple layers for glow effect
+                                    val glowColor = config.visual.glowColor
+                                    // Outer glow layer
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        color = glowColor.copy(alpha = 0.2f),
+                                        topLeft = Offset(
+                                            currentX + animState.offset.x - 2,
+                                            currentY + animState.offset.y - 2
+                                        )
+                                    )
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        color = glowColor.copy(alpha = 0.2f),
+                                        topLeft = Offset(
+                                            currentX + animState.offset.x + 2,
+                                            currentY + animState.offset.y + 2
+                                        )
+                                    )
+                                    // Middle glow layer
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        color = glowColor.copy(alpha = 0.3f),
+                                        topLeft = Offset(
+                                            currentX + animState.offset.x - 1,
+                                            currentY + animState.offset.y - 1
+                                        )
+                                    )
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        color = glowColor.copy(alpha = 0.3f),
+                                        topLeft = Offset(
+                                            currentX + animState.offset.x + 1,
+                                            currentY + animState.offset.y + 1
+                                        )
+                                    )
+                                }
+
+                                // Apply gradient if enabled for active characters
+                                if (config.visual.gradientEnabled && charProgress > 0f) {
+                                    val gradient = GradientFactory.createLinearGradient(
+                                        colors = listOf(
+                                            config.visual.colors.active,
+                                            config.visual.colors.sung
+                                        ),
+                                        angle = config.visual.gradientAngle,
+                                        width = charLayout.size.width.toFloat(),
+                                        height = charLayout.size.height.toFloat()
+                                    )
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        brush = gradient,
+                                        topLeft = Offset(currentX + animState.offset.x, currentY + animState.offset.y)
+                                    )
+                                } else {
+                                    drawText(
+                                        textLayoutResult = charLayout,
+                                        color = charColor,
+                                        topLeft = Offset(currentX + animState.offset.x, currentY + animState.offset.y)
+                                    )
+                                }
                             }
                         }
                     }
                 } else {
-                    // Draw without animation
-                    drawText(
-                        textLayoutResult = charLayout,
-                        color = charColor,
-                        topLeft = Offset(currentX, currentY)
-                    )
+                    // Draw without animation but with effects if enabled
+
+                    // Draw shadow if enabled
+                    if (config.visual.shadowEnabled) {
+                        drawText(
+                            textLayoutResult = charLayout,
+                            color = config.visual.shadowColor.copy(alpha = 0.3f),
+                            topLeft = Offset(
+                                currentX + config.visual.shadowOffset.x,
+                                currentY + config.visual.shadowOffset.y
+                            )
+                        )
+                    }
+
+                    // Calculate character progress for effects
+                    val charProgress = if (charEndTime > charStartTime && currentTimeMs >= charStartTime) {
+                        ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
+                            .coerceIn(0f, 1f)
+                    } else 0f
+
+                    // Draw glow if enabled
+                    if (config.visual.glowEnabled && charProgress > 0f) {
+                        val glowColor = config.visual.glowColor
+                        drawText(
+                            textLayoutResult = charLayout,
+                            color = glowColor.copy(alpha = 0.2f),
+                            topLeft = Offset(currentX - 2, currentY - 2)
+                        )
+                        drawText(
+                            textLayoutResult = charLayout,
+                            color = glowColor.copy(alpha = 0.2f),
+                            topLeft = Offset(currentX + 2, currentY + 2)
+                        )
+                    }
+
+                    // Draw main text with gradient if enabled
+                    if (config.visual.gradientEnabled && charProgress > 0f) {
+                        val gradient = GradientFactory.createLinearGradient(
+                            colors = listOf(
+                                config.visual.colors.active,
+                                config.visual.colors.sung
+                            ),
+                            angle = config.visual.gradientAngle,
+                            width = charLayout.size.width.toFloat(),
+                            height = charLayout.size.height.toFloat()
+                        )
+                        drawText(
+                            textLayoutResult = charLayout,
+                            brush = gradient,
+                            topLeft = Offset(currentX, currentY)
+                        )
+                    } else {
+                        drawText(
+                            textLayoutResult = charLayout,
+                            color = charColor,
+                            topLeft = Offset(currentX, currentY)
+                        )
+                    }
                 }
 
                 currentX += charLayout.size.width

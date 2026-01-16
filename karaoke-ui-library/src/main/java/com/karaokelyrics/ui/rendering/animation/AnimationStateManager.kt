@@ -53,15 +53,19 @@ class AnimationStateManager {
             label = "lineScale"
         )
 
+        // Enhanced fade animations with smoother transitions
         val opacity by animateFloatAsState(
             targetValue = when {
-                currentTime < lineStartTime -> 0.6f
-                currentTime in lineStartTime..lineEndTime -> 1f
-                else -> 0.25f
+                currentTime < lineStartTime - 3000 -> 0f  // Far upcoming lines are invisible
+                currentTime < lineStartTime - 1000 -> 0.3f  // Fade in starts
+                currentTime < lineStartTime -> 0.6f  // Almost ready
+                currentTime in lineStartTime..lineEndTime -> 1f  // Fully visible when active
+                currentTime > lineEndTime + 2000 -> 0.1f  // Fade out completed
+                else -> 0.25f  // Just played
             },
             animationSpec = tween(
-                durationMillis = 300,
-                easing = LinearEasing
+                durationMillis = 500,  // Smoother fade transition
+                easing = FastOutSlowInEasing
             ),
             label = "lineOpacity"
         )

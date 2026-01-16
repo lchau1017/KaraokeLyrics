@@ -49,9 +49,18 @@ class LibraryConfigMapper @Inject constructor() {
             // Map background
             backgroundColor = Color(userSettings.backgroundColorArgb),
 
-            // Map gradient settings - use defaults
-            enableGradients = true,
-            playingGradientColors = listOf(Color(0xFF00BCD4), Color(0xFFE91E63)),
+            // Map gradient settings - enable for testing
+            gradientEnabled = true,
+            shadowEnabled = true,
+            shadowColor = Color.Black.copy(alpha = 0.5f),
+            shadowOffset = androidx.compose.ui.geometry.Offset(2f, 2f),
+            glowEnabled = true,
+            glowColor = Color.Yellow.copy(alpha = 0.6f),
+            colors = ColorConfig(
+                sung = Color.Green,
+                unsung = Color.White,
+                active = Color.Yellow
+            ),
             gradientAngle = 45f
         )
     }
