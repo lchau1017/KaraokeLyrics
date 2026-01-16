@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.graphics.Color
+import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 
 /**
  * Calculates opacity values for lyrics lines based on their state.
@@ -17,32 +18,33 @@ object LyricsOpacityCalculator {
         isUpcoming: Boolean,
         distanceFromCurrent: Int,
         currentTimeMs: Int,
-        lineEndTime: Int
+        lineEndTime: Int,
+        config: KaraokeConfig = KaraokeConfig.Default
     ): Float {
         return when {
-            isCurrentLine -> 1f // Currently playing
-            hasBeenPlayed -> calculatePlayedOpacity(currentTimeMs - lineEndTime)
-            isUpcoming -> calculateUpcomingOpacity(distanceFromCurrent)
-            else -> 0.25f // Default minimum opacity
+            isCurrentLine -> config.activeLineOpacity
+            hasBeenPlayed -> calculatePlayedOpacity(currentTimeMs - lineEndTime, config)
+            isUpcoming -> calculateUpcomingOpacity(distanceFromCurrent, config)
+            else -> config.distantLineOpacity
         }
     }
 
-    private fun calculatePlayedOpacity(timeSincePlayed: Int): Float {
+    private fun calculatePlayedOpacity(timeSincePlayed: Int, config: KaraokeConfig): Float {
         val time = timeSincePlayed.coerceAtLeast(0)
         return when {
-            time < 500 -> 0.8f
-            time < 1000 -> 0.6f
-            time < 2000 -> 0.4f
-            else -> 0.25f // Minimum opacity for old played lines
+            time < config.recentlyPlayedWindow -> config.recentlyPlayedOpacity
+            time < config.recentlyPlayedWindow * 2 -> config.recentlyPlayedOpacity * 0.75f
+            time < config.fadeOutWindow -> config.recentlyPlayedOpacity * 0.5f
+            else -> config.playedLineOpacity
         }
     }
 
-    private fun calculateUpcomingOpacity(distance: Int): Float {
+    private fun calculateUpcomingOpacity(distance: Int, config: KaraokeConfig): Float {
         return when (distance) {
-            1 -> 0.6f
-            2 -> 0.45f
-            3 -> 0.35f
-            else -> 0.25f
+            1 -> config.upcomingLineOpacity
+            2 -> config.upcomingLineOpacity * 0.75f
+            3 -> config.upcomingLineOpacity * 0.6f
+            else -> config.distantLineOpacity
         }
     }
 
@@ -50,24 +52,26 @@ object LyricsOpacityCalculator {
         isCurrentLine: Boolean,
         hasBeenPlayed: Boolean,
         isUpcoming: Boolean,
-        distanceFromCurrent: Int
+        distanceFromCurrent: Int,
+        config: KaraokeConfig = KaraokeConfig.Default
     ): Float {
         return when {
-            isCurrentLine -> 1.05f // Only scale the currently playing line
-            else -> 1.0f // All other lines remain at normal scale
+            isCurrentLine -> config.activeLineScale
+            else -> config.normalLineScale
         }
     }
 
     fun calculateBlur(
         useBlurEffect: Boolean,
         isUpcoming: Boolean,
-        distanceFromCurrent: Int
+        distanceFromCurrent: Int,
+        config: KaraokeConfig = KaraokeConfig.Default
     ): Float {
         if (!useBlurEffect || !isUpcoming) return 0f
 
         return when (distanceFromCurrent) {
-            in 4..6 -> 1.5f
-            in 7..Int.MAX_VALUE -> 2.5f
+            in 4..6 -> config.distantLineBlurRadius * 0.6f
+            in 7..Int.MAX_VALUE -> config.distantLineBlurRadius
             else -> 0f
         }
     }

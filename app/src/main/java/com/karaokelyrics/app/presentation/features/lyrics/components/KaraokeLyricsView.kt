@@ -26,6 +26,7 @@ import com.karaokelyrics.app.presentation.features.lyrics.components.line.Lyrics
 import com.karaokelyrics.app.presentation.features.lyrics.components.opacity.LyricsOpacityCalculator
 import com.karaokelyrics.app.presentation.features.lyrics.components.opacity.animatedOpacity
 import com.karaokelyrics.app.presentation.features.lyrics.components.scroll.rememberLyricsScrollController
+import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 
 /**
  * Refactored KaraokeLyricsView following SOLID principles.
@@ -51,7 +52,8 @@ fun KaraokeLyricsView(
     textColor: Color = Color.White,
     useBlurEffect: Boolean = true,
     enableCharacterAnimations: Boolean = true,
-    offset: Dp = 100.dp
+    offset: Dp = 100.dp,
+    config: KaraokeConfig = KaraokeConfig.Default
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
@@ -103,7 +105,8 @@ fun KaraokeLyricsView(
                 isUpcoming = isUpcoming,
                 distanceFromCurrent = distanceFromCurrent,
                 currentTimeMs = currentTimeMs,
-                lineEndTime = line.end
+                lineEndTime = line.end,
+                config = config
             )
 
             val opacity by animatedOpacity(targetOpacity)
@@ -112,13 +115,15 @@ fun KaraokeLyricsView(
                 isCurrentLine = isCurrentLine,
                 hasBeenPlayed = hasBeenPlayed,
                 isUpcoming = isUpcoming,
-                distanceFromCurrent = distanceFromCurrent
+                distanceFromCurrent = distanceFromCurrent,
+                config = config
             )
 
             val blur = LyricsOpacityCalculator.calculateBlur(
                 useBlurEffect = useBlurEffect,
                 isUpcoming = isUpcoming,
-                distanceFromCurrent = distanceFromCurrent
+                distanceFromCurrent = distanceFromCurrent,
+                config = config
             )
 
             // Determine text style
@@ -141,7 +146,8 @@ fun KaraokeLyricsView(
                 textColor = textColor,
                 textStyle = textStyle,
                 enableCharacterAnimations = enableCharacterAnimations,
-                onLineClicked = onLineClicked
+                onLineClicked = onLineClicked,
+                config = config
             )
         }
 

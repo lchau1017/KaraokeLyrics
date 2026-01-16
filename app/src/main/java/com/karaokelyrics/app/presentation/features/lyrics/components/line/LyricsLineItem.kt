@@ -18,6 +18,7 @@ import com.karaokelyrics.app.domain.model.karaoke.KaraokeAlignment
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.synced.SyncedLine
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.KaraokeLineText
+import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 
 /**
  * Renders a single lyrics line item.
@@ -34,7 +35,8 @@ fun LyricsLineItem(
     textStyle: TextStyle,
     enableCharacterAnimations: Boolean,
     onLineClicked: (ISyncedLine) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    config: KaraokeConfig = KaraokeConfig.Default
 ) {
     Box(
         modifier = modifier
@@ -64,7 +66,8 @@ fun LyricsLineItem(
                     activeColor = textColor,
                     inactiveColor = textColor.copy(alpha = 0.3f),
                     enableCharacterAnimations = enableCharacterAnimations,
-                    enableBlurEffect = blur > 0
+                    enableBlurEffect = blur > 0,
+                    config = config
                 )
             }
             is SyncedLine -> {

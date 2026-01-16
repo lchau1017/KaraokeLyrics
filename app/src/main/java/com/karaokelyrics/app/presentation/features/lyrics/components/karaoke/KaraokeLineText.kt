@@ -15,6 +15,7 @@ import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.dir
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.layout.rememberKaraokeLayout
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.renderer.KaraokeRowRenderer
 import com.karaokelyrics.app.presentation.features.lyrics.components.karaoke.state.KaraokeLineState
+import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 import com.karaokelyrics.app.presentation.shared.animation.rememberAnimationStateManager
 import com.karaokelyrics.app.presentation.shared.rendering.SyllableRenderer
 
@@ -31,7 +32,8 @@ fun KaraokeLineText(
     inactiveColor: Color,
     modifier: Modifier = Modifier,
     enableCharacterAnimations: Boolean = true,
-    enableBlurEffect: Boolean = true
+    enableBlurEffect: Boolean = true,
+    config: KaraokeConfig = KaraokeConfig.Default
 ) {
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
@@ -64,9 +66,9 @@ fun KaraokeLineText(
         KaraokeAlignmentResolver.resolveAlignment(line.alignment, isRtl)
     }
 
-    // Clean up old animations periodically
+    // Clean up old animations periodically based on config
     LaunchedEffect(currentTimeMs) {
-        if (currentTimeMs % 5000 == 0) {
+        if (currentTimeMs % config.cleanupInterval == 0) {
             animationStateManager.clearOldAnimations(currentTimeMs)
         }
     }
@@ -74,7 +76,7 @@ fun KaraokeLineText(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 8.dp),
+            .padding(horizontal = config.linePadding, vertical = config.lineSpacing / 2),
         contentAlignment = alignment
     ) {
         val availableWidthPx = with(density) { maxWidth.toPx() }
