@@ -1,9 +1,10 @@
-package com.karaokelyrics.app.domain.usecase
+package com.karaokelyrics.app.presentation.features.lyrics.coordinator
 
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.repository.PlayerRepository
+import com.karaokelyrics.app.presentation.player.PlayerController
+import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -13,8 +14,8 @@ import javax.inject.Inject
  * Domain use case that coordinates playback state with lyrics synchronization.
  * Encapsulates the business logic that was previously in LyricsViewModel.
  */
-class CoordinatePlaybackSyncUseCase @Inject constructor(
-    private val playerRepository: PlayerRepository,
+class PlaybackSyncCoordinator @Inject constructor(
+    private val playerController: PlayerController,
     private val syncLyricsUseCase: SyncLyricsUseCase
 ) {
 
@@ -36,8 +37,8 @@ class CoordinatePlaybackSyncUseCase @Inject constructor(
         userSettings: UserSettings
     ): Flow<PlaybackSyncState> {
         return combine(
-            playerRepository.observePlaybackPosition(),
-            playerRepository.observeIsPlaying()
+            playerController.observePlaybackPosition(),
+            playerController.observeIsPlaying()
         ) { position, isPlaying ->
             val syncState = if (lyrics != null) {
                 // Use the timing offset from user settings
@@ -61,8 +62,8 @@ class CoordinatePlaybackSyncUseCase @Inject constructor(
      */
     fun observePlaybackOnly(): Flow<PlaybackSyncState> {
         return combine(
-            playerRepository.observePlaybackPosition(),
-            playerRepository.observeIsPlaying()
+            playerController.observePlaybackPosition(),
+            playerController.observeIsPlaying()
         ) { position, isPlaying ->
             PlaybackSyncState(
                 playbackPosition = position,

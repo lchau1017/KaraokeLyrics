@@ -2,7 +2,6 @@ package com.karaokelyrics.app.data.parser
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-// KaraokeAlignment removed - using metadata map instead
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import org.xmlpull.v1.XmlPullParser

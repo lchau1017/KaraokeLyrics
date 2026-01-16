@@ -11,7 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.repository.PlayerRepository
+import com.karaokelyrics.app.presentation.player.PlayerController
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
@@ -35,7 +35,7 @@ import javax.inject.Inject
 class LyricsViewModel @Inject constructor(
     private val loadLyricsUseCase: LoadLyricsUseCase,
     private val syncLyricsUseCase: SyncLyricsUseCase,
-    private val playerRepository: PlayerRepository,
+    private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
     private val lyricsRenderMapper: LyricsRenderMapper
 ) : ViewModel() {
@@ -106,7 +106,7 @@ class LyricsViewModel @Inject constructor(
                         error = null
                     )
                 }
-                playerRepository.loadMedia(audioFileName)
+                playerController.loadMedia(audioFileName)
             }
             .onFailure { error ->
                 Timber.e(error, "Failed to load lyrics")
@@ -127,7 +127,7 @@ class LyricsViewModel @Inject constructor(
     private suspend fun seekToLine(lineIndex: Int) {
         val line = _state.value.lyrics?.lines?.getOrNull(lineIndex)
         line?.let {
-            playerRepository.seekTo(it.start.toLong())
+            playerController.seekTo(it.start.toLong())
             _effects.send(LyricsEffect.ScrollToLine(lineIndex))
         }
     }
@@ -138,7 +138,7 @@ class LyricsViewModel @Inject constructor(
 
     private fun observeLyricsSync() {
         viewModelScope.launch {
-            playerRepository.observePlaybackPosition().collect { position ->
+            playerController.observePlaybackPosition().collect { position ->
                 val lyrics = _state.value.lyrics
                 val userSettings = _state.value.userSettings
 

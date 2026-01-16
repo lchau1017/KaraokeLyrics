@@ -2,7 +2,7 @@ package com.karaokelyrics.app.presentation.features.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.domain.repository.PlayerRepository
+import com.karaokelyrics.app.presentation.player.PlayerController
 import com.karaokelyrics.app.presentation.features.player.effect.PlayerEffect
 import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    private val playerRepository: PlayerRepository
+    private val playerController: PlayerController
 ) : ViewModel() {
 
     data class PlayerState(
@@ -59,22 +59,22 @@ class PlayerViewModel @Inject constructor(
 
     private suspend fun togglePlayPause() {
         if (_state.value.isPlaying) {
-            playerRepository.pause()
+            playerController.pause()
             _effects.send(PlayerEffect.PlaybackPaused)
         } else {
-            playerRepository.play()
+            playerController.play()
             _effects.send(PlayerEffect.PlaybackStarted)
         }
     }
 
     private suspend fun seekTo(position: Long) {
-        playerRepository.seekTo(position)
+        playerController.seekTo(position)
         _effects.send(PlayerEffect.SeekCompleted(position))
     }
 
     private suspend fun loadMedia(fileName: String) {
         try {
-            playerRepository.loadMedia(fileName)
+            playerController.loadMedia(fileName)
         } catch (e: Exception) {
             _effects.send(PlayerEffect.ShowError(e.message ?: "Failed to load media"))
         }
@@ -83,8 +83,8 @@ class PlayerViewModel @Inject constructor(
     private fun observePlaybackState() {
         viewModelScope.launch {
             combine(
-                playerRepository.observeIsPlaying(),
-                playerRepository.observePlaybackPosition()
+                playerController.observeIsPlaying(),
+                playerController.observePlaybackPosition()
             ) { isPlaying, position ->
                 PlayerState(
                     isPlaying = isPlaying,

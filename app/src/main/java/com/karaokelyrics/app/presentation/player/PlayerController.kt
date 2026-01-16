@@ -1,8 +1,12 @@
-package com.karaokelyrics.app.domain.repository
+package com.karaokelyrics.app.presentation.player
 
 import kotlinx.coroutines.flow.Flow
 
-interface PlayerRepository {
+/**
+ * Player controller interface for presentation layer.
+ * Handles media playback which is a UI/presentation concern.
+ */
+interface PlayerController {
     fun observePlaybackPosition(): Flow<Long>
     fun observeIsPlaying(): Flow<Boolean>
     suspend fun play()

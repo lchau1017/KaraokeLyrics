@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.data.repository
+package com.karaokelyrics.app.presentation.player
 
 import android.content.ComponentName
 import android.content.Context
@@ -6,7 +6,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.presentation.service.PlaybackService
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,10 +21,14 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Media player controller for presentation layer.
+ * Handles Android MediaController and MediaSession interaction.
+ */
 @Singleton
-class PlayerRepositoryImpl @Inject constructor(
+class MediaPlayerController @Inject constructor(
     @ApplicationContext private val context: Context
-) : PlayerRepository {
+) : PlayerController {
 
     private var mediaController: MediaController? = null
     private val controllerFuture: ListenableFuture<MediaController>
