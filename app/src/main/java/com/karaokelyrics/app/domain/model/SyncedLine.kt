@@ -1,6 +1,4 @@
-package com.karaokelyrics.app.domain.model.synced
-
-import com.karaokelyrics.app.domain.model.ISyncedLine
+package com.karaokelyrics.app.domain.model
 
 data class SyncedLine(
     override val content: String,

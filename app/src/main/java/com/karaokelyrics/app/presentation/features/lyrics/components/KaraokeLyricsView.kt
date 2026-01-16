@@ -13,7 +13,7 @@ import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
  * Acts as a thin wrapper to integrate the library with the app.
  */
 @Composable
-fun KaraokeLyricsViewNew(
+fun KaraokeLyricsView(
     lyrics: SyncedLyrics?,
     currentTimeMs: Int,
     libraryConfig: KaraokeLibraryConfig,
@@ -49,7 +49,7 @@ private fun ISyncedLine.toLibraryLine(): com.karaokelyrics.ui.core.models.ISynce
     val appLine = this
 
     // If it's a KaraokeLine, convert it properly
-    if (appLine is com.karaokelyrics.app.domain.model.karaoke.KaraokeLine) {
+    if (appLine is com.karaokelyrics.app.domain.model.KaraokeLine) {
         return com.karaokelyrics.ui.core.models.KaraokeLine(
             syllables = appLine.syllables.map { syllable ->
                 com.karaokelyrics.ui.core.models.KaraokeSyllable(

@@ -1,6 +1,6 @@
 package com.karaokelyrics.app.domain.usecase
 
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
+import com.karaokelyrics.app.domain.model.KaraokeSyllable
 import javax.inject.Inject
 
 /**
