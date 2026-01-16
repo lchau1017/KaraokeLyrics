@@ -1,5 +1,6 @@
 package com.karaokelyrics.app.presentation.features.lyrics.components.karaoke
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -23,6 +24,7 @@ import com.karaokelyrics.app.presentation.shared.rendering.SyllableRenderer
  * Refactored KaraokeLineContainer following SOLID principles.
  * Delegates responsibilities to specialized components.
  */
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun KaraokeLineText(
     line: KaraokeLine,

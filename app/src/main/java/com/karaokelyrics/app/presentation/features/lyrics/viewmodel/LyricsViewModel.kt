@@ -18,8 +18,8 @@ import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
-import com.karaokelyrics.app.presentation.features.lyrics.mapper.LyricsUiMapper
-import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsUiState
+import com.karaokelyrics.app.presentation.features.lyrics.mapper.LyricsRenderMapper
+import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsRenderState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -37,7 +37,7 @@ class LyricsViewModel @Inject constructor(
     private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerRepository: PlayerRepository,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-    private val lyricsUiMapper: LyricsUiMapper
+    private val lyricsRenderMapper: LyricsRenderMapper
 ) : ViewModel() {
 
     data class LyricsState(
@@ -46,7 +46,7 @@ class LyricsViewModel @Inject constructor(
         val isLoading: Boolean = false,
         val error: String? = null,
         val userSettings: UserSettings = UserSettings(),
-        val uiState: LyricsUiState? = null,
+        val renderState: LyricsRenderState? = null,
         val currentTimeMs: Int = 0,
         val textColor: Color = Color.White,
         val normalTextStyle: TextStyle = TextStyle(
@@ -152,26 +152,22 @@ class LyricsViewModel @Inject constructor(
                     // Map to UI state with all pre-calculated values
                     val currentTimeMs = (position + userSettings.lyricsTimingOffsetMs).toInt()
 
-                    // Use color from user settings
-                    val textColor = Color(userSettings.lyricsColorArgb)
-
-                    val uiState = lyricsUiMapper.mapToUiState(
+                    val renderState = lyricsRenderMapper.mapToRenderState(
                         lyrics = lyrics,
                         currentTimeMs = currentTimeMs,
-                        textColor = textColor,
-                        normalTextStyle = _state.value.normalTextStyle.copy(
+                        userSettings = userSettings,
+                        textStyle = _state.value.normalTextStyle.copy(
                             fontSize = userSettings.fontSize.sp.sp
                         ),
                         accompanimentTextStyle = _state.value.accompanimentTextStyle.copy(
                             fontSize = (userSettings.fontSize.sp * 0.6f).sp
-                        ),
-                        config = _state.value.config
+                        )
                     )
 
                     _state.update {
                         it.copy(
                             syncState = syncState,
-                            uiState = uiState,
+                            renderState = renderState,
                             currentTimeMs = currentTimeMs
                         )
                     }

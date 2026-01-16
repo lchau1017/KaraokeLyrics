@@ -16,56 +16,56 @@ import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
 import com.karaokelyrics.app.presentation.features.lyrics.components.line.LyricsLineItem
 import com.karaokelyrics.app.presentation.features.lyrics.components.scroll.rememberLyricsScrollController
 import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
-import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsLineUiModel
-import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsUiState
+import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsRenderModel
+import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsRenderState
 
 /**
- * Refactored KaraokeLyricsView using pre-calculated UI models.
+ * Refactored KaraokeLyricsView using pre-calculated render models.
  * "Dumb View" - only renders, no calculations.
  */
 @Composable
 fun KaraokeLyricsView(
-    uiState: LyricsUiState,
+    renderState: LyricsRenderState,
     onLineClicked: (ISyncedLine) -> Unit,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState(),
-    enableCharacterAnimations: Boolean = true,
-    offset: Dp = 100.dp,
-    config: KaraokeConfig = KaraokeConfig.Default
+    listState: LazyListState = rememberLazyListState()
 ) {
     val density = LocalDensity.current
+    val globalConfig = renderState.globalConfig
 
     // Calculate stable offset in pixels
-    val offsetPx = remember(offset, density) {
-        with(density) { offset.toPx().toInt() }
+    val offsetPx = remember(globalConfig.verticalPadding, density) {
+        with(density) { globalConfig.verticalPadding.dp.toPx().toInt() }
     }
 
     // Use scroll controller
     val scrollController = rememberLyricsScrollController(listState, offsetPx)
 
-    // Auto-scroll to focused line
-    LaunchedEffect(uiState.focusedLineIndex) {
-        scrollController.scrollToLine(uiState.focusedLineIndex)
+    // Auto-scroll to target
+    LaunchedEffect(renderState.scrollTarget) {
+        renderState.scrollTarget?.let {
+            scrollController.scrollToLine(it.index)
+        }
     }
 
     LazyColumn(
         state = listState,
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = offset),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        contentPadding = PaddingValues(
+            vertical = globalConfig.verticalPadding.dp,
+            horizontal = globalConfig.horizontalPadding.dp
+        ),
+        verticalArrangement = Arrangement.spacedBy(globalConfig.lineSpacing.dp)
     ) {
         items(
-            items = uiState.lines,
-            key = { lineModel ->
-                "${lineModel.line.start}-${lineModel.line.end}-${lineModel.index}-${lineModel.visualState.color.value}"
+            items = renderState.models,
+            key = { model ->
+                "${model.line.start}-${model.line.end}-${model.index}"
             }
-        ) { lineModel ->
+        ) { model ->
             KaraokeLyricsLineItem(
-                uiModel = lineModel,
-                currentTimeMs = uiState.currentTimeMs,
-                enableCharacterAnimations = enableCharacterAnimations,
-                onLineClicked = onLineClicked,
-                config = config
+                renderModel = model,
+                onLineClicked = onLineClicked
             )
         }
 
@@ -77,41 +77,33 @@ fun KaraokeLyricsView(
 }
 
 /**
- * Line item that uses pre-calculated UI model.
+ * Line item that uses pre-calculated render model.
  * No calculations, just rendering.
  */
 @Composable
 fun KaraokeLyricsLineItem(
-    uiModel: LyricsLineUiModel,
-    currentTimeMs: Int,
-    enableCharacterAnimations: Boolean,
-    onLineClicked: (ISyncedLine) -> Unit,
-    config: KaraokeConfig
+    renderModel: LyricsRenderModel,
+    onLineClicked: (ISyncedLine) -> Unit
 ) {
     // Animate opacity for smooth transitions
     val animatedOpacity by animateFloatAsState(
-        targetValue = uiModel.visualState.opacity,
+        targetValue = renderModel.visual.opacity,
         label = "opacity"
     )
 
-    // Debug: Log the values being passed
-    LaunchedEffect(uiModel.index) {
-        if (uiModel.index == 0) {
-            println("DEBUG: Line ${uiModel.index} - opacity: ${uiModel.visualState.opacity}, color: ${uiModel.visualState.color}, text: ${uiModel.line.content}")
-        }
-    }
-
-    // Use pre-calculated values from UI model
+    // Use pre-calculated values from render model
     LyricsLineItem(
-        line = uiModel.line,
-        currentTimeMs = currentTimeMs,
+        line = renderModel.line,
+        currentTimeMs = renderModel.timing.currentTimeMs,
         opacity = animatedOpacity,
-        scale = uiModel.visualState.scale,
-        blur = uiModel.visualState.blur,
-        textColor = uiModel.visualState.color,
-        textStyle = uiModel.visualState.textStyle,
-        enableCharacterAnimations = enableCharacterAnimations,
+        scale = renderModel.visual.scale,
+        blur = renderModel.visual.blur,
+        textColor = renderModel.visual.textColor,
+        textStyle = renderModel.visual.textStyle,
+        enableCharacterAnimations = renderModel.visual.enableCharacterAnimations,
         onLineClicked = onLineClicked,
-        config = config
+        config = KaraokeConfig(
+            characterFloatOffset = renderModel.visual.characterFloatOffset
+        )
     )
 }

@@ -95,7 +95,7 @@ fun LyricsScreen(
                     }
                 )
             }
-            lyricsState.uiState != null -> {
+            lyricsState.renderState != null -> {
                 LyricsContent(
                     lyricsState = lyricsState,
                     playerState = playerState,
@@ -165,19 +165,17 @@ private fun LyricsContent(
     onSettingsClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Use pre-calculated UI state instead of raw lyrics
-        lyricsState.uiState?.let { uiState ->
+        // Use pre-calculated render state
+        lyricsState.renderState?.let { renderState ->
             KaraokeLyricsView(
-                uiState = uiState,
+                renderState = renderState,
                 onLineClicked = { line ->
-                    val index = uiState.lines.indexOfFirst { it.line == line }
+                    val index = renderState.models.indexOfFirst { it.line == line }
                     if (index >= 0) onLineClicked(index)
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(settings.backgroundColorArgb)),
-                enableCharacterAnimations = settings.enableCharacterAnimations && settings.enableAnimations,
-                config = lyricsState.config
+                    .background(Color(settings.backgroundColorArgb))
             )
 
             PlayerControls(
