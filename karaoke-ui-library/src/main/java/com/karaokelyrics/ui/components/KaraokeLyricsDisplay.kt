@@ -39,106 +39,112 @@ fun KaraokeLyricsDisplay(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Find the current playing line index
+    // Find the current playing line index (for distance calculation)
     val currentLineIndex = remember(currentTimeMs, lines) {
         lines.indexOfFirst { line ->
             currentTimeMs in line.start..line.end
         }.takeIf { it != -1 }
     }
 
-    // Track the previous line index to detect changes
-    var previousLineIndex by remember { mutableStateOf<Int?>(null) }
+    // Find the last played line index
+    val lastPlayedLineIndex = remember(currentTimeMs, lines) {
+        lines.indexOfLast { line ->
+            currentTimeMs > line.end
+        }.takeIf { it != -1 }
+    }
 
-    // Handle automatic scrolling
-    LaunchedEffect(currentLineIndex) {
-        if (currentLineIndex != null &&
-            currentLineIndex != previousLineIndex &&
-            config.behavior.scrollBehavior != ScrollBehavior.NONE) {
+    // Track the previous last played line index to detect changes
+    var previousLastPlayedIndex by remember { mutableStateOf<Int?>(null) }
 
-            previousLineIndex = currentLineIndex
+    // Handle automatic scrolling based on last played line
+    LaunchedEffect(lastPlayedLineIndex) {
+        if (lastPlayedLineIndex != null &&
+            lastPlayedLineIndex != previousLastPlayedIndex) {
 
-            val targetIndex = when (config.behavior.scrollBehavior) {
-                ScrollBehavior.SMOOTH_CENTER -> {
-                    // Calculate center position considering visible items
-                    val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size.takeIf { it > 0 } ?: 5
-                    (currentLineIndex - visibleItemsCount / 2).coerceAtLeast(0)
-                }
-                ScrollBehavior.SMOOTH_TOP -> {
-                    // Scroll to make current line appear at top with some offset
-                    currentLineIndex.coerceAtLeast(0)
-                }
-                ScrollBehavior.INSTANT_CENTER -> {
-                    val visibleItemsCount = listState.layoutInfo.visibleItemsInfo.size.takeIf { it > 0 } ?: 5
-                    (currentLineIndex - visibleItemsCount / 2).coerceAtLeast(0)
-                }
-                ScrollBehavior.PAGED -> currentLineIndex
-                else -> currentLineIndex
-            }
+            previousLastPlayedIndex = lastPlayedLineIndex
 
-            when (config.behavior.scrollBehavior) {
-                ScrollBehavior.SMOOTH_CENTER, ScrollBehavior.SMOOTH_TOP -> {
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(
-                            index = targetIndex,
-                            scrollOffset = 0 // Let contentPadding handle the offset
-                        )
-                    }
-                }
-                ScrollBehavior.INSTANT_CENTER -> {
-                    coroutineScope.launch {
-                        listState.scrollToItem(
-                            index = targetIndex,
-                            scrollOffset = 0
-                        )
-                    }
-                }
-                ScrollBehavior.PAGED -> {
-                    // Page-like scrolling with snap behavior
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(
-                            index = currentLineIndex,
-                            scrollOffset = 0
-                        )
-                    }
-                }
-                else -> {}
+            // Scroll to show the next line after the last played
+            coroutineScope.launch {
+                val targetIndex = (lastPlayedLineIndex + 1).coerceAtMost(lines.size - 1)
+                listState.animateScrollToItem(
+                    index = targetIndex,
+                    scrollOffset = 0
+                )
             }
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(config.visual.backgroundColor)
             .padding(config.layout.containerPadding)
     ) {
+        val screenHeight = maxHeight
+
         LazyColumn(
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(config.layout.lineSpacing),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(
-                top = config.behavior.scrollOffset,
-                bottom = 200.dp
-            ) // Space at top for scroll offset and bottom for last lines
+                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),  // Status bar padding only
+                bottom = screenHeight // Full screen height bottom padding
+            )
         ) {
             itemsIndexed(
                 items = lines,
                 key = { index, line -> "$index-${line.start}" }
             ) { index, line ->
-                val distance = currentLineIndex?.let { kotlin.math.abs(index - it) } ?: 999
+                // Check line states
+                val hasPlayed = currentTimeMs > line.end
+                val isPlaying = currentTimeMs in line.start..line.end
+                val isUpcoming = currentTimeMs < line.start
 
-                KaraokeLineDisplayWithDistance(
-                    line = line,
-                    currentTimeMs = currentTimeMs,
-                    distance = distance,
-                    config = config,
-                    onLineClick = if (onLineClick != null) {
-                        { onLineClick(line, index) }
-                    } else null,
-                    onLineLongPress = if (onLineLongPress != null) {
-                        { onLineLongPress(line, index) }
-                    } else null
-                )
+                // Check if this is the last played line (has played but next line is playing or upcoming)
+                val isLastPlayed = hasPlayed && index < lines.size - 1 &&
+                    currentTimeMs <= lines[index + 1].end
+
+                // Check if this is the first upcoming line (is upcoming but previous line is played or playing)
+                val isFirstUpcoming = isUpcoming && index > 0 &&
+                    currentTimeMs >= lines[index - 1].start
+
+                // Check if this is the first active line in the active group
+                val isFirstActive = isPlaying && index > 0 && !lines[index - 1].let { prevLine ->
+                    currentTimeMs in prevLine.start..prevLine.end
+                }
+
+                Column {
+                    // Add spacing before line
+                    if (index > 0) {
+                        val spaceBefore = when {
+                            // Add extra space only before the first active line in the group
+                            isFirstActive -> 60.dp
+                            // Add extra space before first upcoming line
+                            isFirstUpcoming -> 60.dp
+                            // Normal spacing for all other cases
+                            else -> config.layout.lineSpacing
+                        }
+                        Spacer(modifier = Modifier.height(spaceBefore))
+                    }
+
+                    KaraokeLineDisplayWithDistance(
+                        line = line,
+                        currentTimeMs = currentTimeMs,
+                        distance = currentLineIndex?.let { kotlin.math.abs(index - it) } ?: 999,
+                        config = config,
+                        onLineClick = if (onLineClick != null) {
+                            { onLineClick(line, index) }
+                        } else null,
+                        onLineLongPress = if (onLineLongPress != null) {
+                            { onLineLongPress(line, index) }
+                        } else null
+                    )
+
+                    // Add extra spacing after last played line
+                    if (isLastPlayed) {
+                        Spacer(modifier = Modifier.height(screenHeight * 0.25f))
+                    }
+                }
             }
         }
     }
