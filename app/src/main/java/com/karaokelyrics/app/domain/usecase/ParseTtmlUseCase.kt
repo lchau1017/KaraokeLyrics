@@ -1,6 +1,7 @@
 package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.SyncedLyrics
+import com.karaokelyrics.app.domain.parser.TtmlParser
 import javax.inject.Inject
 
 /**
@@ -8,7 +9,9 @@ import javax.inject.Inject
  * This encapsulates the business logic for parsing TTML content,
  * delegating the actual XML parsing to the data layer.
  */
-class ParseTtmlUseCase @Inject constructor() {
+class ParseTtmlUseCase @Inject constructor(
+    private val ttmlParser: TtmlParser
+) {
 
     /**
      * Parse TTML content into domain model.
@@ -17,12 +20,8 @@ class ParseTtmlUseCase @Inject constructor() {
      */
     operator fun invoke(lines: List<String>): SyncedLyrics {
         // Business logic for TTML parsing coordination
-        // The actual XML parsing will be delegated to data layer parser
+        // The actual XML parsing is delegated to the injected parser
         // This use case orchestrates the parsing process and applies business rules
-
-        // For now, we'll create a data layer parser instance
-        // In a more complete implementation, this would be injected
-        val parser = com.karaokelyrics.app.data.parser.TtmlParser()
-        return parser.parse(lines)
+        return ttmlParser.parse(lines)
     }
 }

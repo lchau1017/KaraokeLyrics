@@ -1,5 +1,7 @@
 package com.karaokelyrics.app.domain.repository
 
+import android.content.res.AssetFileDescriptor
+import com.karaokelyrics.app.domain.model.MediaContent
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import kotlinx.coroutines.flow.Flow
 
@@ -19,4 +21,19 @@ interface LyricsRepository {
      * Get current lyrics as a flow for observing changes.
      */
     fun getCurrentLyrics(): Flow<SyncedLyrics?>
+
+    /**
+     * Get audio file descriptor for media playback.
+     */
+    suspend fun getAudioFileDescriptor(fileName: String): Result<AssetFileDescriptor>
+
+    /**
+     * Get available media content.
+     */
+    fun getAvailableContent(): List<MediaContent>
+
+    /**
+     * Get default content to load.
+     */
+    fun getDefaultContent(): MediaContent
 }

@@ -1,134 +1,53 @@
 package com.karaokelyrics.app.data.repository
 
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
+import com.karaokelyrics.app.data.source.local.PreferencesDataSource
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 @Singleton
 class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val preferencesDataSource: PreferencesDataSource
 ) : SettingsRepository {
 
-    private val dataStore = context.dataStore
-
-    companion object {
-        // Dark theme colors
-        val DARK_LYRICS_COLOR_KEY = intPreferencesKey("dark_lyrics_color")
-        val DARK_BACKGROUND_COLOR_KEY = intPreferencesKey("dark_background_color")
-
-        // Light theme colors
-        val LIGHT_LYRICS_COLOR_KEY = intPreferencesKey("light_lyrics_color")
-        val LIGHT_BACKGROUND_COLOR_KEY = intPreferencesKey("light_background_color")
-
-        // Legacy keys for migration
-        val LYRICS_COLOR_KEY = intPreferencesKey("lyrics_color")
-        val BACKGROUND_COLOR_KEY = intPreferencesKey("background_color")
-
-        val FONT_SIZE_KEY = stringPreferencesKey("font_size")
-        val ENABLE_ANIMATIONS_KEY = booleanPreferencesKey("enable_animations")
-        val ENABLE_BLUR_EFFECT_KEY = booleanPreferencesKey("enable_blur_effect")
-        val ENABLE_CHARACTER_ANIMATIONS_KEY = booleanPreferencesKey("enable_character_animations")
-        val LYRICS_TIMING_OFFSET_MS_KEY = intPreferencesKey("lyrics_timing_offset_ms")
-        val IS_DARK_MODE_KEY = booleanPreferencesKey("is_dark_mode")
-    }
-
-    override fun getUserSettings(): Flow<UserSettings> = dataStore.data.map { preferences ->
-        // Migration: Use legacy keys if new ones don't exist
-        val defaultDarkLyrics = 0xFF1DB954.toInt()
-        val defaultDarkBackground = 0xFF121212.toInt()
-        val defaultLightLyrics = 0xFF1DB954.toInt()
-        val defaultLightBackground = 0xFFFFFFFF.toInt()
-
-        UserSettings(
-            darkLyricsColorArgb = preferences[DARK_LYRICS_COLOR_KEY]
-                    ?: preferences[LYRICS_COLOR_KEY]
-                    ?: defaultDarkLyrics,
-            darkBackgroundColorArgb = preferences[DARK_BACKGROUND_COLOR_KEY]
-                    ?: preferences[BACKGROUND_COLOR_KEY]
-                    ?: defaultDarkBackground,
-            lightLyricsColorArgb = preferences[LIGHT_LYRICS_COLOR_KEY] ?: defaultLightLyrics,
-            lightBackgroundColorArgb = preferences[LIGHT_BACKGROUND_COLOR_KEY] ?: defaultLightBackground,
-            fontSize = FontSize.valueOf(preferences[FONT_SIZE_KEY] ?: FontSize.MEDIUM.name),
-            enableAnimations = preferences[ENABLE_ANIMATIONS_KEY] ?: true,
-            enableBlurEffect = preferences[ENABLE_BLUR_EFFECT_KEY] ?: true,
-            enableCharacterAnimations = preferences[ENABLE_CHARACTER_ANIMATIONS_KEY] ?: true,
-            lyricsTimingOffsetMs = preferences[LYRICS_TIMING_OFFSET_MS_KEY] ?: 200,
-            isDarkMode = preferences[IS_DARK_MODE_KEY] ?: true
-        )
-    }
+    override fun getUserSettings(): Flow<UserSettings> = preferencesDataSource.userSettings
 
     override suspend fun updateLyricsColor(colorArgb: Int) {
-        dataStore.edit { preferences ->
-            val isDark = preferences[IS_DARK_MODE_KEY] ?: true
-            if (isDark) {
-                preferences[DARK_LYRICS_COLOR_KEY] = colorArgb
-            } else {
-                preferences[LIGHT_LYRICS_COLOR_KEY] = colorArgb
-            }
-        }
+        preferencesDataSource.updateLyricsColor(colorArgb)
     }
 
     override suspend fun updateBackgroundColor(colorArgb: Int) {
-        dataStore.edit { preferences ->
-            val isDark = preferences[IS_DARK_MODE_KEY] ?: true
-            if (isDark) {
-                preferences[DARK_BACKGROUND_COLOR_KEY] = colorArgb
-            } else {
-                preferences[LIGHT_BACKGROUND_COLOR_KEY] = colorArgb
-            }
-        }
+        preferencesDataSource.updateBackgroundColor(colorArgb)
     }
 
     override suspend fun updateFontSize(fontSize: FontSize) {
-        dataStore.edit { preferences ->
-            preferences[FONT_SIZE_KEY] = fontSize.name
-        }
+        preferencesDataSource.updateFontSize(fontSize)
     }
 
     override suspend fun updateAnimationsEnabled(enabled: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[ENABLE_ANIMATIONS_KEY] = enabled
-        }
+        preferencesDataSource.updateAnimationsEnabled(enabled)
     }
 
     override suspend fun updateBlurEffectEnabled(enabled: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[ENABLE_BLUR_EFFECT_KEY] = enabled
-        }
+        preferencesDataSource.updateBlurEffectEnabled(enabled)
     }
 
     override suspend fun updateCharacterAnimationsEnabled(enabled: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[ENABLE_CHARACTER_ANIMATIONS_KEY] = enabled
-        }
+        preferencesDataSource.updateCharacterAnimationsEnabled(enabled)
     }
 
     override suspend fun updateLyricsTimingOffset(offsetMs: Int) {
-        dataStore.edit { preferences ->
-            preferences[LYRICS_TIMING_OFFSET_MS_KEY] = offsetMs
-        }
+        preferencesDataSource.updateLyricsTimingOffset(offsetMs)
     }
 
     override suspend fun updateDarkMode(isDark: Boolean) {
-        dataStore.edit { preferences ->
-            preferences[IS_DARK_MODE_KEY] = isDark
-        }
+        preferencesDataSource.updateDarkModeEnabled(isDark)
     }
 
     override suspend fun resetToDefaults() {
-        dataStore.edit { preferences ->
-            preferences.clear()
-        }
+        preferencesDataSource.clearSettings()
     }
 }

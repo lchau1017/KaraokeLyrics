@@ -1,20 +1,20 @@
 package com.karaokelyrics.app.data.repository
 
-import android.content.Context
+import android.content.res.AssetFileDescriptor
+import com.karaokelyrics.app.data.source.local.AssetDataSource
+import com.karaokelyrics.app.data.source.local.MediaContentProvider
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class LyricsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val assetDataSource: AssetDataSource,
+    private val mediaContentProvider: MediaContentProvider
 ) : LyricsRepository {
 
     private val _currentLyrics = MutableStateFlow<SyncedLyrics?>(null)
@@ -24,13 +24,43 @@ class LyricsRepositoryImpl @Inject constructor(
      * This is pure data access without any parsing or processing.
      */
     override suspend fun loadFileContent(fileName: String): Result<List<String>> =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                context.assets.open(fileName).bufferedReader().use {
-                    it.readLines()
-                }
-            }
+        assetDataSource.readTextFile(fileName)
+
+    /**
+     * Get audio file descriptor for media playback.
+     */
+    override suspend fun getAudioFileDescriptor(fileName: String): Result<AssetFileDescriptor> =
+        assetDataSource.getAssetFileDescriptor(fileName)
+
+    /**
+     * Get available media content.
+     */
+    override fun getAvailableContent(): List<com.karaokelyrics.app.domain.model.MediaContent> =
+        mediaContentProvider.getAvailableContent().map {
+            com.karaokelyrics.app.domain.model.MediaContent(
+                id = it.id,
+                title = it.title,
+                lyricsFileName = it.lyricsFileName,
+                audioFileName = it.audioFileName,
+                artist = it.artist,
+                album = it.album
+            )
         }
+
+    /**
+     * Get default content to load.
+     */
+    override fun getDefaultContent(): com.karaokelyrics.app.domain.model.MediaContent {
+        val content = mediaContentProvider.getDefaultContent()
+        return com.karaokelyrics.app.domain.model.MediaContent(
+            id = content.id,
+            title = content.title,
+            lyricsFileName = content.lyricsFileName,
+            audioFileName = content.audioFileName,
+            artist = content.artist,
+            album = content.album
+        )
+    }
 
     /**
      * Store processed lyrics in repository.

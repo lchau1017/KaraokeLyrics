@@ -61,10 +61,10 @@ fun LyricsScreen(
         }
     }
 
-    // Load initial lyrics using MVI intent
+    // Load initial lyrics using default media content from data layer
     LaunchedEffect(Unit) {
         lyricsViewModel.handleIntent(
-            LyricsIntent.LoadLyrics("golden-hour.ttml", "golden-hour.m4a")
+            LyricsIntent.LoadDefaultContent
         )
     }
 
@@ -90,7 +90,7 @@ fun LyricsScreen(
                     errorMessage = lyricsState.error,
                     onRetry = {
                         lyricsViewModel.handleIntent(
-                            LyricsIntent.LoadLyrics("golden-hour.ttml", "golden-hour.m4a")
+                            LyricsIntent.LoadDefaultContent
                         )
                     }
                 )
