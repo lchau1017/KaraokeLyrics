@@ -1,0 +1,61 @@
+package com.karaokelyrics.ui.core.config
+
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+/**
+ * Complete configuration for the Karaoke UI Library.
+ * This is completely independent from any app user settings.
+ * The app is responsible for mapping its user settings to this configuration.
+ */
+data class KaraokeLibraryConfig(
+    val visual: VisualConfig = VisualConfig(),
+    val animation: AnimationConfig = AnimationConfig(),
+    val layout: LayoutConfig = LayoutConfig(),
+    val effects: EffectsConfig = EffectsConfig(),
+    val behavior: BehaviorConfig = BehaviorConfig()
+) {
+    companion object {
+        /**
+         * Default configuration with balanced settings
+         */
+        val Default = KaraokeLibraryConfig()
+
+        /**
+         * Minimal configuration with most effects disabled
+         */
+        val Minimal = KaraokeLibraryConfig(
+            effects = EffectsConfig(
+                enableBlur = false,
+                enableShadows = false,
+                enableGlow = false
+            ),
+            animation = AnimationConfig(
+                enableCharacterAnimations = false,
+                enableLineAnimations = false
+            )
+        )
+
+        /**
+         * Dramatic configuration with enhanced effects
+         */
+        val Dramatic = KaraokeLibraryConfig(
+            animation = AnimationConfig(
+                characterMaxScale = 1.3f,
+                characterFloatOffset = 10f,
+                characterRotationDegrees = 5f
+            ),
+            effects = EffectsConfig(
+                blurIntensity = 1.5f,
+                enableGlow = true,
+                glowRadius = 12f
+            )
+        )
+    }
+}
