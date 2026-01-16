@@ -50,17 +50,27 @@ object VisualEffects {
         upcomingBlur: Dp = 3.dp,
         distantBlur: Dp = 5.dp,
         distance: Int = 0,
-        distanceThreshold: Int = 3
+        distanceThreshold: Int = 3,
+        enableBlur: Boolean = true,
+        blurIntensity: Float = 1.0f
     ): Modifier {
-        val blurRadius = when {
-            isPlaying -> 0.dp
-            hasPlayed -> playedBlur
-            distance > distanceThreshold -> distantBlur
-            else -> upcomingBlur
+        // If blur is disabled, return the modifier unchanged
+        if (!enableBlur) return this
+
+        // Only apply blur to unplayed/upcoming lines
+        // Playing and played lines should be clear
+        val baseBlurRadius = when {
+            isPlaying -> 0.dp  // Currently playing - no blur
+            hasPlayed -> 0.dp   // Already played - no blur
+            distance > distanceThreshold -> distantBlur  // Far upcoming - max blur
+            else -> upcomingBlur  // Near upcoming - medium blur
         }
 
-        return if (blurRadius > 0.dp) {
-            this.blur(radius = blurRadius)
+        // Apply intensity multiplier to blur radius
+        val adjustedBlurRadius = (baseBlurRadius.value * blurIntensity).dp
+
+        return if (adjustedBlurRadius > 0.dp) {
+            this.blur(radius = adjustedBlurRadius)
         } else {
             this
         }

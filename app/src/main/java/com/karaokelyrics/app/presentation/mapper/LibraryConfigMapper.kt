@@ -102,12 +102,12 @@ class LibraryConfigMapper @Inject constructor() {
 
     private fun mapEffectsConfig(userSettings: UserSettings): EffectsConfig {
         return EffectsConfig(
-            // Blur effects
+            // Blur effects - only apply to upcoming/unplayed lines
             enableBlur = userSettings.enableBlurEffect,
-            blurIntensity = 1.0f,
-            playedLineBlur = 2.dp,
-            upcomingLineBlur = 3.dp,
-            distantLineBlur = 5.dp,
+            blurIntensity = 1.0f,  // Moderate intensity for readability
+            playedLineBlur = 0.dp,  // No blur for played lines
+            upcomingLineBlur = 3.dp,  // Light blur for upcoming lines
+            distantLineBlur = 6.dp,  // Medium blur for distant lines
 
             // Shadow effects - use defaults
             enableShadows = true,
@@ -120,11 +120,11 @@ class LibraryConfigMapper @Inject constructor() {
             glowColor = Color.White,
             glowRadius = 8f,
 
-            // Opacity - use defaults
-            playingLineOpacity = 1f,
-            playedLineOpacity = 0.25f,
-            upcomingLineOpacity = 0.6f,
-            distantLineOpacity = 0.3f
+            // Opacity - clear for playing/played, slightly reduced for upcoming
+            playingLineOpacity = 1f,      // Full opacity for current line
+            playedLineOpacity = 0.8f,      // Good visibility for played lines
+            upcomingLineOpacity = 0.7f,    // Good visibility with light blur for upcoming
+            distantLineOpacity = 0.5f     // Moderate transparency for distant lines
         )
     }
 

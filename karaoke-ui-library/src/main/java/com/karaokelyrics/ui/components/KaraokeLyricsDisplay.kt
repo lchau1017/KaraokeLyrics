@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.core.config.BehaviorConfig
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
@@ -155,18 +156,43 @@ private fun KaraokeLineDisplayWithDistance(
     onLineClick: ((ISyncedLine) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine) -> Unit)? = null
 ) {
-    // Apply distance-based opacity reduction
+    // Apply distance-based opacity reduction (more subtle)
     val distanceOpacityModifier = when {
-        distance <= 1 -> 1f
-        distance == 2 -> 0.8f
-        distance == 3 -> 0.6f
-        else -> 0.4f
+        distance <= 1 -> 1f      // Current and next line - full visibility
+        distance == 2 -> 0.9f    // Very slight reduction
+        distance == 3 -> 0.8f    // Light reduction
+        distance <= 5 -> 0.7f    // Moderate reduction
+        else -> 0.6f             // Distant lines still readable
+    }
+
+    // Determine if line is played, playing, or upcoming
+    val isPlaying = currentTimeMs in line.start..line.end
+    val hasPlayed = currentTimeMs > line.end
+
+    // Apply distance-based blur ONLY to upcoming/unplayed lines
+    val distanceBlurRadius = if (config.effects.enableBlur && !isPlaying && !hasPlayed) {
+        when (distance) {
+            0 -> 0.dp  // Very next line - no blur for better readability
+            1 -> config.effects.upcomingLineBlur * 0.5f  // Light blur for next line
+            2 -> config.effects.upcomingLineBlur  // Medium blur
+            3, 4 -> config.effects.upcomingLineBlur * 1.5f  // Stronger blur
+            else -> config.effects.distantLineBlur  // Maximum blur for distant
+        }
+    } else {
+        0.dp  // No blur for playing or played lines
     }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .alpha(distanceOpacityModifier)
+            .then(
+                if (distanceBlurRadius > 0.dp) {
+                    Modifier.blur(radius = distanceBlurRadius)
+                } else {
+                    Modifier
+                }
+            )
     ) {
         KaraokeLineDisplay(
             line = line,

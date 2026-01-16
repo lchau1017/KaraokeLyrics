@@ -31,7 +31,6 @@ import com.karaokelyrics.ui.rendering.animation.AnimationStateManager
 import com.karaokelyrics.ui.rendering.animation.CharacterAnimationCalculator
 import com.karaokelyrics.ui.rendering.effects.GradientFactory
 import com.karaokelyrics.ui.rendering.effects.VisualEffects
-import com.karaokelyrics.ui.rendering.effects.VisualEffects.applyConditionalBlur
 import com.karaokelyrics.ui.rendering.text.TextDirectionDetector
 
 /**
@@ -106,21 +105,13 @@ fun KaraokeLineDisplay(
         else -> config.visual.upcomingTextColor
     }
 
-    // Apply modifiers
+    // Apply modifiers (blur is handled at the display level, not here)
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(config.layout.linePadding)
             .scale(lineAnimationState.scale)
             .alpha(opacity)
-            .applyConditionalBlur(
-                isPlaying = isPlaying,
-                hasPlayed = hasPlayed,
-                playedBlur = config.effects.playedLineBlur,
-                upcomingBlur = config.effects.upcomingLineBlur,
-                distantBlur = config.effects.distantLineBlur,
-                distance = 0
-            )
             .then(
                 if (config.behavior.enableLineClick && onLineClick != null) {
                     Modifier.clickable { onLineClick(line) }
