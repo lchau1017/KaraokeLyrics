@@ -6,7 +6,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.ui.core.config.*
 import javax.inject.Inject
 
@@ -31,28 +30,32 @@ class LibraryConfigMapper @Inject constructor() {
 
     private fun mapVisualConfig(userSettings: UserSettings): VisualConfig {
         return VisualConfig(
-            // Map colors - use defaults for now
-            playingTextColor = Color(userSettings.lyricsColorArgb),
-            playedTextColor = Color.Gray,
-            upcomingTextColor = Color.White.copy(alpha = 0.8f),
-            accompanimentTextColor = Color(0xFFFFE082),
+            // Map colors
+            playingTextColor = parseColor(userSettings.playingTextColor, Color.White),
+            playedTextColor = parseColor(userSettings.playedTextColor, Color.Gray),
+            upcomingTextColor = parseColor(userSettings.upcomingTextColor, Color.White.copy(alpha = 0.8f)),
+            accompanimentTextColor = parseColor(userSettings.accompanimentTextColor, Color(0xFFFFE082)),
 
             // Map font settings
-            fontSize = userSettings.fontSize.sp.sp,
-            accompanimentFontSize = (userSettings.fontSize.sp * 0.6f).sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.sp,
+            fontSize = userSettings.fontSize.sp,
+            accompanimentFontSize = (userSettings.fontSize * 0.6f).sp,
+            fontWeight = if (userSettings.boldText) FontWeight.Bold else FontWeight.Normal,
+            letterSpacing = userSettings.letterSpacing.sp,
 
-            // Map alignment - default center
-            textAlign = TextAlign.Center,
+            // Map alignment
+            textAlign = mapTextAlignment(userSettings.textAlignment),
 
             // Map background
-            backgroundColor = Color(userSettings.backgroundColorArgb),
+            backgroundColor = parseColor(userSettings.backgroundColor, Color.Transparent),
 
-            // Map gradient settings - use defaults
-            enableGradients = true,
-            playingGradientColors = listOf(Color(0xFF00BCD4), Color(0xFFE91E63)),
-            gradientAngle = 45f
+            // Map gradient settings
+            enableGradients = userSettings.enableGradients,
+            playingGradientColors = if (userSettings.enableGradients && userSettings.gradientColors.size >= 2) {
+                userSettings.gradientColors.map { parseColor(it, Color.White) }
+            } else {
+                listOf(Color(0xFF00BCD4), Color(0xFFE91E63))
+            },
+            gradientAngle = userSettings.gradientAngle
         )
     }
 
@@ -60,89 +63,100 @@ class LibraryConfigMapper @Inject constructor() {
         return AnimationConfig(
             // Character animations
             enableCharacterAnimations = userSettings.enableCharacterAnimations,
-            characterAnimationDuration = 800f,
-            characterMaxScale = 1.15f,
-            characterFloatOffset = 6f,
-            characterRotationDegrees = 3f,
+            characterAnimationDuration = userSettings.characterAnimationDuration,
+            characterMaxScale = userSettings.characterMaxScale,
+            characterFloatOffset = userSettings.characterFloatOffset,
+            characterRotationDegrees = userSettings.characterRotationDegrees,
 
             // Line animations
-            enableLineAnimations = userSettings.enableAnimations,
-            lineScaleOnPlay = 1.05f,
-            lineAnimationDuration = 700f,
+            enableLineAnimations = userSettings.enableLineAnimations,
+            lineScaleOnPlay = userSettings.lineScaleOnPlay,
+            lineAnimationDuration = userSettings.lineAnimationDuration,
 
             // Transition animations
-            fadeInDuration = 300f,
-            fadeOutDuration = 500f
+            fadeInDuration = userSettings.fadeInDuration,
+            fadeOutDuration = userSettings.fadeOutDuration
         )
     }
 
     private fun mapLayoutConfig(userSettings: UserSettings): LayoutConfig {
         return LayoutConfig(
-            // Spacing - use defaults
+            // Spacing
             linePadding = androidx.compose.foundation.layout.PaddingValues(
-                horizontal = 24.dp,
-                vertical = 12.dp
+                horizontal = userSettings.linePaddingHorizontal.dp,
+                vertical = userSettings.linePaddingVertical.dp
             ),
-            lineSpacing = 12.dp,
-            wordSpacing = 4.dp,
-            characterSpacing = 0.dp,
+            lineSpacing = userSettings.lineSpacing.dp,
+            wordSpacing = userSettings.wordSpacing.dp,
+            characterSpacing = userSettings.characterSpacing.dp,
 
-            // Line height - use defaults
-            lineHeightMultiplier = 1.2f,
-            accompanimentLineHeightMultiplier = 1.0f,
+            // Line height
+            lineHeightMultiplier = userSettings.lineHeightMultiplier,
+            accompanimentLineHeightMultiplier = userSettings.accompanimentLineHeightMultiplier,
 
-            // Container - use defaults
-            containerPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            maxLineWidth = null,
+            // Container
+            containerPadding = androidx.compose.foundation.layout.PaddingValues(
+                userSettings.containerPadding.dp
+            ),
+            maxLineWidth = if (userSettings.maxLineWidth > 0) {
+                userSettings.maxLineWidth.dp
+            } else null,
 
-            // Text direction - auto detect
-            forceTextDirection = null
+            // Text direction
+            forceTextDirection = when (userSettings.forceTextDirection) {
+                "rtl" -> androidx.compose.ui.unit.LayoutDirection.Rtl
+                "ltr" -> androidx.compose.ui.unit.LayoutDirection.Ltr
+                else -> null
+            }
         )
     }
 
     private fun mapEffectsConfig(userSettings: UserSettings): EffectsConfig {
         return EffectsConfig(
             // Blur effects
-            enableBlur = userSettings.enableBlurEffect,
-            blurIntensity = 1.0f, // Default value
-            playedLineBlur = 2.dp, // Default value
-            upcomingLineBlur = 3.dp, // Default value
-            distantLineBlur = 5.dp, // Default value
+            enableBlur = userSettings.enableBlur,
+            blurIntensity = userSettings.blurIntensity,
+            playedLineBlur = userSettings.playedLineBlur.dp,
+            upcomingLineBlur = userSettings.upcomingLineBlur.dp,
+            distantLineBlur = userSettings.distantLineBlur.dp,
 
-            // Shadow effects - use defaults
-            enableShadows = true,
-            textShadowColor = Color.Black.copy(alpha = 0.3f),
-            textShadowOffset = androidx.compose.ui.geometry.Offset(2f, 2f),
-            textShadowRadius = 4f,
+            // Shadow effects
+            enableShadows = userSettings.enableShadows,
+            textShadowColor = parseColor(userSettings.textShadowColor, Color.Black.copy(alpha = 0.3f)),
+            textShadowOffset = androidx.compose.ui.geometry.Offset(
+                userSettings.textShadowOffsetX,
+                userSettings.textShadowOffsetY
+            ),
+            textShadowRadius = userSettings.textShadowRadius,
 
-            // Glow effects - disabled by default
-            enableGlow = false,
-            glowColor = Color.White,
-            glowRadius = 8f,
+            // Glow effects
+            enableGlow = userSettings.enableGlow,
+            glowColor = parseColor(userSettings.glowColor, Color.White),
+            glowRadius = userSettings.glowRadius,
 
-            // Opacity - use defaults
-            playingLineOpacity = 1f,
-            playedLineOpacity = 0.25f,
-            upcomingLineOpacity = 0.6f,
-            distantLineOpacity = 0.3f
+            // Opacity
+            playingLineOpacity = userSettings.playingLineOpacity,
+            playedLineOpacity = userSettings.playedLineOpacity,
+            upcomingLineOpacity = userSettings.upcomingLineOpacity,
+            distantLineOpacity = userSettings.distantLineOpacity
         )
     }
 
     private fun mapBehaviorConfig(userSettings: UserSettings): BehaviorConfig {
         return BehaviorConfig(
-            // Scrolling - use defaults
-            scrollBehavior = ScrollBehavior.SMOOTH_CENTER,
-            scrollAnimationDuration = 500,
-            scrollOffset = 100.dp,
+            // Scrolling
+            scrollBehavior = mapScrollBehavior(userSettings.scrollBehavior),
+            scrollAnimationDuration = userSettings.scrollAnimationDuration,
+            scrollOffset = userSettings.scrollOffset.dp,
 
-            // Interaction - enable basic interaction
-            enableLineClick = true,
-            enableLineLongPress = false,
-            enableSwipeGestures = false,
+            // Interaction
+            enableLineClick = userSettings.enableLineClick,
+            enableLineLongPress = userSettings.enableLineLongPress,
+            enableSwipeGestures = userSettings.enableSwipeGestures,
 
-            // Performance - use defaults
-            preloadLines = 5,
-            recycleDistance = 10
+            // Performance
+            preloadLines = userSettings.preloadLines,
+            recycleDistance = userSettings.recycleDistance
         )
     }
 

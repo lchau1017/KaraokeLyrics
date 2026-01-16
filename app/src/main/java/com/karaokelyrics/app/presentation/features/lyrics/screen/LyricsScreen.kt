@@ -14,7 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karaokelyrics.app.presentation.features.common.components.ErrorScreen
 import com.karaokelyrics.app.presentation.features.common.components.LoadingScreen
-import com.karaokelyrics.app.presentation.features.lyrics.components.KaraokeLyricsViewNew
+import com.karaokelyrics.app.presentation.features.lyrics.components.KaraokeLyricsView
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.features.lyrics.viewmodel.LyricsViewModel
@@ -95,7 +95,7 @@ fun LyricsScreen(
                     }
                 )
             }
-            lyricsState.lyrics != null -> {
+            lyricsState.renderState != null -> {
                 LyricsContent(
                     lyricsState = lyricsState,
                     playerState = playerState,
@@ -165,29 +165,28 @@ private fun LyricsContent(
     onSettingsClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Use the karaoke library
-        KaraokeLyricsViewNew(
-            lyrics = lyricsState.lyrics,
-            currentTimeMs = lyricsState.currentTimeMs,
-            libraryConfig = lyricsState.libraryConfig,
-            onLineClicked = { line ->
-                lyricsState.lyrics?.lines?.indexOf(line)?.let { index ->
+        // Use pre-calculated render state
+        lyricsState.renderState?.let { renderState ->
+            KaraokeLyricsView(
+                renderState = renderState,
+                onLineClicked = { line ->
+                    val index = renderState.models.indexOfFirst { it.line == line }
                     if (index >= 0) onLineClicked(index)
-                }
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(settings.backgroundColorArgb))
-        )
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(settings.backgroundColorArgb))
+            )
 
-        PlayerControls(
-            isPlaying = playerState.isPlaying,
-            position = playerState.currentPosition,
-            duration = playerState.duration,
-            onPlayPause = onPlayPauseClick,
-            onSeek = onSeekTo,
-            onOpenSettings = onSettingsClick,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+            PlayerControls(
+                isPlaying = playerState.isPlaying,
+                position = playerState.currentPosition,
+                duration = playerState.duration,
+                onPlayPause = onPlayPauseClick,
+                onSeek = onSeekTo,
+                onOpenSettings = onSettingsClick,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
     }
 }
