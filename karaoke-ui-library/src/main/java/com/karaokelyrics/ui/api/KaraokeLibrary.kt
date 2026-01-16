@@ -1,5 +1,9 @@
 package com.karaokelyrics.ui.api
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
@@ -28,8 +32,13 @@ object KaraokeLibrary {
         modifier: Modifier = Modifier,
         onLineClick: ((ISyncedLine) -> Unit)? = null
     ) {
-        // TODO: Implementation will be added in Phase 3
-        // This will use the internal components to render a single line
+        com.karaokelyrics.ui.components.KaraokeLineDisplay(
+            line = line,
+            currentTimeMs = currentTimeMs,
+            config = config,
+            modifier = modifier,
+            onLineClick = onLineClick
+        )
     }
 
     /**
@@ -51,8 +60,14 @@ object KaraokeLibrary {
         onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
         onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
     ) {
-        // TODO: Implementation will be added in Phase 3
-        // This will use LazyColumn with automatic scrolling
+        com.karaokelyrics.ui.components.KaraokeLyricsDisplay(
+            lines = lines,
+            currentTimeMs = currentTimeMs,
+            config = config,
+            modifier = modifier,
+            onLineClick = onLineClick,
+            onLineLongPress = onLineLongPress
+        )
     }
 
     /**
@@ -73,7 +88,12 @@ object KaraokeLibrary {
         lineRenderer: @Composable (ISyncedLine, Int, KaraokeLibraryConfig) -> Unit,
         modifier: Modifier = Modifier
     ) {
-        // TODO: Implementation will be added in Phase 3
-        // This allows apps to provide custom rendering logic
+        Box(modifier = modifier.fillMaxSize()) {
+            LazyColumn {
+                itemsIndexed(lines) { index, line ->
+                    lineRenderer(line, currentTimeMs, config)
+                }
+            }
+        }
     }
 }
