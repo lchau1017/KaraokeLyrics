@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.toArgb
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
+import com.karaokelyrics.app.domain.model.theme.ThemeColors
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
 import com.karaokelyrics.app.presentation.ui.core.*
@@ -29,6 +30,7 @@ import kotlinx.coroutines.launch
 fun SettingsBottomSheet(
     isVisible: Boolean,
     settings: UserSettings,
+    themeColors: ThemeColors,
     onDismiss: () -> Unit,
     onUpdateLyricsColor: (Color) -> Unit,
     onUpdateBackgroundColor: (Color) -> Unit,
@@ -127,7 +129,7 @@ fun SettingsBottomSheet(
                                 )
                             )
                             ColorPicker(
-                                selectedColor = settings.lyricsColor,
+                                selectedColor = themeColors.lyricsColor,
                                 onColorSelected = onUpdateLyricsColor,
                                 isDarkColors = false,
                                 isCurrentlyDarkTheme = settings.isDarkMode,
@@ -148,7 +150,7 @@ fun SettingsBottomSheet(
                                 )
                             )
                             ColorPicker(
-                                selectedColor = settings.backgroundColor,
+                                selectedColor = themeColors.backgroundColor,
                                 onColorSelected = onUpdateBackgroundColor,
                                 isDarkColors = true,
                                 isCurrentlyDarkTheme = settings.isDarkMode,

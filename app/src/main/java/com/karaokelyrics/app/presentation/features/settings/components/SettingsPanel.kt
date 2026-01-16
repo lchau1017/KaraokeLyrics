@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
+import com.karaokelyrics.app.domain.model.theme.ThemeColors
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
 import androidx.compose.ui.graphics.toArgb
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.toArgb
 @Composable
 fun SettingsPanel(
     settings: UserSettings,
+    themeColors: ThemeColors,
     onUpdateLyricsColor: (Color) -> Unit,
     onUpdateBackgroundColor: (Color) -> Unit,
     onUpdateFontSize: (FontSize) -> Unit,
@@ -113,7 +115,7 @@ fun SettingsPanel(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             ColorPicker(
-                                selectedColor = settings.lyricsColor,
+                                selectedColor = themeColors.lyricsColor,
                                 onColorSelected = onUpdateLyricsColor,
                                 isDarkColors = false,
                                 isCurrentlyDarkTheme = settings.isDarkMode
@@ -126,7 +128,7 @@ fun SettingsPanel(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             ColorPicker(
-                                selectedColor = settings.backgroundColor,
+                                selectedColor = themeColors.backgroundColor,
                                 onColorSelected = onUpdateBackgroundColor,
                                 isDarkColors = true,
                                 isCurrentlyDarkTheme = settings.isDarkMode

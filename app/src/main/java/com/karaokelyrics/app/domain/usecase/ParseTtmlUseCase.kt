@@ -1,5 +1,8 @@
 package com.karaokelyrics.app.domain.usecase
 
+import com.karaokelyrics.app.data.factory.LyricsFactory
+import com.karaokelyrics.app.data.parser.TtmlXmlParser
+import com.karaokelyrics.app.data.parser.TimeFormatParser
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import javax.inject.Inject
 
@@ -7,22 +10,25 @@ import javax.inject.Inject
  * Domain use case that orchestrates TTML parsing.
  * This encapsulates the business logic for parsing TTML content,
  * delegating the actual XML parsing to the data layer.
+ *
+ * Follows Single Responsibility Principle by only orchestrating the parsing process.
  */
-class ParseTtmlUseCase @Inject constructor() {
+class ParseTtmlUseCase @Inject constructor(
+    private val ttmlParser: TtmlXmlParser,
+    private val lyricsFactory: LyricsFactory
+) {
 
     /**
      * Parse TTML content into domain model.
      * @param lines List of lines from TTML file
      * @return Parsed SyncedLyrics domain model
      */
-    operator fun invoke(lines: List<String>): SyncedLyrics {
-        // Business logic for TTML parsing coordination
-        // The actual XML parsing will be delegated to data layer parser
-        // This use case orchestrates the parsing process and applies business rules
+    suspend operator fun invoke(lines: List<String>): SyncedLyrics {
+        // Step 1: Parse XML structure
+        val content = lines.joinToString("\n")
+        val parsedData = ttmlParser.parse(content)
 
-        // For now, we'll create a data layer parser instance
-        // In a more complete implementation, this would be injected
-        val parser = com.karaokelyrics.app.data.parser.TtmlParser()
-        return parser.parse(lines)
+        // Step 2: Create domain models
+        return lyricsFactory.createSyncedLyrics(parsedData)
     }
 }

@@ -103,6 +103,7 @@ fun LyricsScreen(
         SettingsBottomSheet(
             isVisible = showSettings,
             settings = state.userSettings,
+            themeColors = state.themeColors,
             onDismiss = { showSettings = false },
             onUpdateLyricsColor = { color ->
                 viewModel.processIntent(LyricsIntent.UpdateLyricsColor(color))
@@ -148,7 +149,7 @@ private fun LyricsContent(
                 onLineClicked = onLineClicked,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(state.userSettings.backgroundColor),
+                    .background(state.themeColors.backgroundColor),
                 normalLineTextStyle = LocalTextStyle.current.copy(
                     fontSize = state.userSettings.fontSize.sp.sp,
                     fontWeight = FontWeight.Bold,
@@ -159,7 +160,7 @@ private fun LyricsContent(
                     fontWeight = FontWeight.Bold,
                     textMotion = TextMotion.Animated
                 ),
-                textColor = state.userSettings.lyricsColor,
+                textColor = state.themeColors.lyricsColor,
                 useBlurEffect = state.userSettings.enableBlurEffect && state.userSettings.enableAnimations,
                 enableCharacterAnimations = state.userSettings.enableCharacterAnimations && state.userSettings.enableAnimations
             )
