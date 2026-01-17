@@ -45,42 +45,39 @@ internal fun StackedViewer(
                 index - it
             } ?: 999
 
-            // Determine if line should be shown - only show active and upcoming
+            // Determine if line should be shown - only show active and next upcoming line
             val shouldShow = when {
                 lineState.isPlaying -> true
-                lineState.isUpcoming && distance <= 2 -> true // Show next 2 upcoming lines
-                else -> false // Don't show played lines
+                lineState.isUpcoming && distance == 1 -> true // Show only the very next line
+                else -> false // Don't show played lines or other upcoming
             }
 
             if (shouldShow) {
-                // Calculate z-index - active on top, upcoming below
+                // Calculate z-index - active on top, next below
                 val zIndex = when {
                     lineState.isPlaying -> 1000f // Active line on top
-                    else -> 999f - distance // Upcoming lines below
+                    else -> 999f // Next line below
                 }
 
                 // Calculate vertical offset for stacking effect
                 val yOffset = when {
                     lineState.isPlaying -> 0f
-                    lineState.isUpcoming && distance == 1 -> 50f // Next line slightly below
-                    lineState.isUpcoming && distance == 2 -> 100f // Second upcoming further below
-                    else -> 150f
-                }
-
-                // Calculate opacity
-                val opacity = when {
-                    lineState.isPlaying -> 1f
-                    lineState.isUpcoming && distance == 1 -> 0.5f
-                    lineState.isUpcoming && distance == 2 -> 0.3f
+                    lineState.isUpcoming && distance == 1 -> 60f // Next line below and back
                     else -> 0f
                 }
 
-                // Calculate scale for depth effect
+                // Calculate opacity - next line much more transparent
+                val opacity = when {
+                    lineState.isPlaying -> 1f
+                    lineState.isUpcoming && distance == 1 -> 0.25f // Much more transparent
+                    else -> 0f
+                }
+
+                // Calculate scale for depth effect - next line much smaller
                 val scale = when {
                     lineState.isPlaying -> 1f
-                    lineState.isUpcoming && distance == 1 -> 0.9f
-                    lineState.isUpcoming && distance == 2 -> 0.85f
-                    else -> 0.8f
+                    lineState.isUpcoming && distance == 1 -> 0.7f // Much smaller for depth
+                    else -> 1f
                 }
 
                 // Animate the transition
