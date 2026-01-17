@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.core.models.KaraokeLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.rendering.RenderingCalculations
 import com.karaokelyrics.ui.rendering.syllable.SyllableRenderer
 import com.karaokelyrics.ui.state.LineUiState
 
@@ -62,7 +62,7 @@ internal fun KaraokeSingleLine(
     )
 
     val pulseScale = if (config.animation.enablePulse && lineUiState.isPlaying) {
-        AnimationManager.calculatePulseScale(
+        RenderingCalculations.calculatePulseScale(
             currentTimeMs = currentTimeMs,
             minScale = config.animation.pulseMinScale,
             maxScale = config.animation.pulseMaxScale,

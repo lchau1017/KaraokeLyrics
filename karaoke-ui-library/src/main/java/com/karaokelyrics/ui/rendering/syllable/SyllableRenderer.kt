@@ -29,7 +29,6 @@ fun SyllableRenderer(
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
-    val characterRenderer = remember { CharacterRenderer() }
 
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth()
@@ -60,7 +59,7 @@ fun SyllableRenderer(
                 // Render each syllable in the line
                 lineData.syllables.forEach { syllableData ->
                     // Render each character in the syllable
-                    characterRenderer.renderSyllableCharacters(
+                    CharacterRenderer.renderSyllableCharacters(
                         drawScope = this,
                         syllable = syllableData.syllable,
                         xOffset = syllableData.xOffset,
