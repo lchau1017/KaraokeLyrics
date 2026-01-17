@@ -6,7 +6,7 @@ A configurable, reusable Compose library for displaying synchronized karaoke lyr
 
 - **Syllable-level synchronization**: Highlight individual syllables as they play
 - **Rich animations**: Character animations, line scaling, fade effects
-- **Visual effects**: Blur, shadows, glow, gradients
+- **Visual effects**: Blur (opt-in), shadows, gradients
 - **Fully configurable**: Control every visual aspect through configuration
 - **Performance optimized**: Efficient rendering with lazy loading
 - **RTL/LTR support**: Automatic text direction detection
@@ -41,8 +41,7 @@ val customConfig = KaraokeLibraryConfig(
         characterMaxScale = 1.2f
     ),
     effects = EffectsConfig(
-        enableBlur = true,
-        enableGlow = true
+        enableBlur = true  // Blur is disabled by default
     )
 )
 
@@ -104,9 +103,8 @@ fun mapUserSettingsToConfig(userSettings: UserSettings): KaraokeLibraryConfig {
 - Text direction
 
 ### Effects Config
-- Blur effects with intensity control
+- Blur effects with intensity control (disabled by default, opt-in feature)
 - Shadow effects
-- Glow effects
 - Opacity settings for different states
 
 ### Behavior Config
