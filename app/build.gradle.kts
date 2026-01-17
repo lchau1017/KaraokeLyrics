@@ -81,6 +81,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.1")
 
+    // DataStore for settings
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     // Media3
     implementation("androidx.media3:media3-exoplayer:1.5.0")
     implementation("androidx.media3:media3-session:1.5.0")

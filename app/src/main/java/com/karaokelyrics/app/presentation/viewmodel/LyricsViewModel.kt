@@ -2,6 +2,7 @@ package com.karaokelyrics.app.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.karaokelyrics.app.data.preferences.SettingsPreferencesManager
 import com.karaokelyrics.app.domain.repository.PlayerRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
@@ -19,7 +20,8 @@ import javax.inject.Inject
 class LyricsViewModel @Inject constructor(
     private val loadLyricsUseCase: LoadLyricsUseCase,
     private val syncLyricsUseCase: SyncLyricsUseCase,
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    private val settingsManager: SettingsPreferencesManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LyricsUiState())
@@ -30,6 +32,7 @@ class LyricsViewModel @Inject constructor(
 
     init {
         observePlaybackState()
+        observeUserSettings()
     }
 
     fun processIntent(intent: LyricsIntent) {
@@ -38,6 +41,16 @@ class LyricsViewModel @Inject constructor(
             is LyricsIntent.PlayPause -> togglePlayPause()
             is LyricsIntent.SeekToLine -> seekToLine(intent.lineIndex)
             is LyricsIntent.SeekToPosition -> seekToPosition(intent.position)
+
+            // Settings intents
+            is LyricsIntent.UpdateLyricsColor -> updateLyricsColor(intent.color)
+            is LyricsIntent.UpdateBackgroundColor -> updateBackgroundColor(intent.color)
+            is LyricsIntent.UpdateFontSize -> updateFontSize(intent.fontSize)
+            is LyricsIntent.UpdateAnimationsEnabled -> updateAnimationsEnabled(intent.enabled)
+            is LyricsIntent.UpdateBlurEffectEnabled -> updateBlurEffectEnabled(intent.enabled)
+            is LyricsIntent.UpdateCharacterAnimationsEnabled -> updateCharacterAnimationsEnabled(intent.enabled)
+            is LyricsIntent.UpdateDarkMode -> updateDarkMode(intent.isDark)
+            is LyricsIntent.ResetSettingsToDefaults -> resetSettingsToDefaults()
         }
     }
 
@@ -129,6 +142,63 @@ class LyricsViewModel @Inject constructor(
     private fun seekToPosition(position: Long) {
         viewModelScope.launch {
             playerRepository.seekTo(position)
+        }
+    }
+
+    private fun observeUserSettings() {
+        viewModelScope.launch {
+            settingsManager.userSettings.collect { settings ->
+                _state.update { it.copy(userSettings = settings) }
+            }
+        }
+    }
+
+    // Settings update methods
+    private fun updateLyricsColor(color: androidx.compose.ui.graphics.Color) {
+        viewModelScope.launch {
+            settingsManager.updateLyricsColor(color)
+        }
+    }
+
+    private fun updateBackgroundColor(color: androidx.compose.ui.graphics.Color) {
+        viewModelScope.launch {
+            settingsManager.updateBackgroundColor(color)
+        }
+    }
+
+    private fun updateFontSize(fontSize: com.karaokelyrics.app.domain.model.FontSize) {
+        viewModelScope.launch {
+            settingsManager.updateFontSize(fontSize)
+        }
+    }
+
+    private fun updateAnimationsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsManager.updateAnimationsEnabled(enabled)
+        }
+    }
+
+    private fun updateBlurEffectEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsManager.updateBlurEffectEnabled(enabled)
+        }
+    }
+
+    private fun updateCharacterAnimationsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsManager.updateCharacterAnimationsEnabled(enabled)
+        }
+    }
+
+    private fun updateDarkMode(isDark: Boolean) {
+        viewModelScope.launch {
+            settingsManager.updateDarkMode(isDark)
+        }
+    }
+
+    private fun resetSettingsToDefaults() {
+        viewModelScope.launch {
+            settingsManager.resetToDefaults()
         }
     }
 }

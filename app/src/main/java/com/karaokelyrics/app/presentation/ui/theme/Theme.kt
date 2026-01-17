@@ -44,24 +44,59 @@ private val SpotifyDarkColorScheme = darkColorScheme(
     onErrorContainer = Color(0xFFE22134),
 )
 
-// Light theme (also Spotify-inspired, but still dark)
-private val SpotifyLightColorScheme = SpotifyDarkColorScheme
+// Light theme (Spotify-inspired light variant)
+private val SpotifyLightColorScheme = lightColorScheme(
+    primary = SpotifyGreen,
+    onPrimary = SpotifyWhite,
+    primaryContainer = SpotifyGreen.copy(alpha = 0.12f),
+    onPrimaryContainer = SpotifyGreen,
+
+    secondary = SpotifyGreen,
+    onSecondary = SpotifyWhite,
+    secondaryContainer = SpotifyLightGray,
+    onSecondaryContainer = SpotifyBlack,
+
+    tertiary = SpotifyGreen,
+    onTertiary = SpotifyWhite,
+
+    background = SpotifyWhite,
+    onBackground = SpotifyBlack,
+
+    surface = Color(0xFFF5F5F5),
+    onSurface = SpotifyBlack,
+    surfaceVariant = SpotifyLightGray,
+    onSurfaceVariant = SpotifyDarkGray,
+
+    outline = SpotifyMediumGray,
+    outlineVariant = SpotifyLightGray,
+
+    error = Color(0xFFE22134),
+    onError = SpotifyWhite,
+    errorContainer = Color(0xFFE22134).copy(alpha = 0.12f),
+    onErrorContainer = Color(0xFFE22134),
+)
 
 @Composable
 fun KaraokeLyricsTheme(
-    darkTheme: Boolean = true, // Always use dark theme for Spotify look
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    // Always use Spotify dark theme
-    val colorScheme = SpotifyDarkColorScheme
+    val colorScheme = if (darkTheme) {
+        SpotifyDarkColorScheme
+    } else {
+        SpotifyLightColorScheme
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = SpotifyBlack.toArgb()
-            // Always use dark status bar for Spotify theme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            window.statusBarColor = if (darkTheme) {
+                SpotifyBlack.toArgb()
+            } else {
+                SpotifyWhite.toArgb()
+            }
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
