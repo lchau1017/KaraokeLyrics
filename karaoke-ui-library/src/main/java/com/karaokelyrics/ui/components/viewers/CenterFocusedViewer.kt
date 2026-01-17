@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
+import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.state.KaraokeUiState
@@ -31,7 +31,7 @@ internal fun CenterFocusedViewer(
         currentLine?.let { line ->
             val lineUiState = currentLineIndex?.let { uiState.getLineState(it) } ?: LineUiState.Playing
 
-            KaraokeSingleLineStateless(
+            KaraokeSingleLine(
                 line = line,
                 lineUiState = lineUiState,
                 currentTimeMs = uiState.currentTimeMs,

@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
+import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.state.KaraokeUiState
@@ -76,7 +76,7 @@ internal fun WaveFlowViewer(
                             alpha = opacity
                         }
                 ) {
-                    KaraokeSingleLineStateless(
+                    KaraokeSingleLine(
                         line = line,
                         lineUiState = lineUiState,
                         currentTimeMs = uiState.currentTimeMs,

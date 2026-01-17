@@ -4,9 +4,13 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -22,111 +26,8 @@ import com.karaokelyrics.ui.rendering.syllable.SyllableRenderer
 import com.karaokelyrics.ui.state.LineUiState
 
 /**
- * Composable for displaying a single karaoke line with synchronized highlighting.
- * This is the main public API for rendering a single line of karaoke text.
- *
- * @param line The synchronized line to display
- * @param currentTimeMs Current playback time in milliseconds
- * @param config Complete configuration for visual, animation, and behavior
- * @param modifier Modifier for the composable
- * @param onLineClick Optional callback when line is clicked
- */
-@Composable
-fun KaraokeSingleLine(
-    line: ISyncedLine,
-    currentTimeMs: Int,
-    config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
-    modifier: Modifier = Modifier,
-    onLineClick: ((ISyncedLine) -> Unit)? = null
-) {
-    // Manager instances
-    val animationManager = remember(config.animation) { AnimationManager() }
-    val effectsManager = remember { EffectsManager() }
-
-    // Determine line state
-    val lineState = animationManager.getLineState(line, currentTimeMs)
-
-    // Calculate animations
-    val lineAnimationState = animationManager.animateLine(
-        lineStartTime = line.start,
-        lineEndTime = line.end,
-        currentTime = currentTimeMs,
-        scaleOnPlay = config.animation.lineScaleOnPlay,
-        animationDuration = config.animation.lineAnimationDuration.toInt()
-    )
-
-    val pulseScale = if (config.animation.enablePulse) {
-        animationManager.animatePulse(
-            enabled = lineState.isPlaying,
-            minScale = config.animation.pulseMinScale,
-            maxScale = config.animation.pulseMaxScale,
-            duration = config.animation.pulseDuration
-        )
-    } else 1f
-
-    val shimmerProgress = if (config.animation.enableShimmer) {
-        animationManager.animateShimmer(
-            enabled = lineState.isPlaying,
-            duration = config.animation.shimmerDuration
-        )
-    } else 0f
-
-    // Calculate visual properties
-    val opacity = effectsManager.calculateOpacity(
-        isPlaying = lineState.isPlaying,
-        hasPlayed = lineState.hasPlayed,
-        distance = 0,
-        playingOpacity = config.effects.playingLineOpacity,
-        playedOpacity = config.effects.playedLineOpacity,
-        upcomingOpacity = config.effects.upcomingLineOpacity
-    )
-
-    val textStyle = createTextStyle(line, config)
-    val textColor = calculateTextColor(line, lineState, config, effectsManager)
-
-    // Main container
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(config.layout.linePadding)
-            .scale(lineAnimationState.scale * pulseScale)
-            .alpha(opacity)
-            .then(
-                if (config.behavior.enableLineClick && onLineClick != null) {
-                    Modifier.clickable { onLineClick(line) }
-                } else {
-                    Modifier
-                }
-            ),
-        contentAlignment = getContentAlignment(config.visual.textAlign)
-    ) {
-        when (line) {
-            is KaraokeLine -> {
-                // Render karaoke line with syllable-level timing
-                SyllableRenderer(
-                    line = line,
-                    currentTimeMs = currentTimeMs,
-                    config = config,
-                    textStyle = textStyle,
-                    baseColor = textColor,
-                    shimmerProgress = shimmerProgress
-                )
-            }
-            else -> {
-                // Render simple text line
-                SimpleTextLine(
-                    text = line.getContent(),
-                    textStyle = textStyle,
-                    textColor = textColor
-                )
-            }
-        }
-    }
-}
-
-/**
- * Internal composable that uses pre-calculated LineUiState.
- * This version is more efficient as it doesn't recalculate state.
+ * Stateless composable for displaying a single karaoke line with synchronized highlighting.
+ * Uses pre-calculated LineUiState for efficient rendering.
  *
  * @param line The synchronized line to display
  * @param lineUiState Pre-calculated UI state for this line
@@ -136,7 +37,7 @@ fun KaraokeSingleLine(
  * @param onLineClick Optional callback when line is clicked
  */
 @Composable
-internal fun KaraokeSingleLineStateless(
+internal fun KaraokeSingleLine(
     line: ISyncedLine,
     lineUiState: LineUiState,
     currentTimeMs: Int,
@@ -181,7 +82,7 @@ internal fun KaraokeSingleLineStateless(
     } else 0f
 
     val textStyle = createTextStyle(line, config)
-    val textColor = calculateTextColorFromUiState(line, lineUiState, config, effectsManager)
+    val textColor = calculateTextColor(line, lineUiState, config, effectsManager)
 
     Box(
         modifier = modifier
@@ -261,31 +162,9 @@ private fun createTextStyle(
 }
 
 /**
- * Calculate text color based on line state (legacy - uses AnimationManager.LineState)
- */
-private fun calculateTextColor(
-    line: ISyncedLine,
-    lineState: AnimationManager.LineState,
-    config: KaraokeLibraryConfig,
-    effectsManager: EffectsManager
-): androidx.compose.ui.graphics.Color {
-    val isAccompaniment = line is KaraokeLine && line.isAccompaniment
-
-    return effectsManager.calculateLineColor(
-        isPlaying = lineState.isPlaying,
-        hasPlayed = lineState.hasPlayed,
-        isAccompaniment = isAccompaniment,
-        playingTextColor = config.visual.playingTextColor,
-        playedTextColor = config.visual.playedTextColor,
-        upcomingTextColor = config.visual.upcomingTextColor,
-        accompanimentTextColor = config.visual.accompanimentTextColor
-    )
-}
-
-/**
  * Calculate text color based on LineUiState
  */
-private fun calculateTextColorFromUiState(
+private fun calculateTextColor(
     line: ISyncedLine,
     lineUiState: LineUiState,
     config: KaraokeLibraryConfig,

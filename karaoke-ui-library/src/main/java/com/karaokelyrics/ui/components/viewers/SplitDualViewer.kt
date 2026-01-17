@@ -7,7 +7,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
+import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.state.KaraokeUiState
@@ -47,7 +47,7 @@ internal fun SplitDualViewer(
                     label = "currentAlpha"
                 )
                 Box(modifier = Modifier.alpha(alpha)) {
-                    KaraokeSingleLineStateless(
+                    KaraokeSingleLine(
                         line = line,
                         lineUiState = lineUiState,
                         currentTimeMs = uiState.currentTimeMs,
@@ -82,7 +82,7 @@ internal fun SplitDualViewer(
                     label = "nextAlpha"
                 )
                 Box(modifier = Modifier.alpha(alpha)) {
-                    KaraokeSingleLineStateless(
+                    KaraokeSingleLine(
                         line = line,
                         lineUiState = lineUiState,
                         currentTimeMs = uiState.currentTimeMs,

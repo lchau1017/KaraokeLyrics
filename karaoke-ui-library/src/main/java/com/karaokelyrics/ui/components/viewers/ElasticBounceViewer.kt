@@ -6,7 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
+import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.state.KaraokeUiState
@@ -84,7 +84,7 @@ internal fun ElasticBounceViewer(
                             this.alpha = alpha
                         }
                 ) {
-                    KaraokeSingleLineStateless(
+                    KaraokeSingleLine(
                         line = line,
                         lineUiState = lineUiState,
                         currentTimeMs = uiState.currentTimeMs,
