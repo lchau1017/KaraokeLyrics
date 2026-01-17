@@ -13,8 +13,6 @@ import androidx.compose.ui.Modifier
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.presentation.features.lyrics.screen.LyricsScreen
-import com.karaokelyrics.app.presentation.features.demo.KaraokeEffectsDemo
-import com.karaokelyrics.app.presentation.features.demo.CustomizableKaraokeDemo
 import com.karaokelyrics.app.presentation.ui.theme.KaraokeLyricsTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -38,12 +36,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Show customizable demo screen
-                    CustomizableKaraokeDemo()
-                    // To use preset demo, uncomment this:
-                    // KaraokeEffectsDemo()
-                    // To use normal screen, uncomment this:
-                    // LyricsScreen()
+                    LyricsScreen()
                 }
             }
         }

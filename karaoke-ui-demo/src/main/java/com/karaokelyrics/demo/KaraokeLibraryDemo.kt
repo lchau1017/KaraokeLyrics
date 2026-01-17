@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.presentation.features.demo
+package com.karaokelyrics.demo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,19 +20,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
 import com.karaokelyrics.ui.api.KaraokeLibrary
 import com.karaokelyrics.ui.core.config.*
+import com.karaokelyrics.ui.core.models.KaraokeLine
+import com.karaokelyrics.ui.core.models.KaraokeSyllable
+import com.karaokelyrics.demo.data.DemoLyricsProvider
 import kotlinx.coroutines.delay
 
 /**
- * Fully customizable karaoke demo screen.
- * Allows individual control of all effects, animations, colors, fonts, and more.
+ * Main demo composable for the Karaoke UI Library.
+ * Provides comprehensive customization controls for all library features.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomizableKaraokeDemo() {
+fun KaraokeLibraryDemo() {
     var currentTimeMs by remember { mutableStateOf(0) }
     var isPlaying by remember { mutableStateOf(false) }
 
@@ -83,7 +84,7 @@ fun CustomizableKaraokeDemo() {
     var colorPickerTarget by remember { mutableStateOf<String?>(null) }
 
     // Demo lyrics
-    val demoLines = remember { createDemoLyrics() }
+    val demoLines = remember { DemoLyricsProvider.createDemoLyrics() }
     var selectedLineIndex by remember { mutableStateOf(0) }
 
     // Build config from current settings
@@ -173,7 +174,7 @@ fun CustomizableKaraokeDemo() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Customizable Karaoke Demo") },
+                title = { Text("Karaoke UI Library Demo") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -217,15 +218,19 @@ fun CustomizableKaraokeDemo() {
                             (distance * 2 * blurIntensity).dp
                         } else 0.dp
 
-                        DisplayLineCustom(
-                            line = line,
-                            currentTimeMs = currentTimeMs,
-                            config = currentConfig,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .alpha(lineAlpha)
-                                .blur(lineBlur)
-                        )
+                        // Use key to force recomposition when config changes
+                        key(currentConfig) {
+                            KaraokeLibrary.KaraokeSingleLine(
+                                line = line,
+                                currentTimeMs = currentTimeMs,
+                                config = currentConfig,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .alpha(lineAlpha)
+                                    .blur(lineBlur),
+                                onLineClick = { _ -> }
+                            )
+                        }
 
                         if (index < demoLines.size - 1) {
                             Spacer(modifier = Modifier.height(lineSpacing.dp))
@@ -533,80 +538,76 @@ fun CustomizableKaraokeDemo() {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Button(
-                                onClick = { loadPreset("classic",
-                                    onLoad = { config ->
-                                        config.visual.let {
-                                            fontSize = it.fontSize.value
-                                            fontWeight = it.fontWeight
-                                            sungColor = it.playedTextColor
-                                            unsungColor = it.upcomingTextColor
-                                            activeColor = it.playingTextColor
-                                        }
-                                        config.animation.let {
-                                            charAnimEnabled = it.enableCharacterAnimations
-                                            lineAnimEnabled = it.enableLineAnimations
-                                            pulseEnabled = it.enablePulse
-                                            pulseMinScale = it.pulseMinScale
-                                            pulseMaxScale = it.pulseMaxScale
-                                            shimmerEnabled = it.enableShimmer
-                                            shimmerIntensity = it.shimmerIntensity
-                                        }
-                                        gradientEnabled = false
-                                        shadowEnabled = true
-                                        glowEnabled = false
-                                        blurEnabled = false
-                                    })
+                                onClick = {
+                                    val preset = LibraryPresets.Classic
+                                    preset.visual.let {
+                                        fontSize = it.fontSize.value
+                                        fontWeight = it.fontWeight
+                                        sungColor = it.playedTextColor
+                                        unsungColor = it.upcomingTextColor
+                                        activeColor = it.playingTextColor
+                                    }
+                                    preset.animation.let {
+                                        charAnimEnabled = it.enableCharacterAnimations
+                                        lineAnimEnabled = it.enableLineAnimations
+                                        pulseEnabled = it.enablePulse
+                                        pulseMinScale = it.pulseMinScale
+                                        pulseMaxScale = it.pulseMaxScale
+                                        shimmerEnabled = it.enableShimmer
+                                        shimmerIntensity = it.shimmerIntensity
+                                    }
+                                    gradientEnabled = false
+                                    shadowEnabled = true
+                                    glowEnabled = false
+                                    blurEnabled = false
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Classic", fontSize = 10.sp)
                             }
                             Button(
-                                onClick = { loadPreset("neon",
-                                    onLoad = { config ->
-                                        config.visual.let {
-                                            fontSize = it.fontSize.value
-                                            fontWeight = it.fontWeight
-                                            sungColor = it.playedTextColor
-                                            unsungColor = it.upcomingTextColor
-                                            activeColor = it.playingTextColor
-                                            gradientEnabled = it.gradientEnabled
-                                            shadowEnabled = it.shadowEnabled
-                                            glowEnabled = it.glowEnabled
-                                        }
-                                        config.animation.let {
-                                            charAnimEnabled = it.enableCharacterAnimations
-                                            lineAnimEnabled = it.enableLineAnimations
-                                            pulseEnabled = it.enablePulse
-                                            shimmerEnabled = it.enableShimmer
-                                            shimmerIntensity = it.shimmerIntensity
-                                        }
-                                        config.effects.let {
-                                            blurEnabled = it.enableBlur
-                                            blurIntensity = it.blurIntensity
-                                        }
-                                    })
+                                onClick = {
+                                    val preset = LibraryPresets.Neon
+                                    preset.visual.let {
+                                        fontSize = it.fontSize.value
+                                        fontWeight = it.fontWeight
+                                        sungColor = it.playedTextColor
+                                        unsungColor = it.upcomingTextColor
+                                        activeColor = it.playingTextColor
+                                        gradientEnabled = it.gradientEnabled
+                                        shadowEnabled = it.shadowEnabled
+                                        glowEnabled = it.glowEnabled
+                                    }
+                                    preset.animation.let {
+                                        charAnimEnabled = it.enableCharacterAnimations
+                                        lineAnimEnabled = it.enableLineAnimations
+                                        pulseEnabled = it.enablePulse
+                                        shimmerEnabled = it.enableShimmer
+                                        shimmerIntensity = it.shimmerIntensity
+                                    }
+                                    preset.effects.let {
+                                        blurEnabled = it.enableBlur
+                                        blurIntensity = it.blurIntensity
+                                    }
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Neon", fontSize = 10.sp)
                             }
                             Button(
-                                onClick = { loadPreset("minimal",
-                                    onLoad = { config ->
-                                        fontSize = 30f
-                                        fontWeight = FontWeight.Normal
-                                        sungColor = Color.Gray
-                                        unsungColor = Color.LightGray
-                                        activeColor = Color.Black
-                                        backgroundColor = Color.White
-                                        gradientEnabled = false
-                                        shadowEnabled = false
-                                        glowEnabled = false
-                                        blurEnabled = false
-                                        charAnimEnabled = false
-                                        lineAnimEnabled = false
-                                    })
+                                onClick = {
+                                    fontSize = 30f
+                                    fontWeight = FontWeight.Normal
+                                    sungColor = Color.Gray
+                                    unsungColor = Color.LightGray
+                                    activeColor = Color.Black
+                                    backgroundColor = Color.White
+                                    gradientEnabled = false
+                                    shadowEnabled = false
+                                    glowEnabled = false
+                                    blurEnabled = false
+                                    charAnimEnabled = false
+                                    lineAnimEnabled = false
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -720,92 +721,4 @@ private fun ColorPickerDialog(
             }
         }
     }
-}
-
-@Composable
-private fun DisplayLineCustom(
-    line: KaraokeLine,
-    currentTimeMs: Int,
-    config: KaraokeLibraryConfig,
-    modifier: Modifier = Modifier
-) {
-    val libraryLine = com.karaokelyrics.ui.core.models.KaraokeLine(
-        syllables = line.syllables.map { syllable ->
-            com.karaokelyrics.ui.core.models.KaraokeSyllable(
-                content = syllable.content,
-                start = syllable.start,
-                end = syllable.end
-            )
-        },
-        start = line.start,
-        end = line.end,
-        metadata = line.metadata
-    )
-
-    // Use key to force recomposition when config changes
-    key(config) {
-        KaraokeLibrary.KaraokeSingleLine(
-            line = libraryLine,
-            currentTimeMs = currentTimeMs,
-            config = config,
-            modifier = modifier,
-            onLineClick = { _ -> }
-        )
-    }
-}
-
-private fun loadPreset(name: String, onLoad: (KaraokeLibraryConfig) -> Unit) {
-    val preset = when (name) {
-        "classic" -> LibraryPresets.Classic
-        "neon" -> LibraryPresets.Neon
-        "minimal" -> LibraryPresets.Minimal
-        else -> LibraryPresets.Classic
-    }
-    onLoad(preset)
-}
-
-private fun createDemoLyrics(): List<KaraokeLine> {
-    return listOf(
-        KaraokeLine(
-            syllables = listOf(
-                KaraokeSyllable("Test ", 0, 500),
-                KaraokeSyllable("all ", 500, 1000),
-                KaraokeSyllable("effects", 1000, 2000)
-            ),
-            start = 0,
-            end = 2000
-        ),
-        KaraokeLine(
-            syllables = listOf(
-                KaraokeSyllable("Cus", 2000, 2300),
-                KaraokeSyllable("tom", 2300, 2600),
-                KaraokeSyllable("ize ", 2600, 2900),
-                KaraokeSyllable("every", 2900, 3400),
-                KaraokeSyllable("thing", 3400, 4000)
-            ),
-            start = 2000,
-            end = 4000
-        ),
-        KaraokeLine(
-            syllables = listOf(
-                KaraokeSyllable("Colors, ", 4000, 4500),
-                KaraokeSyllable("fonts, ", 4500, 5000),
-                KaraokeSyllable("and ", 5000, 5300),
-                KaraokeSyllable("animations", 5300, 6500)
-            ),
-            start = 4000,
-            end = 6500
-        ),
-        KaraokeLine(
-            syllables = listOf(
-                KaraokeSyllable("🎨 ", 6500, 7000),
-                KaraokeSyllable("Visual ", 7000, 7500),
-                KaraokeSyllable("Effects ", 7500, 8000),
-                KaraokeSyllable("Demo ", 8000, 8500),
-                KaraokeSyllable("🎨", 8500, 9000)
-            ),
-            start = 6500,
-            end = 9000
-        )
-    )
 }
