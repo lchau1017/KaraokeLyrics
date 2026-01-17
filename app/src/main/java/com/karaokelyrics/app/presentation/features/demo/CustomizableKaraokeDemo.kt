@@ -744,7 +744,7 @@ private fun DisplayLineCustom(
 
     // Use key to force recomposition when config changes
     key(config) {
-        KaraokeLibrary.KaraokeLineDisplay(
+        KaraokeLibrary.KaraokeSingleLine(
             line = libraryLine,
             currentTimeMs = currentTimeMs,
             config = config,

@@ -299,7 +299,7 @@ private fun DisplayLine(
     }
 
     libraryLine?.let {
-        KaraokeLibrary.KaraokeLineDisplay(
+        KaraokeLibrary.KaraokeSingleLine(
             line = it,
             currentTimeMs = currentTimeMs,
             config = config,

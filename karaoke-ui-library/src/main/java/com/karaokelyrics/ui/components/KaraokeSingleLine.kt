@@ -32,9 +32,12 @@ import com.karaokelyrics.ui.rendering.animation.AnimationStateManager
 import com.karaokelyrics.ui.rendering.animation.CharacterAnimationCalculator
 import com.karaokelyrics.ui.rendering.effects.GradientFactory
 import com.karaokelyrics.ui.rendering.effects.VisualEffects
+import com.karaokelyrics.ui.utils.LineStateUtils
 
 /**
  * Composable for displaying a single karaoke line with synchronized highlighting.
+ * This component handles character-by-character progression and all visual effects
+ * for a single line of karaoke text.
  *
  * @param line The synchronized line to display
  * @param currentTimeMs Current playback time in milliseconds
@@ -43,7 +46,7 @@ import com.karaokelyrics.ui.rendering.effects.VisualEffects
  * @param onLineClick Optional callback when line is clicked
  */
 @Composable
-fun KaraokeLineDisplay(
+fun KaraokeSingleLine(
     line: ISyncedLine,
     currentTimeMs: Int,
     config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
@@ -55,10 +58,8 @@ fun KaraokeLineDisplay(
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
 
-    // Determine line state
-    val isPlaying = currentTimeMs in line.start..line.end
-    val hasPlayed = currentTimeMs > line.end
-    val isUpcoming = currentTimeMs < line.start
+    // Determine line state using utility
+    val lineState = LineStateUtils.getLineState(line, currentTimeMs)
 
     // Get line-level animation state
     val lineAnimationState = animationManager.animateLine(
@@ -72,7 +73,7 @@ fun KaraokeLineDisplay(
     // Get pulse animation for active lines
     val pulseScale = if (config.animation.enablePulse) {
         animationManager.animatePulse(
-            enabled = isPlaying,
+            enabled = lineState.isPlaying,
             minScale = config.animation.pulseMinScale,
             maxScale = config.animation.pulseMaxScale,
             duration = config.animation.pulseDuration
@@ -82,15 +83,15 @@ fun KaraokeLineDisplay(
     // Get shimmer effect for active lines
     val shimmerProgress = if (config.animation.enableShimmer) {
         animationManager.animateShimmer(
-            enabled = isPlaying,
+            enabled = lineState.isPlaying,
             duration = config.animation.shimmerDuration
         )
     } else 0f
 
     // Calculate opacity
     val opacity = VisualEffects.calculateOpacity(
-        isPlaying = isPlaying,
-        hasPlayed = hasPlayed,
+        isPlaying = lineState.isPlaying,
+        hasPlayed = lineState.hasPlayed,
         distance = 0,
         playingOpacity = config.effects.playingLineOpacity,
         playedOpacity = config.effects.playedLineOpacity,
@@ -119,8 +120,8 @@ fun KaraokeLineDisplay(
     // Determine text color (base color for unplayed characters)
     val textColor = when {
         line is KaraokeLine && line.isAccompaniment -> config.visual.accompanimentTextColor
-        isPlaying -> config.visual.upcomingTextColor  // Use upcoming color for unplayed chars in active line
-        hasPlayed -> config.visual.playedTextColor
+        lineState.isPlaying -> config.visual.upcomingTextColor  // Use upcoming color for unplayed chars in active line
+        lineState.hasPlayed -> config.visual.playedTextColor
         else -> config.visual.upcomingTextColor
     }
 

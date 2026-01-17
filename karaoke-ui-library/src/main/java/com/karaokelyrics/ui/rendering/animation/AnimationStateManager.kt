@@ -97,38 +97,6 @@ class AnimationStateManager {
     }
 
     /**
-     * Animate syllable progress within a line.
-     */
-    @Composable
-    fun animateSyllableProgress(
-        syllableStartTime: Int,
-        syllableEndTime: Int,
-        currentTime: Int
-    ): Float {
-        val progress by animateFloatAsState(
-            targetValue = when {
-                currentTime <= syllableStartTime -> 0f
-                currentTime >= syllableEndTime -> 1f
-                else -> {
-                    val duration = syllableEndTime - syllableStartTime
-                    if (duration > 0) {
-                        ((currentTime - syllableStartTime).toFloat() / duration).coerceIn(0f, 1f)
-                    } else {
-                        1f
-                    }
-                }
-            },
-            animationSpec = tween(
-                durationMillis = 100,
-                easing = LinearEasing
-            ),
-            label = "syllableProgress"
-        )
-
-        return progress
-    }
-
-    /**
      * Create a pulsing animation for active elements.
      */
     @Composable
@@ -151,36 +119,6 @@ class AnimationStateManager {
         )
 
         return if (enabled) scale else 1f
-    }
-
-    /**
-     * Animate color transition based on timing.
-     */
-    @Composable
-    fun animateColorTransition(
-        startTime: Int,
-        endTime: Int,
-        currentTime: Int,
-        playingColor: androidx.compose.ui.graphics.Color,
-        playedColor: androidx.compose.ui.graphics.Color,
-        upcomingColor: androidx.compose.ui.graphics.Color
-    ): androidx.compose.ui.graphics.Color {
-        val targetColor = when {
-            currentTime < startTime -> upcomingColor
-            currentTime in startTime..endTime -> playingColor
-            else -> playedColor
-        }
-
-        val animatedColor by animateColorAsState(
-            targetValue = targetColor,
-            animationSpec = tween(
-                durationMillis = 300,
-                easing = FastOutSlowInEasing
-            ),
-            label = "colorTransition"
-        )
-
-        return animatedColor
     }
 
     /**
