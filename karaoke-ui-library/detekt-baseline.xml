@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>BracesOnWhenStatements:KaraokeStateCalculator.kt$KaraokeStateCalculator$when</ID>
+    <ID>BracesOnWhenStatements:RenderingCalculations.kt$RenderingCalculations$when</ID>
+    <ID>CognitiveComplexMethod:ElasticBounceViewer.kt$@Composable internal fun ElasticBounceViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -&gt; Unit)? = null)</ID>
+    <ID>CognitiveComplexMethod:FlipCardViewer.kt$@Composable internal fun FlipCardViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -&gt; Unit)? = null)</ID>
+    <ID>CognitiveComplexMethod:RadialBurstViewer.kt$@Composable internal fun RadialBurstViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -&gt; Unit)? = null)</ID>
+    <ID>CognitiveComplexMethod:SpiralViewer.kt$@Composable internal fun SpiralViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -&gt; Unit)? = null)</ID>
+    <ID>CognitiveComplexMethod:StackedViewer.kt$@Composable internal fun StackedViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -&gt; Unit)? = null)</ID>
+    <ID>DataClassShouldBeImmutable:TextLayoutCalculator.kt$TextLayoutCalculator.SyllableLayoutData$var xOffset: Float</ID>
+    <ID>LongParameterList:CharacterRenderer.kt$CharacterRenderer$( drawScope: DrawScope, syllable: KaraokeSyllable, xOffset: Float, yOffset: Float, currentTimeMs: Int, config: KaraokeLibraryConfig, textStyle: TextStyle, baseColor: Color, textMeasurer: TextMeasurer )</ID>
+    <ID>UnderscoresInNumericLiterals:KaraokeStateHolderTest.kt$KaraokeStateHolderTest$20000</ID>
+    <ID>UnderscoresInNumericLiterals:SpiralViewer.kt$10000</ID>
+    <ID>UnderscoresInNumericLiterals:TestData.kt$TestData$10000</ID>
+    <ID>UnderscoresInNumericLiterals:TestData.kt$TestData$12000</ID>
+    <ID>UnderscoresInNumericLiterals:TestData.kt$TestData.TimePoints$11000</ID>
+    <ID>UnderscoresInNumericLiterals:TestData.kt$TestData.TimePoints$15000</ID>
+    <ID>UnnecessaryParentheses:CharacterRenderer.kt$CharacterRenderer$(charEndTime + config.animation.characterAnimationDuration.toInt())</ID>
+    <ID>UnnecessaryParentheses:GradientFactory.kt$GradientFactory$(index.toFloat() / (colors.size - 1))</ID>
+    <ID>UnnecessaryParentheses:RadialBurstViewer.kt$(index * 137.5f)</ID>
+    <ID>UnnecessaryParentheses:RenderingCalculations.kt$RenderingCalculations$(elapsed % 400f)</ID>
+    <ID>UnnecessaryParentheses:RenderingCalculations.kt$RenderingCalculations$(elapsed % 600f)</ID>
+    <ID>UnnecessaryParentheses:RenderingCalculations.kt$RenderingCalculations$(elapsed % 800f)</ID>
+    <ID>UnnecessaryParentheses:SpiralViewer.kt$(1f - kotlin.math.abs(distance) * 0.15f)</ID>
+    <ID>UnnecessaryParentheses:SpiralViewer.kt$(distance * 15f)</ID>
+    <ID>UnnecessaryParentheses:SyllableRenderer.kt$(layoutInfo.totalHeight)</ID>
+    <ID>UnnecessaryParentheses:WaveFlowViewer.kt$(1f - kotlin.math.abs(distance) * 0.1f)</ID>
+    <ID>UnusedPrivateProperty:SpiralViewer.kt$val density = LocalDensity.current</ID>
+  </CurrentIssues>
+</SmellBaseline>

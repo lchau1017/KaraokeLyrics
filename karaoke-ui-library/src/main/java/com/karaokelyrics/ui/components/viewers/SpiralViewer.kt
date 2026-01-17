@@ -19,11 +19,7 @@ import kotlin.math.sin
  * Active line at center with played lines spiraling outward.
  */
 @Composable
-internal fun SpiralViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun SpiralViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
     val density = LocalDensity.current
 

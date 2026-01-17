@@ -1,17 +1,15 @@
 package com.karaokelyrics.app.presentation.features.settings.components
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
@@ -24,9 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
-import androidx.compose.ui.graphics.toArgb
+import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 
 @Composable
 fun SettingsPanel(
@@ -204,10 +201,7 @@ fun SettingsPanel(
 }
 
 @Composable
-private fun SettingsSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
+private fun SettingsSection(title: String, content: @Composable () -> Unit) {
     Column {
         Text(
             text = title,
@@ -221,12 +215,7 @@ private fun SettingsSection(
 }
 
 @Composable
-private fun SettingsToggle(
-    title: String,
-    subtitle: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
+private fun SettingsToggle(title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -276,7 +265,7 @@ private fun ColorPicker(
         Color(0xFFF39C12), // orange
         Color(0xFFE91E63), // pink
         Color(0xFF00BCD4), // cyan
-        Color(0xFFFFEB3B)  // yellow
+        Color(0xFFFFEB3B) // yellow
     )
 
     val lightLyricColors = listOf(
@@ -288,7 +277,7 @@ private fun ColorPicker(
         Color(0xFFE67E22), // orange
         Color(0xFFD81B60), // pink
         Color(0xFF00ACC1), // cyan
-        Color(0xFFF9A825)  // yellow
+        Color(0xFFF9A825) // yellow
     )
 
     val darkBackgroundColors = listOf(
@@ -300,7 +289,7 @@ private fun ColorPicker(
         Color(0xFF1E1E1E), // charcoal
         Color(0xFF101010), // jet black
         Color(0xFF0A0A0A), // onyx
-        Color(0xFF141414)  // dark charcoal
+        Color(0xFF141414) // dark charcoal
     )
 
     val lightBackgroundColors = listOf(
@@ -312,7 +301,7 @@ private fun ColorPicker(
         Color(0xFFF0F0F0), // smoke white
         Color(0xFFF8F8F8), // ghost white
         Color(0xFFEEEEEE), // white smoke
-        Color(0xFFFDFDFD)  // snow
+        Color(0xFFFDFDFD) // snow
     )
 
     val colors = when {
@@ -338,11 +327,7 @@ private fun ColorPicker(
 // ColorSwatch is now imported from the public component
 
 @Composable
-private fun FontSizeChip(
-    fontSize: FontSize,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
+private fun FontSizeChip(fontSize: FontSize, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))

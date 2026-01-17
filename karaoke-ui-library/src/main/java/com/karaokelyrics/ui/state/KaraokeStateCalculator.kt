@@ -21,11 +21,7 @@ class KaraokeStateCalculator {
      * @param config Library configuration for visual/animation settings
      * @return Complete UI state ready for rendering
      */
-    fun calculateState(
-        lines: List<ISyncedLine>,
-        currentTimeMs: Int,
-        config: KaraokeLibraryConfig
-    ): KaraokeUiState {
+    fun calculateState(lines: List<ISyncedLine>, currentTimeMs: Int, config: KaraokeLibraryConfig): KaraokeUiState {
         if (lines.isEmpty()) {
             return KaraokeUiState(currentTimeMs = currentTimeMs, isInitialized = true)
         }
@@ -58,11 +54,9 @@ class KaraokeStateCalculator {
      * @param currentTimeMs Current playback time
      * @return Index of the playing line, or null if no line is playing
      */
-    fun findCurrentLineIndex(lines: List<ISyncedLine>, currentTimeMs: Int): Int? {
-        return lines.indexOfFirst { line ->
-            currentTimeMs >= line.start && currentTimeMs <= line.end
-        }.takeIf { it != -1 }
-    }
+    fun findCurrentLineIndex(lines: List<ISyncedLine>, currentTimeMs: Int): Int? = lines.indexOfFirst { line ->
+        currentTimeMs >= line.start && currentTimeMs <= line.end
+    }.takeIf { it != -1 }
 
     /**
      * Calculate the UI state for a single line.
@@ -120,24 +114,17 @@ class KaraokeStateCalculator {
     /**
      * Calculate the distance (in lines) from the current playing line.
      */
-    fun calculateDistanceFromCurrent(lineIndex: Int, currentLineIndex: Int?): Int {
-        return if (currentLineIndex != null) {
-            abs(lineIndex - currentLineIndex)
-        } else {
-            lineIndex
-        }
+    fun calculateDistanceFromCurrent(lineIndex: Int, currentLineIndex: Int?): Int = if (currentLineIndex != null) {
+        abs(lineIndex - currentLineIndex)
+    } else {
+        lineIndex
     }
 
     /**
      * Calculate opacity based on line state and distance.
      * Matches the logic from EffectsManager.calculateOpacity
      */
-    fun calculateOpacity(
-        isPlaying: Boolean,
-        hasPlayed: Boolean,
-        distance: Int,
-        config: KaraokeLibraryConfig
-    ): Float {
+    fun calculateOpacity(isPlaying: Boolean, hasPlayed: Boolean, distance: Int, config: KaraokeLibraryConfig): Float {
         val effects = config.effects
         return when {
             isPlaying -> effects.playingLineOpacity
@@ -154,27 +141,17 @@ class KaraokeStateCalculator {
      * Calculate scale based on playing state.
      * Matches the logic from AnimationManager.animateLine
      */
-    fun calculateScale(
-        isPlaying: Boolean,
-        config: KaraokeLibraryConfig
-    ): Float {
-        return if (isPlaying && config.animation.enableLineAnimations) {
-            config.animation.lineScaleOnPlay
-        } else {
-            1f
-        }
+    fun calculateScale(isPlaying: Boolean, config: KaraokeLibraryConfig): Float = if (isPlaying && config.animation.enableLineAnimations) {
+        config.animation.lineScaleOnPlay
+    } else {
+        1f
     }
 
     /**
      * Calculate blur radius based on line state and distance.
      * Matches the logic from EffectsManager.applyConditionalBlur
      */
-    fun calculateBlurRadius(
-        isPlaying: Boolean,
-        hasPlayed: Boolean,
-        distance: Int,
-        config: KaraokeLibraryConfig
-    ): Float {
+    fun calculateBlurRadius(isPlaying: Boolean, hasPlayed: Boolean, distance: Int, config: KaraokeLibraryConfig): Float {
         val effects = config.effects
         if (!effects.enableBlur) {
             return 0f
@@ -194,12 +171,10 @@ class KaraokeStateCalculator {
      * Determine the appropriate line state category.
      * Useful for simple state checks without full calculation.
      */
-    fun getLineStateCategory(line: ISyncedLine, currentTimeMs: Int): LineStateCategory {
-        return when {
-            currentTimeMs >= line.start && currentTimeMs <= line.end -> LineStateCategory.PLAYING
-            currentTimeMs > line.end -> LineStateCategory.PLAYED
-            else -> LineStateCategory.UPCOMING
-        }
+    fun getLineStateCategory(line: ISyncedLine, currentTimeMs: Int): LineStateCategory = when {
+        currentTimeMs >= line.start && currentTimeMs <= line.end -> LineStateCategory.PLAYING
+        currentTimeMs > line.end -> LineStateCategory.PLAYED
+        else -> LineStateCategory.UPCOMING
     }
 
     /**

@@ -19,11 +19,7 @@ import kotlin.math.sin
  * Rotates to bring active line to front.
  */
 @Composable
-internal fun Carousel3DViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun Carousel3DViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
 
     // Animate rotation to current line

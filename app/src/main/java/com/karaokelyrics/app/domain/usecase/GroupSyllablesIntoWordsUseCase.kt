@@ -37,7 +37,5 @@ class GroupSyllablesIntoWordsUseCase @Inject constructor() {
         return words
     }
 
-    private fun hasTrailingWhitespace(content: String): Boolean {
-        return content.trimEnd().length < content.length
-    }
+    private fun hasTrailingWhitespace(content: String): Boolean = content.trimEnd().length < content.length
 }

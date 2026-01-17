@@ -10,18 +10,13 @@ import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.state.KaraokeUiState
-import com.karaokelyrics.ui.state.LineUiState
 
 /**
  * Flip card viewer with 3D card flip transitions.
  * Creates a page-turning effect with front/back metaphor.
  */
 @Composable
-internal fun FlipCardViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun FlipCardViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
 
     var previousIndex by remember { mutableStateOf(-1) }

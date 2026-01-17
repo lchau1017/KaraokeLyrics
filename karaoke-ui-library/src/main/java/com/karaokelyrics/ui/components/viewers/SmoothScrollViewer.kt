@@ -18,11 +18,7 @@ import kotlinx.coroutines.launch
  * Shows multiple lines for context, ideal for following along with lyrics.
  */
 @Composable
-internal fun SmoothScrollViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun SmoothScrollViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 

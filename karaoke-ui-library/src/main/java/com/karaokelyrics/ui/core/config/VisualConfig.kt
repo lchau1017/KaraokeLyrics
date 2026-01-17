@@ -11,10 +11,10 @@ import androidx.compose.ui.unit.sp
  * Types of gradients available for text effects
  */
 enum class GradientType {
-    LINEAR,      // Simple linear gradient
-    PROGRESS,    // Progress-based gradient for karaoke
+    LINEAR, // Simple linear gradient
+    PROGRESS, // Progress-based gradient for karaoke
     MULTI_COLOR, // Multi-color gradient
-    PRESET       // Use preset gradient patterns
+    PRESET // Use preset gradient patterns
 }
 
 /**
@@ -56,7 +56,7 @@ data class VisualConfig(
     // Gradient Configuration
     val playingGradientColors: List<Color> = listOf(
         Color(0xFF00BCD4), // Cyan
-        Color(0xFFE91E63)  // Pink
+        Color(0xFFE91E63) // Pink
     ),
     val gradientAngle: Float = 45f,
     val gradientEnabled: Boolean = false,

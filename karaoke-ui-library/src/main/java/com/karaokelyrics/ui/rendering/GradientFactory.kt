@@ -67,12 +67,7 @@ object GradientFactory {
     /**
      * Create a linear gradient brush based on angle.
      */
-    fun createLinearGradient(
-        colors: List<Color>,
-        angle: Float = 45f,
-        width: Float = 1000f,
-        height: Float = 100f
-    ): Brush {
+    fun createLinearGradient(colors: List<Color>, angle: Float = 45f, width: Float = 1000f, height: Float = 100f): Brush {
         val (start, end) = calculateGradientEndpoints(angle, width, height)
         return Brush.linearGradient(
             colors = colors,
@@ -85,12 +80,7 @@ object GradientFactory {
      * Create a progress-based gradient for karaoke highlighting effect.
      * Shows highlight color up to progress point, then base color.
      */
-    fun createProgressGradient(
-        progress: Float,
-        baseColor: Color,
-        highlightColor: Color,
-        width: Float = 1000f
-    ): Brush {
+    fun createProgressGradient(progress: Float, baseColor: Color, highlightColor: Color, width: Float = 1000f): Brush {
         if (progress <= 0f) {
             return Brush.linearGradient(
                 colors = listOf(baseColor, baseColor),
@@ -123,12 +113,7 @@ object GradientFactory {
     /**
      * Create a multi-color gradient with evenly distributed color stops.
      */
-    fun createMultiColorGradient(
-        colors: List<Color>,
-        angle: Float = 45f,
-        width: Float = 1000f,
-        height: Float = 100f
-    ): Brush {
+    fun createMultiColorGradient(colors: List<Color>, angle: Float = 45f, width: Float = 1000f, height: Float = 100f): Brush {
         if (colors.size < 2) {
             val color = colors.firstOrNull() ?: Color.White
             return Brush.linearGradient(colors = listOf(color, color))
@@ -185,11 +170,7 @@ object GradientFactory {
     /**
      * Calculate gradient start and end points based on angle.
      */
-    private fun calculateGradientEndpoints(
-        angle: Float,
-        width: Float,
-        height: Float
-    ): Pair<Offset, Offset> {
+    private fun calculateGradientEndpoints(angle: Float, width: Float, height: Float): Pair<Offset, Offset> {
         val angleRad = angle * PI / 180
         val cos = cos(angleRad).toFloat()
         val sin = sin(angleRad).toFloat()

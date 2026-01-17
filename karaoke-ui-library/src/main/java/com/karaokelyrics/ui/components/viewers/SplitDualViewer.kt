@@ -11,18 +11,13 @@ import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.state.KaraokeUiState
-import com.karaokelyrics.ui.state.LineUiState
 
 /**
  * Split dual viewer showing current and next line simultaneously.
  * Perfect for duets or learning apps.
  */
 @Composable
-internal fun SplitDualViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun SplitDualViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
     val currentLine = uiState.lines.getOrNull(currentLineIndex)
     val nextLine = uiState.lines.getOrNull(currentLineIndex + 1)

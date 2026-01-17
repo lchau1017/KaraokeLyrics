@@ -20,7 +20,6 @@ import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
 import com.karaokelyrics.app.presentation.features.player.viewmodel.PlayerViewModel
 import com.karaokelyrics.app.presentation.features.settings.components.SettingsBottomSheet
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
-// Removed unused imports
 import com.karaokelyrics.app.presentation.features.settings.viewmodel.SettingsViewModel
 import kotlinx.coroutines.flow.collectLatest
 

@@ -19,11 +19,7 @@ import kotlin.math.sin
  * Lines flow in a wave pattern with the active line at the peak.
  */
 @Composable
-internal fun WaveFlowViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun WaveFlowViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
     val density = LocalDensity.current
 

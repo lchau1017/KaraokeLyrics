@@ -34,9 +34,7 @@ class PlaybackService : MediaSessionService() {
             .build()
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
-        return mediaSession
-    }
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
 
     override fun onDestroy() {
         mediaSession?.run {
@@ -52,8 +50,6 @@ class PlaybackService : MediaSessionService() {
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
             mediaItems: List<MediaItem>
-        ): ListenableFuture<List<MediaItem>> {
-            return Futures.immediateFuture(mediaItems)
-        }
+        ): ListenableFuture<List<MediaItem>> = Futures.immediateFuture(mediaItems)
     }
 }

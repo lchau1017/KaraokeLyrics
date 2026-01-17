@@ -16,11 +16,7 @@ import com.karaokelyrics.ui.state.KaraokeUiState
  * Creates ripple/explosion effect with pulsing active line.
  */
 @Composable
-internal fun RadialBurstViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun RadialBurstViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
 
     // Pulse animation for active line

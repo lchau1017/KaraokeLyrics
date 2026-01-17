@@ -32,10 +32,7 @@ import com.karaokelyrics.ui.core.models.ISyncedLine
  * ```
  */
 @Stable
-class KaraokeStateHolder(
-    initialConfig: KaraokeLibraryConfig,
-    private val calculator: KaraokeStateCalculator = KaraokeStateCalculator()
-) {
+class KaraokeStateHolder(initialConfig: KaraokeLibraryConfig, private val calculator: KaraokeStateCalculator = KaraokeStateCalculator()) {
     private val _uiState = mutableStateOf(KaraokeUiState())
     private var _config = initialConfig
 
@@ -151,9 +148,7 @@ class KaraokeStateHolder(
  * @return A remembered state holder instance
  */
 @Composable
-fun rememberKaraokeStateHolder(
-    config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default
-): KaraokeStateHolder {
+fun rememberKaraokeStateHolder(config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default): KaraokeStateHolder {
     val stateHolder = remember {
         KaraokeStateHolder(config)
     }
@@ -172,10 +167,7 @@ fun rememberKaraokeStateHolder(
  * @return A remembered state holder instance initialized with lines
  */
 @Composable
-fun rememberKaraokeStateHolder(
-    lines: List<ISyncedLine>,
-    config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default
-): KaraokeStateHolder {
+fun rememberKaraokeStateHolder(lines: List<ISyncedLine>, config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default): KaraokeStateHolder {
     val stateHolder = remember {
         KaraokeStateHolder(config).also { holder ->
             holder.setLines(lines)

@@ -74,7 +74,9 @@ object CharacterRenderer {
                     floatOffset = config.animation.characterFloatOffset,
                     rotationDegrees = config.animation.characterRotationDegrees
                 )
-            } else null
+            } else {
+                null
+            }
 
             // Render character with effects
             EffectsManager.renderCharacterWithEffects(

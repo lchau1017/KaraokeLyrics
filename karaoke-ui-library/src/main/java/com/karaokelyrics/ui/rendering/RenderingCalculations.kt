@@ -21,11 +21,7 @@ object RenderingCalculations {
      * Contains only the properties actually used for rendering.
      */
     @Stable
-    data class CharacterAnimationState(
-        val scale: Float = 1f,
-        val offset: Offset = Offset.Zero,
-        val rotation: Float = 0f
-    ) {
+    data class CharacterAnimationState(val scale: Float = 1f, val offset: Offset = Offset.Zero, val rotation: Float = 0f) {
         companion object {
             val Default = CharacterAnimationState()
         }
@@ -83,12 +79,7 @@ object RenderingCalculations {
      * Calculate pulse scale based on current time.
      * Returns a scale value that oscillates between minScale and maxScale.
      */
-    fun calculatePulseScale(
-        currentTimeMs: Int,
-        minScale: Float = 0.95f,
-        maxScale: Float = 1.05f,
-        duration: Int = 1000
-    ): Float {
+    fun calculatePulseScale(currentTimeMs: Int, minScale: Float = 0.95f, maxScale: Float = 1.05f, duration: Int = 1000): Float {
         val progress = (currentTimeMs % duration).toFloat() / duration
         val sineValue = sin(progress * 2 * PI).toFloat()
         val normalizedSine = (sineValue + 1f) / 2f
@@ -107,25 +98,23 @@ object RenderingCalculations {
         baseColor: Color,
         playingColor: Color,
         playedColor: Color
-    ): Color {
-        return when {
-            currentTimeMs > charEndTime -> playedColor
-            currentTimeMs >= charStartTime -> {
-                val progress = calculateProgress(currentTimeMs, charStartTime, charEndTime)
-                lerpColor(baseColor, playingColor, progress)
-            }
-            else -> baseColor
+    ): Color = when {
+        currentTimeMs > charEndTime -> playedColor
+        currentTimeMs >= charStartTime -> {
+            val progress = calculateProgress(currentTimeMs, charStartTime, charEndTime)
+            lerpColor(baseColor, playingColor, progress)
         }
+        else -> baseColor
     }
 
     /**
      * Calculate progress between start and end times (0.0 to 1.0).
      */
-    fun calculateProgress(currentTime: Int, startTime: Int, endTime: Int): Float {
-        return if (endTime > startTime && currentTime >= startTime) {
-            ((currentTime - startTime).toFloat() / (endTime - startTime))
-                .coerceIn(0f, 1f)
-        } else 0f
+    fun calculateProgress(currentTime: Int, startTime: Int, endTime: Int): Float = if (endTime > startTime && currentTime >= startTime) {
+        ((currentTime - startTime).toFloat() / (endTime - startTime))
+            .coerceIn(0f, 1f)
+    } else {
+        0f
     }
 
     // ==================== Utility Functions ====================
@@ -133,30 +122,24 @@ object RenderingCalculations {
     /**
      * Cubic ease-in-out function for smooth animations.
      */
-    private fun easeInOutCubic(t: Float): Float {
-        return if (t < 0.5f) {
-            4f * t * t * t
-        } else {
-            1f - (-2f * t + 2f).let { it * it * it } / 2f
-        }
+    private fun easeInOutCubic(t: Float): Float = if (t < 0.5f) {
+        4f * t * t * t
+    } else {
+        1f - (-2f * t + 2f).let { it * it * it } / 2f
     }
 
     /**
      * Linear interpolation between two float values.
      */
-    fun lerp(start: Float, end: Float, fraction: Float): Float {
-        return start + (end - start) * fraction
-    }
+    fun lerp(start: Float, end: Float, fraction: Float): Float = start + (end - start) * fraction
 
     /**
      * Linear interpolation between two colors.
      */
-    fun lerpColor(start: Color, end: Color, fraction: Float): Color {
-        return Color(
-            red = start.red + (end.red - start.red) * fraction,
-            green = start.green + (end.green - start.green) * fraction,
-            blue = start.blue + (end.blue - start.blue) * fraction,
-            alpha = start.alpha + (end.alpha - start.alpha) * fraction
-        )
-    }
+    fun lerpColor(start: Color, end: Color, fraction: Float): Color = Color(
+        red = start.red + (end.red - start.red) * fraction,
+        green = start.green + (end.green - start.green) * fraction,
+        blue = start.blue + (end.blue - start.blue) * fraction,
+        alpha = start.alpha + (end.alpha - start.alpha) * fraction
+    )
 }

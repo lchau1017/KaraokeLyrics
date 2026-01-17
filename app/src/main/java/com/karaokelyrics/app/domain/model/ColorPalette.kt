@@ -53,7 +53,7 @@ object ColorPalette {
             0xFF2A2A2A.toInt(),
             0xFF0D47A1.toInt(), // dark blue
             0xFF1B5E20.toInt(), // dark green
-            0xFF4A148C.toInt()  // dark purple
+            0xFF4A148C.toInt() // dark purple
         )
     }
 
@@ -71,7 +71,7 @@ object ColorPalette {
             0xFFFF8F00.toInt(), // darker orange
             0xFFC2185B.toInt(), // darker pink
             0xFF0097A7.toInt(), // darker cyan
-            0xFFFBC02D.toInt()  // darker yellow
+            0xFFFBC02D.toInt() // darker yellow
         )
 
         val backgroundOptions = listOf(
@@ -82,7 +82,7 @@ object ColorPalette {
             0xFFFFF3E0.toInt(), // light orange
             0xFFF3E5F5.toInt(), // light purple
             0xFFE0F2F1.toInt(), // light cyan
-            0xFFFFFDE7.toInt()  // light yellow
+            0xFFFFFDE7.toInt() // light yellow
         )
     }
 }

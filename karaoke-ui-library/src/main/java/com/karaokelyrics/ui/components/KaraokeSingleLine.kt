@@ -15,10 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.core.models.KaraokeLine
@@ -76,7 +76,9 @@ internal fun KaraokeSingleLine(
             maxScale = config.animation.pulseMaxScale,
             duration = config.animation.pulseDuration
         )
-    } else 1f
+    } else {
+        1f
+    }
 
     val textStyle = createTextStyle(line, config)
     val textColor = calculateTextColor(line, lineUiState, config)
@@ -128,11 +130,7 @@ internal fun KaraokeSingleLine(
  * Simple text line without karaoke effects
  */
 @Composable
-private fun SimpleTextLine(
-    text: String,
-    textStyle: TextStyle,
-    textColor: Color
-) {
+private fun SimpleTextLine(text: String, textStyle: TextStyle, textColor: Color) {
     Text(
         text = text,
         style = textStyle,
@@ -145,10 +143,7 @@ private fun SimpleTextLine(
 /**
  * Create text style based on line type and configuration
  */
-private fun createTextStyle(
-    line: ISyncedLine,
-    config: KaraokeLibraryConfig
-): TextStyle {
+private fun createTextStyle(line: ISyncedLine, config: KaraokeLibraryConfig): TextStyle {
     val isAccompaniment = line is KaraokeLine && line.isAccompaniment
 
     return TextStyle(
@@ -167,11 +162,7 @@ private fun createTextStyle(
 /**
  * Calculate text color based on LineUiState
  */
-private fun calculateTextColor(
-    line: ISyncedLine,
-    lineUiState: LineUiState,
-    config: KaraokeLibraryConfig
-): Color {
+private fun calculateTextColor(line: ISyncedLine, lineUiState: LineUiState, config: KaraokeLibraryConfig): Color {
     val isAccompaniment = line is KaraokeLine && line.isAccompaniment
 
     return when {
@@ -185,10 +176,8 @@ private fun calculateTextColor(
 /**
  * Get content alignment based on text align
  */
-private fun getContentAlignment(textAlign: TextAlign?): Alignment {
-    return when (textAlign) {
-        TextAlign.Start, TextAlign.Left -> Alignment.CenterStart
-        TextAlign.End, TextAlign.Right -> Alignment.CenterEnd
-        else -> Alignment.Center
-    }
+private fun getContentAlignment(textAlign: TextAlign?): Alignment = when (textAlign) {
+    TextAlign.Start, TextAlign.Left -> Alignment.CenterStart
+    TextAlign.End, TextAlign.Right -> Alignment.CenterEnd
+    else -> Alignment.Center
 }

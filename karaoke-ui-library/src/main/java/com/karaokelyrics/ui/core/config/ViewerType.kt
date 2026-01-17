@@ -119,7 +119,6 @@ enum class ViewerType {
  */
 data class ViewerConfig(
     val type: ViewerType = ViewerType.SMOOTH_SCROLL,
-
-    // SMOOTH_SCROLL specific
-    val scrollPosition: Float = 0.33f // Where to position active line (0.33 = top third)
+    // SMOOTH_SCROLL specific: Where to position active line (0.33 = top third)
+    val scrollPosition: Float = 0.33f
 )

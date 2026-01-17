@@ -43,7 +43,5 @@ data class KaraokeUiState(
     /**
      * Get the state for a specific line by index
      */
-    fun getLineState(index: Int): LineUiState {
-        return lineStates[index] ?: LineUiState()
-    }
+    fun getLineState(index: Int): LineUiState = lineStates[index] ?: LineUiState()
 }

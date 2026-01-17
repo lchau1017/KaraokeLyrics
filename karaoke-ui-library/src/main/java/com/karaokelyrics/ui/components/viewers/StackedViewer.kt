@@ -17,11 +17,7 @@ import com.karaokelyrics.ui.state.KaraokeUiState
  * Active line appears on top with played lines stacking underneath.
  */
 @Composable
-internal fun StackedViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun StackedViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex
 
     Box(

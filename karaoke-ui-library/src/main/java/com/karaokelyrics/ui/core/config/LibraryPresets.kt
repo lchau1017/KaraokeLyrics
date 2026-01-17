@@ -71,7 +71,7 @@ object LibraryPresets {
             fontSize = 36.sp,
             fontWeight = FontWeight.Black,
             gradientEnabled = true,
-            gradientAngle = 0f,  // Horizontal gradient
+            gradientAngle = 0f, // Horizontal gradient
             colors = ColorConfig(
                 sung = Color.Red,
                 unsung = Color.Blue,
@@ -84,7 +84,7 @@ object LibraryPresets {
                 Color.Green,
                 Color.Blue,
                 Color(0xFF4B0082), // Indigo
-                Color(0xFF8B00FF)  // Violet
+                Color(0xFF8B00FF) // Violet
             )
         ),
         animation = AnimationConfig(
@@ -102,17 +102,17 @@ object LibraryPresets {
             fontSize = 35.sp,
             fontWeight = FontWeight.Bold,
             gradientEnabled = true,
-            gradientAngle = 90f,  // Vertical gradient (fire goes up)
+            gradientAngle = 90f, // Vertical gradient (fire goes up)
             colors = ColorConfig(
-                sung = Color(0xFFFF4500),  // Orange red
+                sung = Color(0xFFFF4500), // Orange red
                 unsung = Color(0xFFFFD700), // Gold
-                active = Color(0xFFFF6347)  // Tomato
+                active = Color(0xFFFF6347) // Tomato
             )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
             characterMaxScale = 1.25f,
-            characterFloatOffset = 10f,  // Characters "flicker" like fire
+            characterFloatOffset = 10f, // Characters "flicker" like fire
             characterAnimationDuration = 600f
         ),
         effects = EffectsConfig(
@@ -131,16 +131,16 @@ object LibraryPresets {
             gradientEnabled = true,
             gradientAngle = 135f,
             colors = ColorConfig(
-                sung = Color(0xFF006994),  // Deep blue
+                sung = Color(0xFF006994), // Deep blue
                 unsung = Color(0xFF00CED1), // Dark turquoise
-                active = Color(0xFF00FFFF)  // Aqua
+                active = Color(0xFF00FFFF) // Aqua
             )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
             characterMaxScale = 1.15f,
-            characterFloatOffset = 12f,  // Wave-like motion
-            characterAnimationDuration = 1200f,  // Slower, wave-like
+            characterFloatOffset = 12f, // Wave-like motion
+            characterAnimationDuration = 1200f, // Slower, wave-like
             characterRotationDegrees = 2f
         )
     )
@@ -155,9 +155,9 @@ object LibraryPresets {
             gradientEnabled = true,
             gradientAngle = 45f,
             colors = ColorConfig(
-                sung = Color(0xFFFF1493),  // Deep pink
+                sung = Color(0xFFFF1493), // Deep pink
                 unsung = Color(0xFF00FFFF), // Cyan
-                active = Color(0xFFFFFF00)  // Yellow
+                active = Color(0xFFFFFF00) // Yellow
             )
         ),
         animation = AnimationConfig(
@@ -168,7 +168,7 @@ object LibraryPresets {
             lineScaleOnPlay = 1.1f
         ),
         effects = EffectsConfig(
-            enableBlur = false  // Sharp, retro look
+            enableBlur = false // Sharp, retro look
         )
     )
 
@@ -199,13 +199,13 @@ object LibraryPresets {
      */
     val Elegant = KaraokeLibraryConfig(
         visual = VisualConfig(
-            playingTextColor = Color(0xFFFFD700),  // Gold
-            playedTextColor = Color(0xFFC0C0C0),   // Silver
-            upcomingTextColor = Color(0xFFF5F5DC),  // Beige
+            playingTextColor = Color(0xFFFFD700), // Gold
+            playedTextColor = Color(0xFFC0C0C0), // Silver
+            upcomingTextColor = Color(0xFFF5F5DC), // Beige
             fontSize = 32.sp,
             fontWeight = FontWeight.Light,
             gradientEnabled = true,
-            gradientAngle = 180f,  // Top to bottom
+            gradientAngle = 180f, // Top to bottom
             colors = ColorConfig(
                 sung = Color(0xFFC0C0C0),
                 unsung = Color(0xFFF5F5DC),
@@ -214,15 +214,15 @@ object LibraryPresets {
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
-            characterMaxScale = 1.08f,  // Subtle scale
-            characterFloatOffset = 3f,   // Gentle movement
+            characterMaxScale = 1.08f, // Subtle scale
+            characterFloatOffset = 3f, // Gentle movement
             characterAnimationDuration = 1000f,
             enableLineAnimations = true,
             lineScaleOnPlay = 1.02f
         ),
         effects = EffectsConfig(
             enableBlur = true,
-            blurIntensity = 0.3f  // Very subtle blur
+            blurIntensity = 0.3f // Very subtle blur
         )
     )
 
@@ -241,8 +241,12 @@ object LibraryPresets {
                 active = Color.Yellow
             ),
             playingGradientColors = listOf(
-                Color.Red, Color.Yellow, Color.Green,
-                Color.Cyan, Color.Blue, Color.Magenta
+                Color.Red,
+                Color.Yellow,
+                Color.Green,
+                Color.Cyan,
+                Color.Blue,
+                Color.Magenta
             )
         ),
         animation = AnimationConfig(
@@ -270,14 +274,14 @@ object LibraryPresets {
      */
     val Matrix = KaraokeLibraryConfig(
         visual = VisualConfig(
-            playingTextColor = Color(0xFF00FF00),  // Bright green
-            playedTextColor = Color(0xFF008000),   // Dark green
+            playingTextColor = Color(0xFF00FF00), // Bright green
+            playedTextColor = Color(0xFF008000), // Dark green
             upcomingTextColor = Color(0xFF00FF00).copy(alpha = 0.3f),
             fontSize = 28.sp,
             fontWeight = FontWeight.Normal,
             fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
             gradientEnabled = true,
-            gradientAngle = 270f,  // Bottom to top
+            gradientAngle = 270f, // Bottom to top
             colors = ColorConfig(
                 sung = Color(0xFF008000),
                 unsung = Color(0xFF00FF00).copy(alpha = 0.5f),
@@ -289,7 +293,7 @@ object LibraryPresets {
             enableCharacterAnimations = true,
             characterMaxScale = 1.1f,
             characterFloatOffset = 5f,
-            characterAnimationDuration = 300f,  // Fast, digital feel
+            characterAnimationDuration = 300f, // Fast, digital feel
             enableLineAnimations = false
         ),
         effects = EffectsConfig(

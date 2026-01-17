@@ -3,13 +3,13 @@ package com.karaokelyrics.app.data.repository
 import android.content.res.AssetFileDescriptor
 import com.karaokelyrics.app.data.source.local.AssetDataSource
 import com.karaokelyrics.app.data.source.local.MediaContentProvider
-import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.model.SyncedLyrics
+import com.karaokelyrics.app.domain.repository.LyricsRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class LyricsRepositoryImpl @Inject constructor(
@@ -23,8 +23,7 @@ class LyricsRepositoryImpl @Inject constructor(
      * Load raw file content from assets.
      * This is pure data access without any parsing or processing.
      */
-    override suspend fun loadFileContent(fileName: String): Result<List<String>> =
-        assetDataSource.readTextFile(fileName)
+    override suspend fun loadFileContent(fileName: String): Result<List<String>> = assetDataSource.readTextFile(fileName)
 
     /**
      * Get audio file descriptor for media playback.

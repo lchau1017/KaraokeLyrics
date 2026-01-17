@@ -34,6 +34,6 @@ data class AnimationConfig(
     val fadeInDuration: Float = 300f,
     val fadeOutDuration: Float = 500f,
 
-    // Easing
-    val animationEasing: Easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f) // FastOutSlowIn
+    // Easing (FastOutSlowIn)
+    val animationEasing: Easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
 )

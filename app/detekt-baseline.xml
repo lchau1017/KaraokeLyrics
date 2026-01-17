@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>BracesOnWhenStatements:ProcessLyricsDataUseCase.kt$ProcessLyricsDataUseCase$when</ID>
+    <ID>BracesOnWhenStatements:TtmlParser.kt$TtmlParserImpl$when</ID>
+    <ID>CognitiveComplexMethod:SettingsPanel.kt$@Composable fun SettingsPanel( settings: UserSettings, onUpdateLyricsColor: (Color) -&gt; Unit, onUpdateBackgroundColor: (Color) -&gt; Unit, onUpdateFontSize: (FontSize) -&gt; Unit, onUpdateAnimationsEnabled: (Boolean) -&gt; Unit, onUpdateBlurEffectEnabled: (Boolean) -&gt; Unit, onUpdateCharacterAnimationsEnabled: (Boolean) -&gt; Unit, onUpdateDarkMode: (Boolean) -&gt; Unit, onResetToDefaults: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>CognitiveComplexMethod:TtmlParser.kt$TtmlParserImpl$private fun parseP(parser: XmlPullParser, lyricsLines: MutableList&lt;ISyncedLine&gt;)</ID>
+    <ID>CognitiveComplexMethod:TtmlParser.kt$TtmlParserImpl$private fun parseTime(timeStr: String?): Int</ID>
+    <ID>CyclomaticComplexMethod:TtmlParser.kt$TtmlParserImpl$private fun parseP(parser: XmlPullParser, lyricsLines: MutableList&lt;ISyncedLine&gt;)</ID>
+    <ID>CyclomaticComplexMethod:TtmlParser.kt$TtmlParserImpl$private fun parseTime(timeStr: String?): Int</ID>
+    <ID>ImplicitDefaultLocale:PlayerControls.kt$String.format("%02d:%02d", minutes, seconds)</ID>
+    <ID>LongMethod:TtmlParser.kt$TtmlParserImpl$private fun parseP(parser: XmlPullParser, lyricsLines: MutableList&lt;ISyncedLine&gt;)</ID>
+    <ID>MatchingDeclarationName:TtmlParser.kt$TtmlParserImpl : TtmlParser</ID>
+    <ID>NestedBlockDepth:TtmlParser.kt$TtmlParserImpl$private fun parseP(parser: XmlPullParser, lyricsLines: MutableList&lt;ISyncedLine&gt;)</ID>
+    <ID>SwallowedException:AssetDataSource.kt$AssetDataSource$e: Exception</ID>
+    <ID>SwallowedException:PreferencesDataSource.kt$PreferencesDataSource$e: IllegalArgumentException</ID>
+    <ID>SwallowedException:TtmlParser.kt$TtmlParserImpl$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AssetDataSource.kt$AssetDataSource$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:PlayerViewModel.kt$PlayerViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TtmlParser.kt$TtmlParserImpl$e: Exception</ID>
+    <ID>TooManyFunctions:AppModule.kt$AppModule</ID>
+    <ID>UnderscoresInNumericLiterals:TtmlParser.kt$TtmlParserImpl$3600000</ID>
+    <ID>UnderscoresInNumericLiterals:TtmlParser.kt$TtmlParserImpl$60000</ID>
+    <ID>UnnecessaryParentheses:PlayerControls.kt$(millis / 1000)</ID>
+    <ID>UnusedParameter:LibraryConfigMapper.kt$LibraryConfigMapper$userSettings: UserSettings</ID>
+    <ID>UnusedParameter:LyricsViewModel.kt$LyricsViewModel$position: Long</ID>
+    <ID>UnusedPrivateProperty:TtmlParser.kt$TtmlParserImpl$val agent = parser.getAttributeValue("http://www.w3.org/ns/ttml#metadata", "agent")</ID>
+  </CurrentIssues>
+</SmellBaseline>

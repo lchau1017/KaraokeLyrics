@@ -7,12 +7,12 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 
 // Extension property to get DataStore instance
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_settings")
@@ -22,9 +22,7 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  * Single responsibility: Persist and retrieve user settings.
  */
 @Singleton
-class PreferencesDataSource @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
+class PreferencesDataSource @Inject constructor(@ApplicationContext private val context: Context) {
     // Define preference keys
     private object PreferencesKeys {
         val DARK_LYRICS_COLOR = intPreferencesKey("dark_lyrics_color")
@@ -150,24 +148,23 @@ class PreferencesDataSource @Inject constructor(
     /**
      * Map preferences to domain model.
      */
-    private fun mapPreferencesToUserSettings(preferences: Preferences): UserSettings {
-        return UserSettings(
-            darkLyricsColorArgb = preferences[PreferencesKeys.DARK_LYRICS_COLOR] ?: defaultSettings.darkLyricsColorArgb,
-            darkBackgroundColorArgb = preferences[PreferencesKeys.DARK_BACKGROUND_COLOR] ?: defaultSettings.darkBackgroundColorArgb,
-            lightLyricsColorArgb = preferences[PreferencesKeys.LIGHT_LYRICS_COLOR] ?: defaultSettings.lightLyricsColorArgb,
-            lightBackgroundColorArgb = preferences[PreferencesKeys.LIGHT_BACKGROUND_COLOR] ?: defaultSettings.lightBackgroundColorArgb,
-            fontSize = preferences[PreferencesKeys.FONT_SIZE]?.let {
-                try {
-                    FontSize.valueOf(it)
-                } catch (e: IllegalArgumentException) {
-                    defaultSettings.fontSize
-                }
-            } ?: defaultSettings.fontSize,
-            enableAnimations = preferences[PreferencesKeys.ENABLE_ANIMATIONS] ?: defaultSettings.enableAnimations,
-            enableBlurEffect = preferences[PreferencesKeys.ENABLE_BLUR_EFFECT] ?: defaultSettings.enableBlurEffect,
-            enableCharacterAnimations = preferences[PreferencesKeys.ENABLE_CHARACTER_ANIMATIONS] ?: defaultSettings.enableCharacterAnimations,
-            lyricsTimingOffsetMs = preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS] ?: defaultSettings.lyricsTimingOffsetMs,
-            isDarkMode = preferences[PreferencesKeys.IS_DARK_MODE] ?: defaultSettings.isDarkMode
-        )
-    }
+    private fun mapPreferencesToUserSettings(preferences: Preferences): UserSettings = UserSettings(
+        darkLyricsColorArgb = preferences[PreferencesKeys.DARK_LYRICS_COLOR] ?: defaultSettings.darkLyricsColorArgb,
+        darkBackgroundColorArgb = preferences[PreferencesKeys.DARK_BACKGROUND_COLOR] ?: defaultSettings.darkBackgroundColorArgb,
+        lightLyricsColorArgb = preferences[PreferencesKeys.LIGHT_LYRICS_COLOR] ?: defaultSettings.lightLyricsColorArgb,
+        lightBackgroundColorArgb = preferences[PreferencesKeys.LIGHT_BACKGROUND_COLOR] ?: defaultSettings.lightBackgroundColorArgb,
+        fontSize = preferences[PreferencesKeys.FONT_SIZE]?.let {
+            try {
+                FontSize.valueOf(it)
+            } catch (e: IllegalArgumentException) {
+                defaultSettings.fontSize
+            }
+        } ?: defaultSettings.fontSize,
+        enableAnimations = preferences[PreferencesKeys.ENABLE_ANIMATIONS] ?: defaultSettings.enableAnimations,
+        enableBlurEffect = preferences[PreferencesKeys.ENABLE_BLUR_EFFECT] ?: defaultSettings.enableBlurEffect,
+        enableCharacterAnimations =
+        preferences[PreferencesKeys.ENABLE_CHARACTER_ANIMATIONS] ?: defaultSettings.enableCharacterAnimations,
+        lyricsTimingOffsetMs = preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS] ?: defaultSettings.lyricsTimingOffsetMs,
+        isDarkMode = preferences[PreferencesKeys.IS_DARK_MODE] ?: defaultSettings.isDarkMode
+    )
 }

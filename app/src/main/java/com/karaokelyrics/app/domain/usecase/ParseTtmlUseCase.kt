@@ -9,9 +9,7 @@ import javax.inject.Inject
  * This encapsulates the business logic for parsing TTML content,
  * delegating the actual XML parsing to the data layer.
  */
-class ParseTtmlUseCase @Inject constructor(
-    private val ttmlParser: TtmlParser
-) {
+class ParseTtmlUseCase @Inject constructor(private val ttmlParser: TtmlParser) {
 
     /**
      * Parse TTML content into domain model.

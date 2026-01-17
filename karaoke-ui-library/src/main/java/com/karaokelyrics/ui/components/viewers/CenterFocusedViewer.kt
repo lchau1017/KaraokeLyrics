@@ -15,11 +15,7 @@ import com.karaokelyrics.ui.state.LineUiState
  * Perfect for karaoke mode where focus should be on the current line only.
  */
 @Composable
-internal fun CenterFocusedViewer(
-    uiState: KaraokeUiState,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun CenterFocusedViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex
     val currentLine = uiState.currentLine
 

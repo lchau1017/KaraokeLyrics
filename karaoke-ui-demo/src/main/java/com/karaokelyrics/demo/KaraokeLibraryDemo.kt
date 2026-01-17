@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.karaokelyrics.demo.data.DemoLyricsProvider
 import com.karaokelyrics.ui.api.KaraokeLibrary
 import com.karaokelyrics.ui.core.config.*
-import com.karaokelyrics.demo.data.DemoLyricsProvider
 import kotlinx.coroutines.delay
 
 /**
@@ -63,64 +63,64 @@ fun KaraokeLibraryDemo() {
     val currentConfig by remember {
         derivedStateOf {
             KaraokeLibraryConfig(
-            visual = VisualConfig(
-                fontSize = settings.fontSize.sp,
-                fontWeight = settings.fontWeight,
-                fontFamily = settings.fontFamily,
-                textAlign = settings.textAlign,
-                playingTextColor = settings.activeColor,
-                playedTextColor = settings.sungColor,
-                upcomingTextColor = settings.unsungColor,
-                backgroundColor = settings.backgroundColor,
-                gradientEnabled = settings.gradientEnabled,
-                gradientAngle = settings.gradientAngle,
-                colors = ColorConfig(
-                    sung = settings.sungColor,
-                    unsung = settings.unsungColor,
-                    active = settings.activeColor
-                )
-            ),
-            animation = AnimationConfig(
-                enableCharacterAnimations = settings.charAnimEnabled,
-                characterMaxScale = settings.charMaxScale,
-                characterFloatOffset = settings.charFloatOffset,
-                characterRotationDegrees = settings.charRotationDegrees,
-                characterAnimationDuration = 800f,
-                enableLineAnimations = settings.lineAnimEnabled,
-                lineScaleOnPlay = settings.lineScaleOnPlay,
-                lineAnimationDuration = 700f,
-                enablePulse = settings.pulseEnabled,
-                pulseMinScale = settings.pulseMinScale,
-                pulseMaxScale = settings.pulseMaxScale,
-            ),
-            effects = EffectsConfig(
-                enableBlur = settings.blurEnabled,
-                blurIntensity = settings.blurIntensity,
-                upcomingLineBlur = (3 * settings.blurIntensity).dp,
-                distantLineBlur = (6 * settings.blurIntensity).dp
-            ),
-            layout = LayoutConfig(
-                viewerConfig = ViewerConfig(
-                    type = when (settings.viewerTypeIndex) {
-                        0 -> ViewerType.CENTER_FOCUSED
-                        1 -> ViewerType.SMOOTH_SCROLL
-                        2 -> ViewerType.STACKED
-                        3 -> ViewerType.HORIZONTAL_PAGED
-                        4 -> ViewerType.WAVE_FLOW
-                        5 -> ViewerType.SPIRAL
-                        6 -> ViewerType.CAROUSEL_3D
-                        7 -> ViewerType.SPLIT_DUAL
-                        8 -> ViewerType.ELASTIC_BOUNCE
-                        9 -> ViewerType.FADE_THROUGH
-                        10 -> ViewerType.RADIAL_BURST
-                        11 -> ViewerType.FLIP_CARD
-                        else -> ViewerType.CENTER_FOCUSED
-                    }
+                visual = VisualConfig(
+                    fontSize = settings.fontSize.sp,
+                    fontWeight = settings.fontWeight,
+                    fontFamily = settings.fontFamily,
+                    textAlign = settings.textAlign,
+                    playingTextColor = settings.activeColor,
+                    playedTextColor = settings.sungColor,
+                    upcomingTextColor = settings.unsungColor,
+                    backgroundColor = settings.backgroundColor,
+                    gradientEnabled = settings.gradientEnabled,
+                    gradientAngle = settings.gradientAngle,
+                    colors = ColorConfig(
+                        sung = settings.sungColor,
+                        unsung = settings.unsungColor,
+                        active = settings.activeColor
+                    )
                 ),
-                lineSpacing = settings.lineSpacing.dp,
-                containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
+                animation = AnimationConfig(
+                    enableCharacterAnimations = settings.charAnimEnabled,
+                    characterMaxScale = settings.charMaxScale,
+                    characterFloatOffset = settings.charFloatOffset,
+                    characterRotationDegrees = settings.charRotationDegrees,
+                    characterAnimationDuration = 800f,
+                    enableLineAnimations = settings.lineAnimEnabled,
+                    lineScaleOnPlay = settings.lineScaleOnPlay,
+                    lineAnimationDuration = 700f,
+                    enablePulse = settings.pulseEnabled,
+                    pulseMinScale = settings.pulseMinScale,
+                    pulseMaxScale = settings.pulseMaxScale,
+                ),
+                effects = EffectsConfig(
+                    enableBlur = settings.blurEnabled,
+                    blurIntensity = settings.blurIntensity,
+                    upcomingLineBlur = (3 * settings.blurIntensity).dp,
+                    distantLineBlur = (6 * settings.blurIntensity).dp
+                ),
+                layout = LayoutConfig(
+                    viewerConfig = ViewerConfig(
+                        type = when (settings.viewerTypeIndex) {
+                            0 -> ViewerType.CENTER_FOCUSED
+                            1 -> ViewerType.SMOOTH_SCROLL
+                            2 -> ViewerType.STACKED
+                            3 -> ViewerType.HORIZONTAL_PAGED
+                            4 -> ViewerType.WAVE_FLOW
+                            5 -> ViewerType.SPIRAL
+                            6 -> ViewerType.CAROUSEL_3D
+                            7 -> ViewerType.SPLIT_DUAL
+                            8 -> ViewerType.ELASTIC_BOUNCE
+                            9 -> ViewerType.FADE_THROUGH
+                            10 -> ViewerType.RADIAL_BURST
+                            11 -> ViewerType.FLIP_CARD
+                            else -> ViewerType.CENTER_FOCUSED
+                        }
+                    ),
+                    lineSpacing = settings.lineSpacing.dp,
+                    containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
+                )
             )
-        )
         }
     }
 
@@ -203,7 +203,10 @@ fun KaraokeLibraryDemo() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = { currentTimeMs = 0; isPlaying = false }) {
+                        Button(onClick = {
+                            currentTimeMs = 0
+                            isPlaying = false
+                        }) {
                             Text("Reset")
                         }
                         Button(onClick = { isPlaying = !isPlaying }) {
@@ -327,7 +330,7 @@ fun KaraokeLibraryDemo() {
                     Slider(
                         value = settings.lineSpacing,
                         onValueChange = { settings = settings.copy(lineSpacing = it) },
-                        valueRange = 0f..150f  // Allow much larger spacing
+                        valueRange = 0f..150f // Allow much larger spacing
                     )
 
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
@@ -436,7 +439,13 @@ fun KaraokeLibraryDemo() {
                         Text("Pulse Effect", modifier = Modifier.padding(start = 8.dp))
                     }
                     if (settings.pulseEnabled) {
-                        Text("Pulse Range: ${String.format("%.2f", settings.pulseMinScale)} - ${String.format("%.2f", settings.pulseMaxScale)}", fontSize = 12.sp)
+                        Text(
+                            "Pulse Range: ${String.format(
+                                "%.2f",
+                                settings.pulseMinScale
+                            )} - ${String.format("%.2f", settings.pulseMaxScale)}",
+                            fontSize = 12.sp
+                        )
                         Slider(
                             value = settings.pulseMinScale,
                             onValueChange = { settings = settings.copy(pulseMinScale = it) },
@@ -569,11 +578,7 @@ private fun ColorRow(label: String, color: Color, onClick: () -> Unit) {
 }
 
 @Composable
-private fun ColorPickerDialog(
-    currentColor: Color,
-    onColorSelected: (Color) -> Unit,
-    onDismiss: () -> Unit
-) {
+private fun ColorPickerDialog(currentColor: Color, onColorSelected: (Color) -> Unit, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card {
             Column(
@@ -591,7 +596,7 @@ private fun ColorPickerDialog(
                     Color(0xFFC0C0C0), // Silver
                     Color(0xFFFF6347), // Tomato
                     Color(0xFF00CED1), // Dark Turquoise
-                    Color(0xFFFF1493)  // Deep Pink
+                    Color(0xFFFF1493) // Deep Pink
                 )
 
                 colors.chunked(4).forEach { row ->

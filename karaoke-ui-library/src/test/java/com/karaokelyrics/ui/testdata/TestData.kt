@@ -13,11 +13,7 @@ object TestData {
     /**
      * Simple implementation of ISyncedLine for testing
      */
-    data class SimpleSyncedLine(
-        override val start: Int,
-        override val end: Int,
-        private val content: String
-    ) : ISyncedLine {
+    data class SimpleSyncedLine(override val start: Int, override val end: Int, private val content: String) : ISyncedLine {
         override fun getContent(): String = content
     }
 
@@ -108,13 +104,13 @@ object TestData {
      */
     object TimePoints {
         // For createSimpleLines()
-        const val BEFORE_ALL_LINES = -500       // Before any line starts
-        const val LINE_0_PLAYING = 1000         // Middle of line 0
-        const val BETWEEN_LINE_0_AND_1 = 2250   // Gap between lines
-        const val LINE_1_PLAYING = 3500         // Middle of line 1
-        const val LINE_2_START = 5000           // Exactly at line 2 start
-        const val LINE_2_END = 7000             // Exactly at line 2 end
-        const val LINE_4_PLAYING = 11000        // Last line playing
-        const val AFTER_ALL_LINES = 15000       // After all lines
+        const val BEFORE_ALL_LINES = -500 // Before any line starts
+        const val LINE_0_PLAYING = 1000 // Middle of line 0
+        const val BETWEEN_LINE_0_AND_1 = 2250 // Gap between lines
+        const val LINE_1_PLAYING = 3500 // Middle of line 1
+        const val LINE_2_START = 5000 // Exactly at line 2 start
+        const val LINE_2_END = 7000 // Exactly at line 2 end
+        const val LINE_4_PLAYING = 11000 // Last line playing
+        const val AFTER_ALL_LINES = 15000 // After all lines
     }
 }

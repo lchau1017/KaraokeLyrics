@@ -1,13 +1,13 @@
 package com.karaokelyrics.app.data.parser
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.KaraokeLine
 import com.karaokelyrics.app.domain.model.KaraokeSyllable
+import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.parser.TtmlParser
+import javax.inject.Inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
-import javax.inject.Inject
 
 class TtmlParserImpl @Inject constructor() : TtmlParser {
 
@@ -71,7 +71,6 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         val pBegin = parser.getAttributeValue(null, "begin")
         val pEnd = parser.getAttributeValue(null, "end")
         val agent = parser.getAttributeValue("http://www.w3.org/ns/ttml#metadata", "agent")
-
 
         if (pBegin == null || pEnd == null) {
             // Skip to end of this p element
@@ -231,10 +230,10 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
                             // Convert fractional seconds to milliseconds
                             val fractionStr = secondParts[1]
                             when (fractionStr.length) {
-                                1 -> fractionStr.toIntOrNull()?.times(100) ?: 0  // .6 = 600ms
-                                2 -> fractionStr.toIntOrNull()?.times(10) ?: 0   // .60 = 600ms
-                                3 -> fractionStr.toIntOrNull() ?: 0               // .600 = 600ms
-                                else -> fractionStr.take(3).toIntOrNull() ?: 0   // .6000 = 600ms
+                                1 -> fractionStr.toIntOrNull()?.times(100) ?: 0 // .6 = 600ms
+                                2 -> fractionStr.toIntOrNull()?.times(10) ?: 0 // .60 = 600ms
+                                3 -> fractionStr.toIntOrNull() ?: 0 // .600 = 600ms
+                                else -> fractionStr.take(3).toIntOrNull() ?: 0 // .6000 = 600ms
                             }
                         } else {
                             0

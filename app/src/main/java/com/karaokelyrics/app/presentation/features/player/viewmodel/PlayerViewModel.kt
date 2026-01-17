@@ -2,29 +2,23 @@ package com.karaokelyrics.app.presentation.features.player.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.presentation.player.PlayerController
 import com.karaokelyrics.app.presentation.features.player.effect.PlayerEffect
 import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
+import com.karaokelyrics.app.presentation.player.PlayerController
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * MVI ViewModel for Player controls following Clean Architecture.
  * Single Responsibility: Manages playback state and handles intents.
  */
 @HiltViewModel
-class PlayerViewModel @Inject constructor(
-    private val playerController: PlayerController
-) : ViewModel() {
+class PlayerViewModel @Inject constructor(private val playerController: PlayerController) : ViewModel() {
 
-    data class PlayerState(
-        val isPlaying: Boolean = false,
-        val currentPosition: Long = 0L,
-        val duration: Long = 0L
-    )
+    data class PlayerState(val isPlaying: Boolean = false, val currentPosition: Long = 0L, val duration: Long = 0L)
 
     private val _state = MutableStateFlow(PlayerState())
     val state: StateFlow<PlayerState> = _state.asStateFlow()

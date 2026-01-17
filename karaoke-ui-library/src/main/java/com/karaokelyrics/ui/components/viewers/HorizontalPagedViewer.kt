@@ -37,11 +37,13 @@ internal fun HorizontalPagedViewer(
         AnimatedContent(
             targetState = currentLineIndex,
             transitionSpec = {
-                (slideInHorizontally(
-                    animationSpec = tween(500, easing = FastOutSlowInEasing)
-                ) { fullWidth -> fullWidth } + fadeIn(
-                    animationSpec = tween(300)
-                )).togetherWith(
+                (
+                    slideInHorizontally(
+                        animationSpec = tween(500, easing = FastOutSlowInEasing)
+                    ) { fullWidth -> fullWidth } + fadeIn(
+                        animationSpec = tween(300)
+                    )
+                    ).togetherWith(
                     slideOutHorizontally(
                         animationSpec = tween(500, easing = FastOutSlowInEasing)
                     ) { fullWidth -> -fullWidth } + fadeOut(
