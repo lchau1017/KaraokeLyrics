@@ -18,8 +18,7 @@ import com.karaokelyrics.ui.state.LineUiState
 internal fun CenterFocusedViewer(
     uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
 ) {
     val currentLineIndex = uiState.currentLineIndex
     val currentLine = uiState.currentLine

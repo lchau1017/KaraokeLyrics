@@ -22,8 +22,7 @@ import kotlin.math.sin
 internal fun SpiralViewer(
     uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
 ) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
     val density = LocalDensity.current

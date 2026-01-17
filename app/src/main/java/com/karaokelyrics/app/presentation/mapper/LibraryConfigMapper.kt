@@ -86,8 +86,7 @@ class LibraryConfigMapper @Inject constructor() {
             // Viewer configuration - use smooth scroll for app
             viewerConfig = ViewerConfig(
                 type = ViewerType.SMOOTH_SCROLL,
-                scrollPosition = 0.33f, // Position active line at top third
-                smoothScrollDuration = 500
+                scrollPosition = 0.33f // Position active line at top third
             ),
 
             // Spacing - use defaults
@@ -148,13 +147,7 @@ class LibraryConfigMapper @Inject constructor() {
             scrollOffset = 50.dp,
 
             // Interaction - enable basic interaction
-            enableLineClick = true,
-            enableLineLongPress = false,
-            enableSwipeGestures = false,
-
-            // Performance - use defaults
-            preloadLines = 5,
-            recycleDistance = 10
+            enableLineClick = true
         )
     }
 

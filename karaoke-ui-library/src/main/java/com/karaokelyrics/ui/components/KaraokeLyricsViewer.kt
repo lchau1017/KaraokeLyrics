@@ -8,7 +8,6 @@ import com.karaokelyrics.ui.components.viewers.*
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.config.ViewerType
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.state.KaraokeStateHolder
 import com.karaokelyrics.ui.state.KaraokeUiState
 import com.karaokelyrics.ui.state.rememberKaraokeStateHolder
 
@@ -25,7 +24,6 @@ import com.karaokelyrics.ui.state.rememberKaraokeStateHolder
  * @param config Complete configuration for visual, animation, and behavior
  * @param modifier Modifier for the composable
  * @param onLineClick Optional callback when a line is clicked
- * @param onLineLongPress Optional callback when a line is long-pressed
  */
 @Composable
 fun KaraokeLyricsViewer(
@@ -33,8 +31,7 @@ fun KaraokeLyricsViewer(
     currentTimeMs: Int,
     config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
     modifier: Modifier = Modifier,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
 ) {
     // Create and manage state holder internally
     val stateHolder = rememberKaraokeStateHolder(config)
@@ -56,8 +53,7 @@ fun KaraokeLyricsViewer(
         uiState = uiState,
         config = config,
         modifier = modifier,
-        onLineClick = onLineClick,
-        onLineLongPress = onLineLongPress
+        onLineClick = onLineClick
     )
 }
 
@@ -70,8 +66,7 @@ private fun KaraokeLyricsViewerContent(
     uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     modifier: Modifier = Modifier,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -84,96 +79,84 @@ private fun KaraokeLyricsViewerContent(
                 CenterFocusedViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.SMOOTH_SCROLL -> {
                 SmoothScrollViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.STACKED -> {
                 StackedViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.HORIZONTAL_PAGED -> {
                 HorizontalPagedViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.WAVE_FLOW -> {
                 WaveFlowViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.SPIRAL -> {
                 SpiralViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.CAROUSEL_3D -> {
                 Carousel3DViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.SPLIT_DUAL -> {
                 SplitDualViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.ELASTIC_BOUNCE -> {
                 ElasticBounceViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.FADE_THROUGH -> {
                 FadeThroughViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.RADIAL_BURST -> {
                 RadialBurstViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
             ViewerType.FLIP_CARD -> {
                 FlipCardViewer(
                     uiState = uiState,
                     config = config,
-                    onLineClick = onLineClick,
-                    onLineLongPress = onLineLongPress
+                    onLineClick = onLineClick
                 )
             }
         }

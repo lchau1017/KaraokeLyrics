@@ -14,13 +14,7 @@ data class BehaviorConfig(
     val scrollOffset: Dp = 100.dp,
 
     // Interaction
-    val enableLineClick: Boolean = true,
-    val enableLineLongPress: Boolean = false,
-    val enableSwipeGestures: Boolean = false,
-
-    // Performance
-    val preloadLines: Int = 5,
-    val recycleDistance: Int = 10
+    val enableLineClick: Boolean = true
 )
 
 /**

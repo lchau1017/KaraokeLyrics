@@ -30,10 +30,6 @@ data class AnimationConfig(
     val enableColorTransition: Boolean = true,
     val colorTransitionDuration: Int = 300,
 
-    // Orchestrated Animations (for staggered effects)
-    val enableOrchestratedAnimations: Boolean = false,
-    val orchestrationDelayPerItem: Long = 50L,
-
     // Transition Animations
     val fadeInDuration: Float = 300f,
     val fadeOutDuration: Float = 500f,

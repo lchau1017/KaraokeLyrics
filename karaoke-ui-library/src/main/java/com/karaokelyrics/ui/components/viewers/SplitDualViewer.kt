@@ -21,8 +21,7 @@ import com.karaokelyrics.ui.state.LineUiState
 internal fun SplitDualViewer(
     uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
 ) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
     val currentLine = uiState.lines.getOrNull(currentLineIndex)

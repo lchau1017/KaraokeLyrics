@@ -19,8 +19,7 @@ import com.karaokelyrics.ui.state.KaraokeUiState
 internal fun RadialBurstViewer(
     uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
 ) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
 

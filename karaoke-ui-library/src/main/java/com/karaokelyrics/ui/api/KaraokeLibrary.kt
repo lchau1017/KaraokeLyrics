@@ -24,7 +24,6 @@ object KaraokeLibrary {
      * @param config Complete configuration for visual, animation, and behavior
      * @param modifier Modifier for the composable
      * @param onLineClick Optional callback when a line is clicked
-     * @param onLineLongPress Optional callback when a line is long-pressed
      */
     @Composable
     fun KaraokeLyricsViewer(
@@ -32,16 +31,14 @@ object KaraokeLibrary {
         currentTimeMs: Int,
         config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
         modifier: Modifier = Modifier,
-        onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-        onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+        onLineClick: ((ISyncedLine, Int) -> Unit)? = null
     ) {
         com.karaokelyrics.ui.components.KaraokeLyricsViewer(
             lines = lines,
             currentTimeMs = currentTimeMs,
             config = config,
             modifier = modifier,
-            onLineClick = onLineClick,
-            onLineLongPress = onLineLongPress
+            onLineClick = onLineClick
         )
     }
 }
