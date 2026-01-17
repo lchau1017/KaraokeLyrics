@@ -94,4 +94,29 @@ object AnimationManager {
     private fun interpolate(start: Float, end: Float, progress: Float): Float {
         return start + (end - start) * progress
     }
+
+    /**
+     * Calculate pulse scale based on current time.
+     * Returns a scale value that oscillates between minScale and maxScale.
+     *
+     * @param currentTimeMs Current playback time in milliseconds
+     * @param minScale Minimum scale value during pulse
+     * @param maxScale Maximum scale value during pulse
+     * @param duration Duration of one complete pulse cycle in milliseconds
+     * @return Current scale value oscillating between minScale and maxScale
+     */
+    fun calculatePulseScale(
+        currentTimeMs: Int,
+        minScale: Float = 0.95f,
+        maxScale: Float = 1.05f,
+        duration: Int = 1000
+    ): Float {
+        val progress = (currentTimeMs % duration).toFloat() / duration
+        // Use sine wave for smooth oscillation (0 to 1 to 0)
+        val sineValue = sin(progress * 2 * PI).toFloat()
+        // Map from [-1, 1] to [0, 1]
+        val normalizedSine = (sineValue + 1f) / 2f
+        // Interpolate between min and max scale
+        return minScale + (maxScale - minScale) * normalizedSine
+    }
 }
