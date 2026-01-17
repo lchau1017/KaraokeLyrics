@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
@@ -44,34 +45,69 @@ fun KaraokeLyricsViewer(
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
     // Find the current playing line index (for distance calculation)
     val currentLineIndex = remember(currentTimeMs, lines) {
         LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
     }
 
-    // Find the last played line index
-    val lastPlayedLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getLastPlayedLineIndex(lines, currentTimeMs)
+    // Find the next upcoming line when no active line
+    val nextUpcomingIndex = remember(currentTimeMs, lines) {
+        if (currentLineIndex == null) {
+            // Find first line that hasn't started yet
+            lines.indexOfFirst { line -> currentTimeMs < line.start }.takeIf { it >= 0 }
+        } else null
     }
 
-    // Track the previous last played line index to detect changes
-    var previousLastPlayedIndex by remember { mutableStateOf<Int?>(null) }
+    // Track previous indices to detect changes
+    var previousCurrentIndex by remember { mutableStateOf<Int?>(null) }
+    var previousUpcomingIndex by remember { mutableStateOf<Int?>(null) }
 
-    // Handle automatic scrolling based on last played line
-    LaunchedEffect(lastPlayedLineIndex) {
-        if (lastPlayedLineIndex != null &&
-            lastPlayedLineIndex != previousLastPlayedIndex) {
-
-            previousLastPlayedIndex = lastPlayedLineIndex
-
-            // Scroll to show the next line after the last played
-            coroutineScope.launch {
-                val targetIndex = (lastPlayedLineIndex + 1).coerceAtMost(lines.size - 1)
-                listState.animateScrollToItem(
-                    index = targetIndex,
-                    scrollOffset = 0
+    // Handle initial positioning for first line
+    var isInitialized by remember { mutableStateOf(false) }
+    LaunchedEffect(lines) {
+        if (lines.isNotEmpty() && !isInitialized) {
+            isInitialized = true
+            // If first line is about to play or playing, position it like other lines
+            if (currentTimeMs >= lines[0].start - 1000) {
+                listState.scrollToItem(
+                    index = 0,
+                    scrollOffset = 0  // Position first line at top with padding
                 )
+            }
+        }
+    }
+
+    // Handle automatic scrolling based on line changes
+    LaunchedEffect(currentLineIndex, nextUpcomingIndex) {
+        when {
+            // Active line exists - scroll to it
+            currentLineIndex != null && currentLineIndex != previousCurrentIndex -> {
+                previousCurrentIndex = currentLineIndex
+                previousUpcomingIndex = null
+
+                coroutineScope.launch {
+                    // Always use same positioning for consistency
+                    listState.animateScrollToItem(
+                        index = currentLineIndex,
+                        scrollOffset = 0  // Position at top (contentPadding handles the offset)
+                    )
+                }
+            }
+
+            // No active line but there's an upcoming line - scroll to show upcoming
+            currentLineIndex == null && nextUpcomingIndex != null && nextUpcomingIndex != previousUpcomingIndex -> {
+                previousUpcomingIndex = nextUpcomingIndex
+                previousCurrentIndex = null
+
+                coroutineScope.launch {
+                    // Scroll to upcoming line to move played lines out
+                    listState.animateScrollToItem(
+                        index = nextUpcomingIndex,
+                        scrollOffset = 0  // Upcoming at top, played lines scroll out
+                    )
+                }
             }
         }
     }
@@ -89,8 +125,8 @@ fun KaraokeLyricsViewer(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(
-                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),  // Status bar padding only
-                bottom = screenHeight // Full screen height bottom padding
+                top = config.layout.scrollTopOffset,  // Use scrollTopOffset for consistent top spacing
+                bottom = screenHeight * config.layout.contentBottomPaddingRatio // Configurable bottom padding ratio
             )
         ) {
             itemsIndexed(
@@ -108,16 +144,25 @@ fun KaraokeLyricsViewer(
                 Column {
                     // Add spacing before line
                     if (index > 0) {
+                        val hasActiveLine = LineStateUtils.hasActiveLine(lines, currentTimeMs)
+
                         val spaceBefore = when {
-                            // Add extra space only before the first active line in the group
-                            isFirstActive -> 60.dp
-                            // Add extra space before first upcoming line
-                            isFirstUpcoming -> 60.dp
-                            // Normal spacing for all other cases
+                            // Large space before first active line (separation from played lines)
+                            isFirstActive -> config.layout.activeGroupSpacing
+
+                            // Large space before first upcoming when NO active line exists
+                            // This creates visual separation when in gap between lines
+                            isFirstUpcoming && !hasActiveLine -> config.layout.activeGroupSpacing * 1.5f
+
+                            // Normal space before first upcoming when active line exists
+                            isFirstUpcoming && hasActiveLine -> config.layout.upcomingGroupSpacing
+
+                            // Standard spacing between lines in same group
                             else -> config.layout.lineSpacing
                         }
                         Spacer(modifier = Modifier.height(spaceBefore))
                     }
+                    // Note: First line positioning is handled by scrolling, no need for extra padding
 
                     KaraokeSingleLineWithDistance(
                         line = line,
@@ -132,9 +177,17 @@ fun KaraokeLyricsViewer(
                         } else null
                     )
 
-                    // Add extra spacing after last played line
+                    // Add extra spacing after last played line for visual separation
+                    // This ensures played lines don't disappear too quickly
                     if (isLastPlayed) {
-                        Spacer(modifier = Modifier.height(screenHeight * 0.25f))
+                        val hasActiveLine = LineStateUtils.hasActiveLine(lines, currentTimeMs)
+                        // Use larger spacing when no active line to push content down
+                        val spaceAfter = if (!hasActiveLine) {
+                            screenHeight * 0.6f // More than half screen when in gap
+                        } else {
+                            screenHeight * 0.25f // Reduced spacing when active to hide upcoming
+                        }
+                        Spacer(modifier = Modifier.height(spaceAfter))
                     }
                 }
             }

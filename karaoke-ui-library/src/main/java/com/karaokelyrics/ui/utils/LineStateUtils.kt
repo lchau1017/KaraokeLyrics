@@ -99,11 +99,25 @@ object LineStateUtils {
         lines: List<ISyncedLine>,
         currentTimeMs: Int
     ): Boolean {
-        if (index == 0) return false
+        if (index == 0) return currentTimeMs < lines[index].start
 
         val isUpcoming = currentTimeMs < lines[index].start
-        val previousLineStarted = currentTimeMs >= lines[index - 1].start
 
-        return isUpcoming && previousLineStarted
+        // Check if previous line has ended (not just started)
+        val previousLineEnded = currentTimeMs > lines[index - 1].end
+
+        return isUpcoming && previousLineEnded
+    }
+
+    /**
+     * Check if any line is currently active/playing.
+     */
+    fun hasActiveLine(
+        lines: List<ISyncedLine>,
+        currentTimeMs: Int
+    ): Boolean {
+        return lines.any { line ->
+            currentTimeMs in line.start..line.end
+        }
     }
 }

@@ -77,7 +77,7 @@ fun KaraokeLibraryDemo() {
     var shimmerIntensity by remember { mutableStateOf(0.3f) }
 
     // Line spacing
-    var lineSpacing by remember { mutableStateOf(20f) }
+    var lineSpacing by remember { mutableStateOf(80f) } // Very large spacing to show only active line
 
     // Show color picker dialog
     var showColorPicker by remember { mutableStateOf(false) }
@@ -144,7 +144,14 @@ fun KaraokeLibraryDemo() {
                 distantLineBlur = (6 * blurIntensity).dp
             ),
             layout = LayoutConfig(
-                lineSpacing = lineSpacing.dp
+                lineSpacing = lineSpacing.dp,
+                // Adapt padding for demo's smaller viewport (1/3 of screen)
+                contentTopPadding = 30.dp, // Smaller top padding for demo
+                scrollTopOffset = 30.dp, // Match content top padding
+                contentBottomPaddingRatio = 1.5f, // More bottom padding to hide upcoming
+                activeGroupSpacing = 60.dp, // Space before active line
+                upcomingGroupSpacing = 150.dp, // Very large gap to ensure upcoming lines are hidden
+                containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
             )
         )
     }
@@ -181,69 +188,36 @@ fun KaraokeLibraryDemo() {
             )
         }
     ) { paddingValues ->
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Left side - Display area
+            // Top - Display area (1/3 of screen)
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .weight(0.33f)
                     .background(backgroundColor)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = when (textAlign) {
-                        TextAlign.Start -> Alignment.Start
-                        TextAlign.End -> Alignment.End
-                        else -> Alignment.CenterHorizontally
+                // Use KaraokeLyricsViewer for automatic scrolling
+                KaraokeLibrary.KaraokeLyricsViewer(
+                    lines = demoLines,
+                    currentTimeMs = currentTimeMs,
+                    config = currentConfig,
+                    modifier = Modifier.fillMaxSize(),
+                    onLineClick = { line, index ->
+                        // Handle line click if needed
+                        selectedLineIndex = index
                     }
-                ) {
-                    // Display lines with blur effect
-                    demoLines.forEachIndexed { index, line ->
-                        val distance = kotlin.math.abs(index - selectedLineIndex)
-                        val lineAlpha = when (distance) {
-                            0 -> 1f
-                            1 -> 0.6f
-                            2 -> 0.3f
-                            else -> 0.1f
-                        }
-
-                        val lineBlur = if (blurEnabled && index != selectedLineIndex) {
-                            (distance * 2 * blurIntensity).dp
-                        } else 0.dp
-
-                        // Use key to force recomposition when config changes
-                        key(currentConfig) {
-                            KaraokeLibrary.KaraokeSingleLine(
-                                line = line,
-                                currentTimeMs = currentTimeMs,
-                                config = currentConfig,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .alpha(lineAlpha)
-                                    .blur(lineBlur),
-                                onLineClick = { _ -> }
-                            )
-                        }
-
-                        if (index < demoLines.size - 1) {
-                            Spacer(modifier = Modifier.height(lineSpacing.dp))
-                        }
-                    }
-                }
+                )
             }
 
-            // Right side - Controls (scrollable)
+            // Bottom - Controls (2/3 of screen, scrollable)
             Card(
                 modifier = Modifier
-                    .width(400.dp)
-                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .weight(0.67f)
                     .padding(8.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -359,7 +333,7 @@ fun KaraokeLibraryDemo() {
                     Slider(
                         value = lineSpacing,
                         onValueChange = { lineSpacing = it },
-                        valueRange = 0f..50f
+                        valueRange = 0f..150f  // Allow much larger spacing
                     )
 
                     Divider(modifier = Modifier.padding(vertical = 8.dp))

@@ -24,6 +24,15 @@ data class LayoutConfig(
     val containerPadding: PaddingValues = PaddingValues(16.dp),
     val maxLineWidth: Dp? = null, // null means full width
 
+    // Scrollable content padding
+    val contentTopPadding: Dp = 16.dp, // Padding at the top of scrollable content
+    val contentBottomPaddingRatio: Float = 1.0f, // Bottom padding as ratio of viewport height (1.0 = full height)
+    val scrollTopOffset: Dp = 100.dp, // Top offset when scrolling lines to top position
+
+    // Active line group spacing
+    val activeGroupSpacing: Dp = 60.dp, // Extra spacing before/after active line groups
+    val upcomingGroupSpacing: Dp = 60.dp, // Extra spacing before upcoming lines
+
     // RTL/LTR Support
     val forceTextDirection: LayoutDirection? = null // null means auto-detect
 )
