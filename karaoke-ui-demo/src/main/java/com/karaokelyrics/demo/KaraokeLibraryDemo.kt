@@ -112,13 +112,13 @@ fun KaraokeLibraryDemo() {
                 distantLineBlur = (6 * settings.blurIntensity).dp
             ),
             layout = LayoutConfig(
+                viewerConfig = ViewerConfig(
+                    type = ViewerType.CENTER_FOCUSED,
+                    centerOffset = 0.5f, // Center in the viewport
+                    visibleLinesBefore = 0, // Don't show played lines
+                    visibleLinesAfter = 0 // Don't show upcoming lines
+                ),
                 lineSpacing = settings.lineSpacing.dp,
-                // Adapt padding for demo's smaller viewport (1/3 of screen)
-                contentTopPadding = 30.dp, // Smaller top padding for demo
-                scrollTopOffset = 30.dp, // Match content top padding
-                contentBottomPaddingRatio = 1.5f, // More bottom padding to hide upcoming
-                activeGroupSpacing = 60.dp, // Space before active line
-                upcomingGroupSpacing = 150.dp, // Very large gap to ensure upcoming lines are hidden
                 containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
             )
         )
