@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 
 /**
  * Fade through viewer with pure opacity transitions.
@@ -23,8 +23,10 @@ internal fun FadeThroughViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     } ?: 0
 
     Box(

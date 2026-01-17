@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 
 /**
  * Center-focused viewer that shows only the active line truly centered in the viewport.
@@ -21,9 +21,11 @@ internal fun CenterFocusedViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     // Find current line
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     }
 
     // Get the current active line

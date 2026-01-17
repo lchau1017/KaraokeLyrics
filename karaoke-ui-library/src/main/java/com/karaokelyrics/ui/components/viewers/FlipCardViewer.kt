@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 
 /**
  * Flip card viewer with 3D card flip transitions.
@@ -23,8 +23,10 @@ internal fun FlipCardViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     } ?: 0
 
     var previousIndex by remember { mutableStateOf(-1) }

@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 
 /**
  * Split dual viewer showing current and next line simultaneously.
@@ -24,8 +24,10 @@ internal fun SplitDualViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     } ?: 0
 
     val currentLine = lines.getOrNull(currentLineIndex)

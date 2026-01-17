@@ -13,7 +13,6 @@ import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.KaraokeSyllable
 import com.karaokelyrics.ui.rendering.AnimationManager
 import com.karaokelyrics.ui.rendering.EffectsManager
-import com.karaokelyrics.ui.rendering.color.ColorCalculator
 
 /**
  * Handles the rendering of individual characters within syllables.
@@ -22,7 +21,6 @@ import com.karaokelyrics.ui.rendering.color.ColorCalculator
 class CharacterRenderer {
     private val animationManager = AnimationManager()
     private val effectsManager = EffectsManager()
-    private val colorCalculator = ColorCalculator()
 
     fun renderSyllableCharacters(
         drawScope: DrawScope,
@@ -48,7 +46,7 @@ class CharacterRenderer {
                 val charEndTime = syllable.start + ((charIndex + 1) * charDuration).toInt()
 
                 // Calculate character state and color
-                val charColor = colorCalculator.calculateCharacterColor(
+                val charColor = effectsManager.calculateCharacterColor(
                     currentTimeMs = currentTimeMs,
                     charStartTime = charStartTime,
                     charEndTime = charEndTime,

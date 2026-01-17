@@ -25,7 +25,7 @@ import kotlin.math.sin
 
 /**
  * Unified effects manager for all visual effects in karaoke display.
- * Consolidates gradients, shadows, glows, and other visual effects.
+ * Consolidates gradients, shadows, glows, color calculations, and other visual effects.
  */
 class EffectsManager {
 
@@ -451,5 +451,79 @@ class EffectsManager {
                 (upcomingOpacity - distanceReduction).coerceAtLeast(0.2f)
             }
         }
+    }
+
+    /**
+     * Calculate the color for a character based on its timing state
+     */
+    fun calculateCharacterColor(
+        currentTimeMs: Int,
+        charStartTime: Int,
+        charEndTime: Int,
+        baseColor: Color,
+        playingColor: Color,
+        playedColor: Color
+    ): Color {
+        return when {
+            // Character has finished playing
+            currentTimeMs > charEndTime -> playedColor
+
+            // Character is currently playing
+            currentTimeMs >= charStartTime -> {
+                val progress = calculateColorProgress(currentTimeMs, charStartTime, charEndTime)
+                lerpColor(baseColor, playingColor, progress)
+            }
+
+            // Character hasn't started yet
+            else -> baseColor
+        }
+    }
+
+    /**
+     * Calculate line-level color based on state
+     */
+    fun calculateLineColor(
+        isPlaying: Boolean,
+        hasPlayed: Boolean,
+        isAccompaniment: Boolean,
+        playingTextColor: Color,
+        playedTextColor: Color,
+        upcomingTextColor: Color,
+        accompanimentTextColor: Color
+    ): Color {
+        return when {
+            isAccompaniment -> accompanimentTextColor
+            isPlaying -> upcomingTextColor // Base color for unplayed chars in active line
+            hasPlayed -> playedTextColor
+            else -> upcomingTextColor
+        }
+    }
+
+    /**
+     * Calculate progress between start and end times for color interpolation
+     */
+    private fun calculateColorProgress(
+        currentTime: Int,
+        startTime: Int,
+        endTime: Int
+    ): Float {
+        return if (endTime > startTime) {
+            ((currentTime - startTime).toFloat() / (endTime - startTime))
+                .coerceIn(0f, 1f)
+        } else {
+            1f
+        }
+    }
+
+    /**
+     * Interpolate between two colors
+     */
+    private fun lerpColor(start: Color, end: Color, fraction: Float): Color {
+        return Color(
+            red = start.red + (end.red - start.red) * fraction,
+            green = start.green + (end.green - start.green) * fraction,
+            blue = start.blue + (end.blue - start.blue) * fraction,
+            alpha = start.alpha + (end.alpha - start.alpha) * fraction
+        )
     }
 }

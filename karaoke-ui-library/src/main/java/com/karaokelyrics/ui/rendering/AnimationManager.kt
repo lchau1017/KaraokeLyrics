@@ -3,13 +3,15 @@ package com.karaokelyrics.ui.rendering
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
+import com.karaokelyrics.ui.core.models.ISyncedLine
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
 /**
  * Unified animation manager for all karaoke animation effects.
- * Consolidates line-level and character-level animations.
+ * Consolidates line-level and character-level animations, and line state calculations.
  */
 class AnimationManager {
 
@@ -211,5 +213,34 @@ class AnimationManager {
      */
     private fun interpolate(start: Float, end: Float, progress: Float): Float {
         return start + (end - start) * progress
+    }
+
+    /**
+     * Data class representing the state of a line.
+     */
+    data class LineState(
+        val isPlaying: Boolean,
+        val hasPlayed: Boolean,
+        val isUpcoming: Boolean
+    )
+
+    /**
+     * Calculate the state of a line based on current time.
+     */
+    fun getLineState(line: ISyncedLine, currentTimeMs: Int): LineState {
+        return LineState(
+            isPlaying = currentTimeMs in line.start..line.end,
+            hasPlayed = currentTimeMs > line.end,
+            isUpcoming = currentTimeMs < line.start
+        )
+    }
+
+    /**
+     * Find the index of the currently playing line.
+     */
+    fun getCurrentLineIndex(lines: List<ISyncedLine>, currentTimeMs: Int): Int? {
+        return lines.indexOfFirst { line ->
+            currentTimeMs in line.start..line.end
+        }.takeIf { it != -1 }
     }
 }

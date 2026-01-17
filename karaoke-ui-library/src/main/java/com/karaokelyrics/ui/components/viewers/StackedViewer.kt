@@ -13,7 +13,7 @@ import androidx.compose.ui.zIndex
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 
 /**
  * Stacked viewer with z-layer overlapping effect.
@@ -27,9 +27,11 @@ internal fun StackedViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     // Find current line index
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     }
 
     Box(
@@ -38,7 +40,7 @@ internal fun StackedViewer(
     ) {
         lines.forEachIndexed { index, line ->
             val lineState = remember(line, currentTimeMs) {
-                LineStateUtils.getLineState(line, currentTimeMs)
+                animationManager.getLineState(line, currentTimeMs)
             }
 
             val distance = currentLineIndex?.let {

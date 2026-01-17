@@ -15,9 +15,7 @@ import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.core.models.KaraokeLine
 import com.karaokelyrics.ui.rendering.AnimationManager
 import com.karaokelyrics.ui.rendering.EffectsManager
-import com.karaokelyrics.ui.rendering.color.ColorCalculator
 import com.karaokelyrics.ui.rendering.syllable.SyllableRenderer
-import com.karaokelyrics.ui.utils.LineStateUtils
 
 /**
  * Composable for displaying a single karaoke line with synchronized highlighting.
@@ -40,10 +38,9 @@ fun KaraokeSingleLine(
     // Manager instances
     val animationManager = remember(config.animation) { AnimationManager() }
     val effectsManager = remember { EffectsManager() }
-    val colorCalculator = remember { ColorCalculator() }
 
     // Determine line state
-    val lineState = LineStateUtils.getLineState(line, currentTimeMs)
+    val lineState = animationManager.getLineState(line, currentTimeMs)
 
     // Calculate animations
     val lineAnimationState = animationManager.animateLine(
@@ -81,7 +78,7 @@ fun KaraokeSingleLine(
     )
 
     val textStyle = createTextStyle(line, config)
-    val textColor = calculateTextColor(line, lineState, config, colorCalculator)
+    val textColor = calculateTextColor(line, lineState, config, effectsManager)
 
     // Main container
     Box(
@@ -168,13 +165,13 @@ private fun createTextStyle(
  */
 private fun calculateTextColor(
     line: ISyncedLine,
-    lineState: LineStateUtils.LineState,
+    lineState: AnimationManager.LineState,
     config: KaraokeLibraryConfig,
-    colorCalculator: ColorCalculator
+    effectsManager: EffectsManager
 ): androidx.compose.ui.graphics.Color {
     val isAccompaniment = line is KaraokeLine && line.isAccompaniment
 
-    return colorCalculator.calculateLineColor(
+    return effectsManager.calculateLineColor(
         isPlaying = lineState.isPlaying,
         hasPlayed = lineState.hasPlayed,
         isAccompaniment = isAccompaniment,

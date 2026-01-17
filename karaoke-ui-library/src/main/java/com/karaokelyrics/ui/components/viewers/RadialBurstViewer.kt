@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 
 /**
  * Radial burst viewer with lines emerging from center.
@@ -23,8 +23,10 @@ internal fun RadialBurstViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     } ?: 0
 
     // Pulse animation for active line
@@ -63,7 +65,7 @@ internal fun RadialBurstViewer(
 
             if (distance <= 3) {
                 val lineState = remember(line, currentTimeMs) {
-                    LineStateUtils.getLineState(line, currentTimeMs)
+                    animationManager.getLineState(line, currentTimeMs)
                 }
 
                 val radiusMultiplier = when {

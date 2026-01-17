@@ -11,7 +11,7 @@ import androidx.compose.ui.zIndex
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -27,8 +27,10 @@ internal fun Carousel3DViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     } ?: 0
 
     // Animate rotation to current line
@@ -54,7 +56,7 @@ internal fun Carousel3DViewer(
 
             if (kotlin.math.abs(distance) <= visibleRange) {
                 val lineState = remember(line, currentTimeMs) {
-                    LineStateUtils.getLineState(line, currentTimeMs)
+                    animationManager.getLineState(line, currentTimeMs)
                 }
 
                 // Calculate position in 3D space

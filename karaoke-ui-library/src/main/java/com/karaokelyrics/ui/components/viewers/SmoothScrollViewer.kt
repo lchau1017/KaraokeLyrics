@@ -11,7 +11,7 @@ import androidx.compose.ui.draw.alpha
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 import kotlinx.coroutines.launch
 
 /**
@@ -26,12 +26,14 @@ internal fun SmoothScrollViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
     // Find current line index
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     }
 
     // Track previous index to detect changes
@@ -78,7 +80,7 @@ internal fun SmoothScrollViewer(
                 key = { index, line -> "$index-${line.start}" }
             ) { index, line ->
                 val lineState = remember(line, currentTimeMs) {
-                    LineStateUtils.getLineState(line, currentTimeMs)
+                    animationManager.getLineState(line, currentTimeMs)
                 }
 
                 // Apply different opacity based on line state

@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.utils.LineStateUtils
+import com.karaokelyrics.ui.rendering.AnimationManager
 import kotlin.math.sin
 
 /**
@@ -27,8 +27,10 @@ internal fun WaveFlowViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
+    val animationManager = remember { AnimationManager() }
+
     val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        animationManager.getCurrentLineIndex(lines, currentTimeMs)
     } ?: 0
 
     val density = LocalDensity.current
@@ -55,7 +57,7 @@ internal fun WaveFlowViewer(
             // Show lines within range
             if (kotlin.math.abs(distance) <= 3) {
                 val lineState = remember(line, currentTimeMs) {
-                    LineStateUtils.getLineState(line, currentTimeMs)
+                    animationManager.getLineState(line, currentTimeMs)
                 }
 
                 // Calculate wave position
