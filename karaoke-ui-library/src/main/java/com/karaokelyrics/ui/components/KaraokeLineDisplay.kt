@@ -1,5 +1,6 @@
 package com.karaokelyrics.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +13,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale as drawScale
@@ -32,7 +32,6 @@ import com.karaokelyrics.ui.rendering.animation.AnimationStateManager
 import com.karaokelyrics.ui.rendering.animation.CharacterAnimationCalculator
 import com.karaokelyrics.ui.rendering.effects.GradientFactory
 import com.karaokelyrics.ui.rendering.effects.VisualEffects
-import com.karaokelyrics.ui.rendering.text.TextDirectionDetector
 
 /**
  * Composable for displaying a single karaoke line with synchronized highlighting.
@@ -69,6 +68,24 @@ fun KaraokeLineDisplay(
         scaleOnPlay = config.animation.lineScaleOnPlay,
         animationDuration = config.animation.lineAnimationDuration.toInt()
     )
+
+    // Get pulse animation for active lines
+    val pulseScale = if (config.animation.enablePulse) {
+        animationManager.animatePulse(
+            enabled = isPlaying,
+            minScale = config.animation.pulseMinScale,
+            maxScale = config.animation.pulseMaxScale,
+            duration = config.animation.pulseDuration
+        )
+    } else 1f
+
+    // Get shimmer effect for active lines
+    val shimmerProgress = if (config.animation.enableShimmer) {
+        animationManager.animateShimmer(
+            enabled = isPlaying,
+            duration = config.animation.shimmerDuration
+        )
+    } else 0f
 
     // Calculate opacity
     val opacity = VisualEffects.calculateOpacity(
@@ -112,7 +129,7 @@ fun KaraokeLineDisplay(
         modifier = modifier
             .fillMaxWidth()
             .padding(config.layout.linePadding)
-            .scale(lineAnimationState.scale)
+            .scale(lineAnimationState.scale * pulseScale)
             .alpha(opacity)
             .then(
                 if (config.behavior.enableLineClick && onLineClick != null) {
@@ -135,7 +152,8 @@ fun KaraokeLineDisplay(
                     currentTimeMs = currentTimeMs,
                     config = config,
                     textStyle = textStyle,
-                    baseColor = textColor
+                    baseColor = textColor,
+                    shimmerProgress = shimmerProgress
                 )
             }
             else -> {
@@ -155,13 +173,15 @@ fun KaraokeLineDisplay(
 /**
  * Internal component for rendering karaoke syllables with character-by-character progression.
  */
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 private fun KaraokeSyllableRenderer(
     line: KaraokeLine,
     currentTimeMs: Int,
     config: KaraokeLibraryConfig,
     textStyle: TextStyle,
-    baseColor: Color
+    baseColor: Color,
+    shimmerProgress: Float = 0f
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
@@ -267,25 +287,21 @@ private fun KaraokeSyllableRenderer(
                         style = textStyle
                     )
 
-                    // Get character color based on precise timing
+                    // Calculate character color (can't use Composable here in Canvas)
                     val charColor = when {
-                        currentTimeMs > charEndTime -> {
-                            // Character has been fully played
-                            config.visual.playingTextColor
-                        }
+                        currentTimeMs > charEndTime -> config.visual.playedTextColor
                         currentTimeMs >= charStartTime -> {
-                            // Character is currently playing - interpolate
+                            // Interpolate color during playing
                             val progress = if (charEndTime > charStartTime) {
                                 ((currentTimeMs - charStartTime).toFloat() / (charEndTime - charStartTime))
                                     .coerceIn(0f, 1f)
                             } else 1f
                             com.karaokelyrics.ui.components.lerpColor(baseColor, config.visual.playingTextColor, progress)
                         }
-                        else -> {
-                            // Character hasn't started yet
-                            baseColor
-                        }
+                        else -> baseColor
                     }
+
+                    // We'll apply shimmer as a gradient overlay instead of color modification
 
                     // Apply character animations if enabled
                     if (config.animation.enableCharacterAnimations && isCharActive) {
@@ -366,28 +382,87 @@ private fun KaraokeSyllableRenderer(
                                         )
                                     }
 
-                                    // Apply gradient if enabled for active characters
-                                    if (config.visual.gradientEnabled && charProgress > 0f) {
-                                        val gradient = GradientFactory.createLinearGradient(
-                                            colors = listOf(
-                                                config.visual.colors.active,
-                                                config.visual.colors.sung
-                                            ),
-                                            angle = config.visual.gradientAngle,
-                                            width = charLayout.size.width.toFloat(),
-                                            height = charLayout.size.height.toFloat()
-                                        )
-                                        drawText(
-                                            textLayoutResult = charLayout,
-                                            brush = gradient,
-                                            topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
-                                        )
-                                    } else {
-                                        drawText(
-                                            textLayoutResult = charLayout,
-                                            color = charColor,
-                                            topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
-                                        )
+                                    // Apply gradient or shimmer if enabled
+                                    when {
+                                        config.animation.enableShimmer && shimmerProgress > 0f -> {
+                                            // Use shimmer gradient for active characters
+                                            val shimmerGradient = GradientFactory.createShimmerGradient(
+                                                progress = (charX / size.width + shimmerProgress) % 1f,
+                                                baseColor = charColor,
+                                                shimmerColor = Color(
+                                                    red = minOf(1f, charColor.red + 0.3f),
+                                                    green = minOf(1f, charColor.green + 0.3f),
+                                                    blue = minOf(1f, charColor.blue + 0.3f),
+                                                    alpha = charColor.alpha
+                                                ),
+                                                width = charLayout.size.width.toFloat()
+                                            )
+                                            drawText(
+                                                textLayoutResult = charLayout,
+                                                brush = shimmerGradient,
+                                                topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
+                                            )
+                                        }
+                                        config.visual.gradientEnabled && charProgress > 0f -> {
+                                            // Select gradient based on type
+                                            val gradient = when (config.visual.gradientType) {
+                                                com.karaokelyrics.ui.core.config.GradientType.PROGRESS -> {
+                                                    GradientFactory.createProgressGradient(
+                                                        progress = charProgress,
+                                                        baseColor = baseColor,
+                                                        highlightColor = config.visual.colors.active,
+                                                        width = charLayout.size.width.toFloat()
+                                                    )
+                                                }
+                                                com.karaokelyrics.ui.core.config.GradientType.MULTI_COLOR -> {
+                                                    val colors = config.visual.playingGradientColors.takeIf { it.size > 1 }
+                                                        ?: listOf(config.visual.colors.active, config.visual.colors.sung)
+                                                    GradientFactory.createMultiColorGradient(
+                                                        colors = colors,
+                                                        angle = config.visual.gradientAngle,
+                                                        width = charLayout.size.width.toFloat(),
+                                                        height = charLayout.size.height.toFloat()
+                                                    )
+                                                }
+                                                com.karaokelyrics.ui.core.config.GradientType.PRESET -> {
+                                                    val presetColors = when (config.visual.gradientPreset) {
+                                                        com.karaokelyrics.ui.core.config.GradientPreset.RAINBOW -> GradientFactory.Presets.Rainbow
+                                                        com.karaokelyrics.ui.core.config.GradientPreset.SUNSET -> GradientFactory.Presets.Sunset
+                                                        com.karaokelyrics.ui.core.config.GradientPreset.OCEAN -> GradientFactory.Presets.Ocean
+                                                        com.karaokelyrics.ui.core.config.GradientPreset.FIRE -> GradientFactory.Presets.Fire
+                                                        com.karaokelyrics.ui.core.config.GradientPreset.NEON -> GradientFactory.Presets.Neon
+                                                        null -> listOf(config.visual.colors.active, config.visual.colors.sung)
+                                                    }
+                                                    GradientFactory.createMultiColorGradient(
+                                                        colors = presetColors,
+                                                        angle = config.visual.gradientAngle,
+                                                        width = charLayout.size.width.toFloat(),
+                                                        height = charLayout.size.height.toFloat()
+                                                    )
+                                                }
+                                                else -> {
+                                                    // Default linear gradient
+                                                    GradientFactory.createLinearGradient(
+                                                        colors = listOf(config.visual.colors.active, config.visual.colors.sung),
+                                                        angle = config.visual.gradientAngle,
+                                                        width = charLayout.size.width.toFloat(),
+                                                        height = charLayout.size.height.toFloat()
+                                                    )
+                                                }
+                                            }
+                                            drawText(
+                                                textLayoutResult = charLayout,
+                                                brush = gradient,
+                                                topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
+                                            )
+                                        }
+                                        else -> {
+                                            drawText(
+                                                textLayoutResult = charLayout,
+                                                color = charColor,
+                                                topLeft = Offset(charX + animState.offset.x, currentY + animState.offset.y)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -428,28 +503,46 @@ private fun KaraokeSyllableRenderer(
                             )
                         }
 
-                        // Draw main text with gradient if enabled
-                        if (config.visual.gradientEnabled && charProgress > 0f) {
-                            val gradient = GradientFactory.createLinearGradient(
-                                colors = listOf(
-                                    config.visual.colors.active,
-                                    config.visual.colors.sung
-                                ),
-                                angle = config.visual.gradientAngle,
-                                width = charLayout.size.width.toFloat(),
-                                height = charLayout.size.height.toFloat()
-                            )
-                            drawText(
-                                textLayoutResult = charLayout,
-                                brush = gradient,
-                                topLeft = Offset(charX, currentY)
-                            )
-                        } else {
-                            drawText(
-                                textLayoutResult = charLayout,
-                                color = charColor,
-                                topLeft = Offset(charX, currentY)
-                            )
+                        // Draw main text with appropriate effect
+                        when {
+                            config.animation.enableShimmer && shimmerProgress > 0f -> {
+                                val shimmerGradient = GradientFactory.createShimmerGradient(
+                                    progress = (charX / size.width + shimmerProgress) % 1f,
+                                    baseColor = charColor,
+                                    shimmerColor = Color(
+                                        red = minOf(1f, charColor.red + 0.3f),
+                                        green = minOf(1f, charColor.green + 0.3f),
+                                        blue = minOf(1f, charColor.blue + 0.3f),
+                                        alpha = charColor.alpha
+                                    ),
+                                    width = charLayout.size.width.toFloat()
+                                )
+                                drawText(
+                                    textLayoutResult = charLayout,
+                                    brush = shimmerGradient,
+                                    topLeft = Offset(charX, currentY)
+                                )
+                            }
+                            config.visual.gradientEnabled && charProgress > 0f -> {
+                                val progressGradient = GradientFactory.createProgressGradient(
+                                    progress = charProgress,
+                                    baseColor = baseColor,
+                                    highlightColor = config.visual.colors.active,
+                                    width = charLayout.size.width.toFloat()
+                                )
+                                drawText(
+                                    textLayoutResult = charLayout,
+                                    brush = progressGradient,
+                                    topLeft = Offset(charX, currentY)
+                                )
+                            }
+                            else -> {
+                                drawText(
+                                    textLayoutResult = charLayout,
+                                    color = charColor,
+                                    topLeft = Offset(charX, currentY)
+                                )
+                            }
                         }
                     }
 

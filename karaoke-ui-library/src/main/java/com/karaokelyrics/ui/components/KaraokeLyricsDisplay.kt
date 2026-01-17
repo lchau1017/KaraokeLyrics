@@ -12,9 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.ui.core.config.BehaviorConfig
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
-import com.karaokelyrics.ui.core.config.ScrollBehavior
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import kotlinx.coroutines.launch
 

@@ -68,6 +68,13 @@ fun CustomizableKaraokeDemo() {
     var lineAnimEnabled by remember { mutableStateOf(false) }
     var lineScaleOnPlay by remember { mutableStateOf(1.05f) }
 
+    // New animation settings
+    var pulseEnabled by remember { mutableStateOf(false) }
+    var pulseMinScale by remember { mutableStateOf(0.98f) }
+    var pulseMaxScale by remember { mutableStateOf(1.02f) }
+    var shimmerEnabled by remember { mutableStateOf(false) }
+    var shimmerIntensity by remember { mutableStateOf(0.3f) }
+
     // Line spacing
     var lineSpacing by remember { mutableStateOf(20f) }
 
@@ -87,6 +94,8 @@ fun CustomizableKaraokeDemo() {
         shadowOffsetX, shadowOffsetY, glowEnabled, glowColor,
         blurEnabled, blurIntensity, charAnimEnabled, charMaxScale,
         charFloatOffset, charRotationDegrees, lineAnimEnabled, lineScaleOnPlay,
+        pulseEnabled, pulseMinScale, pulseMaxScale,
+        shimmerEnabled, shimmerIntensity,
         lineSpacing
     ) {
         KaraokeLibraryConfig(
@@ -120,7 +129,12 @@ fun CustomizableKaraokeDemo() {
                 characterAnimationDuration = 800f,
                 enableLineAnimations = lineAnimEnabled,
                 lineScaleOnPlay = lineScaleOnPlay,
-                lineAnimationDuration = 700f
+                lineAnimationDuration = 700f,
+                enablePulse = pulseEnabled,
+                pulseMinScale = pulseMinScale,
+                pulseMaxScale = pulseMaxScale,
+                enableShimmer = shimmerEnabled,
+                shimmerIntensity = shimmerIntensity
             ),
             effects = EffectsConfig(
                 enableBlur = blurEnabled,
@@ -479,6 +493,39 @@ fun CustomizableKaraokeDemo() {
                         )
                     }
 
+                    // Pulse animation
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Switch(checked = pulseEnabled, onCheckedChange = { pulseEnabled = it })
+                        Text("Pulse Effect", modifier = Modifier.padding(start = 8.dp))
+                    }
+                    if (pulseEnabled) {
+                        Text("Pulse Range: ${String.format("%.2f", pulseMinScale)} - ${String.format("%.2f", pulseMaxScale)}", fontSize = 12.sp)
+                        Slider(
+                            value = pulseMinScale,
+                            onValueChange = { pulseMinScale = it },
+                            valueRange = 0.9f..1f
+                        )
+                        Slider(
+                            value = pulseMaxScale,
+                            onValueChange = { pulseMaxScale = it },
+                            valueRange = 1f..1.1f
+                        )
+                    }
+
+                    // Shimmer animation
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Switch(checked = shimmerEnabled, onCheckedChange = { shimmerEnabled = it })
+                        Text("Shimmer Effect", modifier = Modifier.padding(start = 8.dp))
+                    }
+                    if (shimmerEnabled) {
+                        Text("Intensity: ${String.format("%.2f", shimmerIntensity)}", fontSize = 12.sp)
+                        Slider(
+                            value = shimmerIntensity,
+                            onValueChange = { shimmerIntensity = it },
+                            valueRange = 0.1f..1f
+                        )
+                    }
+
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
 
                     // Preset buttons
@@ -498,6 +545,11 @@ fun CustomizableKaraokeDemo() {
                                         config.animation.let {
                                             charAnimEnabled = it.enableCharacterAnimations
                                             lineAnimEnabled = it.enableLineAnimations
+                                            pulseEnabled = it.enablePulse
+                                            pulseMinScale = it.pulseMinScale
+                                            pulseMaxScale = it.pulseMaxScale
+                                            shimmerEnabled = it.enableShimmer
+                                            shimmerIntensity = it.shimmerIntensity
                                         }
                                         gradientEnabled = false
                                         shadowEnabled = true
@@ -512,14 +564,27 @@ fun CustomizableKaraokeDemo() {
                             Button(
                                 onClick = { loadPreset("neon",
                                     onLoad = { config ->
-                                        gradientEnabled = true
-                                        shadowEnabled = true
-                                        glowEnabled = true
-                                        blurEnabled = true
-                                        charAnimEnabled = true
-                                        lineAnimEnabled = true
-                                        activeColor = Color.Cyan
-                                        sungColor = Color.Magenta
+                                        config.visual.let {
+                                            fontSize = it.fontSize.value
+                                            fontWeight = it.fontWeight
+                                            sungColor = it.playedTextColor
+                                            unsungColor = it.upcomingTextColor
+                                            activeColor = it.playingTextColor
+                                            gradientEnabled = it.gradientEnabled
+                                            shadowEnabled = it.shadowEnabled
+                                            glowEnabled = it.glowEnabled
+                                        }
+                                        config.animation.let {
+                                            charAnimEnabled = it.enableCharacterAnimations
+                                            lineAnimEnabled = it.enableLineAnimations
+                                            pulseEnabled = it.enablePulse
+                                            shimmerEnabled = it.enableShimmer
+                                            shimmerIntensity = it.shimmerIntensity
+                                        }
+                                        config.effects.let {
+                                            blurEnabled = it.enableBlur
+                                            blurIntensity = it.blurIntensity
+                                        }
                                     })
                                 },
                                 modifier = Modifier.weight(1f)

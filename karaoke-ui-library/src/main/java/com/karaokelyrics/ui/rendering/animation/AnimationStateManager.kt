@@ -4,8 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 /**
  * Manages animation states for karaoke display.
@@ -208,52 +206,4 @@ class AnimationStateManager {
         return if (enabled) shimmerProgress else 0f
     }
 
-    /**
-     * Orchestrate multiple animations with delays.
-     */
-    @Composable
-    fun orchestrateAnimations(
-        items: List<Any>,
-        delayPerItem: Long = 50L
-    ): List<Boolean> {
-        val animationStates = remember(items.size) {
-            mutableStateListOf(*Array(items.size) { false })
-        }
-
-        LaunchedEffect(items) {
-            items.indices.forEach { index ->
-                launch {
-                    delay(index * delayPerItem)
-                    animationStates[index] = true
-                }
-            }
-        }
-
-        return animationStates
-    }
-
-    companion object {
-        /**
-         * Calculate timing offset for smooth transitions.
-         */
-        fun calculateTimingOffset(
-            lineIndex: Int,
-            totalLines: Int,
-            baseOffset: Int = 200
-        ): Int {
-            val position = lineIndex.toFloat() / (totalLines - 1).coerceAtLeast(1)
-            return (baseOffset * (1 - position)).toInt()
-        }
-
-        /**
-         * Determine if animation should be simplified based on performance.
-         */
-        fun shouldSimplifyAnimation(
-            totalLines: Int,
-            enableComplexAnimations: Boolean,
-            performanceThreshold: Int = 50
-        ): Boolean {
-            return !enableComplexAnimations || totalLines > performanceThreshold
-        }
-    }
 }

@@ -66,7 +66,10 @@ object LibraryPresets {
             enableCharacterAnimations = true,
             characterMaxScale = 1.2f,
             characterFloatOffset = 8f,
-            enableLineAnimations = true
+            enableLineAnimations = true,
+            enableShimmer = true,
+            shimmerIntensity = 0.3f,
+            shimmerDuration = 1500
         ),
         effects = EffectsConfig(
             enableBlur = true,
@@ -293,7 +296,12 @@ object LibraryPresets {
             characterAnimationDuration = 500f,
             enableLineAnimations = true,
             lineScaleOnPlay = 1.2f,
-            lineAnimationDuration = 400f
+            lineAnimationDuration = 400f,
+            enablePulse = true,
+            pulseMinScale = 0.95f,
+            pulseMaxScale = 1.05f,
+            enableShimmer = true,
+            shimmerIntensity = 0.5f
         ),
         effects = EffectsConfig(
             enableBlur = true,

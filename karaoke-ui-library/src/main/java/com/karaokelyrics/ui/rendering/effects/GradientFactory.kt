@@ -3,8 +3,6 @@ package com.karaokelyrics.ui.rendering.effects
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.TileMode
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -89,25 +87,6 @@ object GradientFactory {
             ),
             start = Offset.Zero,
             end = Offset(width, 0f)
-        )
-    }
-
-    /**
-     * Create a radial gradient for glow effects.
-     *
-     * @param center Center of the gradient
-     * @param radius Radius of the gradient
-     * @param colors Gradient colors from center to edge
-     */
-    fun createRadialGradient(
-        center: Offset,
-        radius: Float,
-        colors: List<Color>
-    ): Brush {
-        return Brush.radialGradient(
-            colors = colors,
-            center = center,
-            radius = radius
         )
     }
 
