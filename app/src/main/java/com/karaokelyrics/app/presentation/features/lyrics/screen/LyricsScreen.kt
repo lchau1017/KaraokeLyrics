@@ -7,14 +7,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextMotion
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.karaokelyrics.app.presentation.features.common.components.ErrorScreen
 import com.karaokelyrics.app.presentation.features.common.components.LoadingScreen
-import com.karaokelyrics.app.presentation.features.lyrics.components.KaraokeLyricsViewNew
+import com.karaokelyrics.app.presentation.features.lyrics.components.KaraokeLyricsView
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.features.lyrics.viewmodel.LyricsViewModel
@@ -61,10 +58,10 @@ fun LyricsScreen(
         }
     }
 
-    // Load initial lyrics using MVI intent
+    // Load initial lyrics using default media content from data layer
     LaunchedEffect(Unit) {
         lyricsViewModel.handleIntent(
-            LyricsIntent.LoadLyrics("golden-hour.ttml", "golden-hour.m4a")
+            LyricsIntent.LoadDefaultContent
         )
     }
 
@@ -90,7 +87,7 @@ fun LyricsScreen(
                     errorMessage = lyricsState.error,
                     onRetry = {
                         lyricsViewModel.handleIntent(
-                            LyricsIntent.LoadLyrics("golden-hour.ttml", "golden-hour.m4a")
+                            LyricsIntent.LoadDefaultContent
                         )
                     }
                 )
@@ -166,7 +163,7 @@ private fun LyricsContent(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Use the karaoke library
-        KaraokeLyricsViewNew(
+        KaraokeLyricsView(
             lyrics = lyricsState.lyrics,
             currentTimeMs = lyricsState.currentTimeMs,
             libraryConfig = lyricsState.libraryConfig,

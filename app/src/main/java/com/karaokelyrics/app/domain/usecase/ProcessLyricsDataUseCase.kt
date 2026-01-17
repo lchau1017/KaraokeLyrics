@@ -2,7 +2,7 @@ package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
+import com.karaokelyrics.app.domain.model.KaraokeLine
 import javax.inject.Inject
 
 /**

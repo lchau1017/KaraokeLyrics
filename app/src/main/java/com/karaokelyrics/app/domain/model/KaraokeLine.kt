@@ -1,6 +1,4 @@
-package com.karaokelyrics.app.domain.model.karaoke
-
-import com.karaokelyrics.app.domain.model.ISyncedLine
+package com.karaokelyrics.app.domain.model
 
 data class KaraokeLine(
     val syllables: List<KaraokeSyllable>,

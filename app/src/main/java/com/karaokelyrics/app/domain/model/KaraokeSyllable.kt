@@ -1,4 +1,4 @@
-package com.karaokelyrics.app.domain.model.karaoke
+package com.karaokelyrics.app.domain.model
 
 data class KaraokeSyllable(
     val content: String,

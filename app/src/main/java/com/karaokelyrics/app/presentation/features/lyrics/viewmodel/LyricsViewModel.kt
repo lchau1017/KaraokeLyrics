@@ -30,7 +30,9 @@ class LyricsViewModel @Inject constructor(
     private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-    private val libraryConfigMapper: LibraryConfigMapper
+    private val libraryConfigMapper: LibraryConfigMapper,
+    private val getDefaultMediaContentUseCase: com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase,
+    private val getAvailableMediaContentUseCase: com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
 ) : ViewModel() {
 
     data class LyricsState(
@@ -67,10 +69,30 @@ class LyricsViewModel @Inject constructor(
         viewModelScope.launch {
             _intents.receiveAsFlow().collect { intent ->
                 when (intent) {
-                    is LyricsIntent.LoadLyrics -> loadLyrics(intent.fileName, intent.audioFileName)
+                    is LyricsIntent.LoadDefaultContent -> loadDefaultContent()
+                    is LyricsIntent.LoadMediaContent -> loadMediaContent(intent.contentId)
                     is LyricsIntent.SeekToLine -> seekToLine(intent.lineIndex)
                     is LyricsIntent.UpdateCurrentPosition -> updatePosition(intent.position)
                 }
+            }
+        }
+    }
+
+    private suspend fun loadDefaultContent() {
+        val defaultContent = getDefaultMediaContentUseCase()
+        loadLyrics(defaultContent.lyricsFileName, defaultContent.audioFileName)
+    }
+
+    private suspend fun loadMediaContent(contentId: String) {
+        val content = getAvailableMediaContentUseCase().find { it.id == contentId }
+        if (content != null) {
+            loadLyrics(content.lyricsFileName, content.audioFileName)
+        } else {
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    error = "Content not found: $contentId"
+                )
             }
         }
     }

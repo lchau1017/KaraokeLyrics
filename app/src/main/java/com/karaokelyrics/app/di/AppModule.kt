@@ -27,23 +27,45 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // Data Sources
+    @Provides
+    @Singleton
+    fun provideAssetDataSource(
+        @ApplicationContext context: Context
+    ): com.karaokelyrics.app.data.source.local.AssetDataSource =
+        com.karaokelyrics.app.data.source.local.AssetDataSource(context)
+
+    @Provides
+    @Singleton
+    fun provideMediaContentProvider(): com.karaokelyrics.app.data.source.local.MediaContentProvider =
+        com.karaokelyrics.app.data.source.local.MediaContentProvider()
+
+    @Provides
+    @Singleton
+    fun providePreferencesDataSource(
+        @ApplicationContext context: Context
+    ): com.karaokelyrics.app.data.source.local.PreferencesDataSource =
+        com.karaokelyrics.app.data.source.local.PreferencesDataSource(context)
+
+    // Repositories
     @Provides
     @Singleton
     fun provideLyricsRepository(
-        @ApplicationContext context: Context
-    ): LyricsRepository = LyricsRepositoryImpl(context)
+        assetDataSource: com.karaokelyrics.app.data.source.local.AssetDataSource,
+        mediaContentProvider: com.karaokelyrics.app.data.source.local.MediaContentProvider
+    ): LyricsRepository = LyricsRepositoryImpl(assetDataSource, mediaContentProvider)
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(
+        preferencesDataSource: com.karaokelyrics.app.data.source.local.PreferencesDataSource
+    ): SettingsRepository = SettingsRepositoryImpl(preferencesDataSource)
 
     @Provides
     @Singleton
     fun providePlayerController(
         @ApplicationContext context: Context
     ): PlayerController = MediaPlayerController(context)
-
-    @Provides
-    @Singleton
-    fun provideSettingsRepository(
-        @ApplicationContext context: Context
-    ): SettingsRepository = SettingsRepositoryImpl(context)
 
     // Domain Use Cases
     @Provides
@@ -67,8 +89,15 @@ object AppModule {
     }
 
     @Provides
-    fun provideParseTtmlUseCase(): ParseTtmlUseCase {
-        return ParseTtmlUseCase()
+    @Singleton
+    fun provideTtmlParser(): com.karaokelyrics.app.domain.parser.TtmlParser =
+        com.karaokelyrics.app.data.parser.TtmlParserImpl()
+
+    @Provides
+    fun provideParseTtmlUseCase(
+        ttmlParser: com.karaokelyrics.app.domain.parser.TtmlParser
+    ): ParseTtmlUseCase {
+        return ParseTtmlUseCase(ttmlParser)
     }
 
     @Provides
@@ -97,6 +126,20 @@ object AppModule {
         settingsRepository: SettingsRepository
     ): UpdateUserSettingsUseCase {
         return UpdateUserSettingsUseCase(settingsRepository)
+    }
+
+    @Provides
+    fun provideGetDefaultMediaContentUseCase(
+        lyricsRepository: LyricsRepository
+    ): com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase {
+        return com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase(lyricsRepository)
+    }
+
+    @Provides
+    fun provideGetAvailableMediaContentUseCase(
+        lyricsRepository: LyricsRepository
+    ): com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase {
+        return com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase(lyricsRepository)
     }
 
 

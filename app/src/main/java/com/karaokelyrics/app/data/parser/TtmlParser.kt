@@ -2,14 +2,16 @@ package com.karaokelyrics.app.data.parser
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeLine
-import com.karaokelyrics.app.domain.model.karaoke.KaraokeSyllable
+import com.karaokelyrics.app.domain.model.KaraokeLine
+import com.karaokelyrics.app.domain.model.KaraokeSyllable
+import com.karaokelyrics.app.domain.parser.TtmlParser
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
+import javax.inject.Inject
 
-class TtmlParser {
+class TtmlParserImpl @Inject constructor() : TtmlParser {
 
-    fun parse(lines: List<String>): SyncedLyrics {
+    override fun parse(lines: List<String>): SyncedLyrics {
         val content = lines.joinToString("\n")
         val factory = XmlPullParserFactory.newInstance()
         factory.isNamespaceAware = true
