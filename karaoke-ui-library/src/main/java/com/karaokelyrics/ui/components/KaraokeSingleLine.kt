@@ -13,7 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -61,6 +63,12 @@ internal fun KaraokeSingleLine(
         label = "lineOpacity"
     )
 
+    val animatedBlur by animateFloatAsState(
+        targetValue = lineUiState.blurRadius,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "lineBlur"
+    )
+
     val pulseScale = if (config.animation.enablePulse && lineUiState.isPlaying) {
         RenderingCalculations.calculatePulseScale(
             currentTimeMs = currentTimeMs,
@@ -79,6 +87,13 @@ internal fun KaraokeSingleLine(
             .padding(config.layout.linePadding)
             .scale(animatedScale * pulseScale)
             .alpha(animatedOpacity)
+            .then(
+                if (animatedBlur > 0f) {
+                    Modifier.blur(animatedBlur.dp)
+                } else {
+                    Modifier
+                }
+            )
             .then(
                 if (config.behavior.enableLineClick && onLineClick != null) {
                     Modifier.clickable { onLineClick(line) }
