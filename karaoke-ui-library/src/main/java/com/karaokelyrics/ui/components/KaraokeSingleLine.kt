@@ -13,9 +13,9 @@ import androidx.compose.ui.text.style.TextAlign
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.core.models.KaraokeLine
-import com.karaokelyrics.ui.rendering.animation.AnimationStateManager
+import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.rendering.EffectsManager
 import com.karaokelyrics.ui.rendering.color.ColorCalculator
-import com.karaokelyrics.ui.rendering.effects.VisualEffects
 import com.karaokelyrics.ui.rendering.syllable.SyllableRenderer
 import com.karaokelyrics.ui.utils.LineStateUtils
 
@@ -37,8 +37,9 @@ fun KaraokeSingleLine(
     modifier: Modifier = Modifier,
     onLineClick: ((ISyncedLine) -> Unit)? = null
 ) {
-    // Animation state management
-    val animationManager = remember(config.animation) { AnimationStateManager() }
+    // Manager instances
+    val animationManager = remember(config.animation) { AnimationManager() }
+    val effectsManager = remember { EffectsManager() }
     val colorCalculator = remember { ColorCalculator() }
 
     // Determine line state
@@ -70,7 +71,7 @@ fun KaraokeSingleLine(
     } else 0f
 
     // Calculate visual properties
-    val opacity = VisualEffects.calculateOpacity(
+    val opacity = effectsManager.calculateOpacity(
         isPlaying = lineState.isPlaying,
         hasPlayed = lineState.hasPlayed,
         distance = 0,

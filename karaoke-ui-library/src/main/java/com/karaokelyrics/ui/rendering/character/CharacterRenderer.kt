@@ -11,18 +11,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.KaraokeSyllable
-import com.karaokelyrics.ui.rendering.animation.CharacterAnimationCalculator
+import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.rendering.EffectsManager
 import com.karaokelyrics.ui.rendering.color.ColorCalculator
-import com.karaokelyrics.ui.rendering.effects.EffectRenderer
 
 /**
  * Handles the rendering of individual characters within syllables.
  * Manages character timing, animation, and effects.
  */
 class CharacterRenderer {
-    private val animationCalculator = CharacterAnimationCalculator()
+    private val animationManager = AnimationManager()
+    private val effectsManager = EffectsManager()
     private val colorCalculator = ColorCalculator()
-    private val effectRenderer = EffectRenderer()
 
     fun renderSyllableCharacters(
         drawScope: DrawScope,
@@ -116,7 +116,7 @@ class CharacterRenderer {
         charColor: Color,
         shimmerProgress: Float
     ) {
-        val animState = animationCalculator.calculateCharacterAnimation(
+        val animState = animationManager.calculateCharacterAnimation(
             characterStartTime = charStartTime,
             characterEndTime = charEndTime,
             currentTime = currentTimeMs,
@@ -126,29 +126,18 @@ class CharacterRenderer {
             rotationDegrees = config.animation.characterRotationDegrees
         )
 
-        drawIntoCanvas {
-            scale(
-                scale = animState.scale,
-                pivot = Offset(charX + charLayout.size.width / 2f, charY + charLayout.size.height / 2f)
-            ) {
-                rotate(
-                    degrees = animState.rotation,
-                    pivot = Offset(charX + charLayout.size.width / 2f, charY + charLayout.size.height / 2f)
-                ) {
-                    // Apply effects and draw character
-                    effectRenderer.renderCharacterWithEffects(
-                        drawScope = drawScope,
-                        charLayout = charLayout,
-                        charX = charX + animState.offset.x,
-                        charY = charY + animState.offset.y,
-                        charColor = charColor,
-                        config = config,
-                        charProgress = calculateProgress(currentTimeMs, charStartTime, charEndTime),
-                        shimmerProgress = shimmerProgress
-                    )
-                }
-            }
-        }
+        // Apply effects and draw character with animation
+        effectsManager.renderCharacterWithEffects(
+            drawScope = drawScope,
+            charLayout = charLayout,
+            charX = charX,
+            charY = charY,
+            charColor = charColor,
+            config = config,
+            charProgress = calculateProgress(currentTimeMs, charStartTime, charEndTime),
+            shimmerProgress = shimmerProgress,
+            animationState = animState
+        )
     }
 
     private fun DrawScope.renderStaticCharacter(
@@ -165,7 +154,7 @@ class CharacterRenderer {
         baseColor: Color,
         shimmerProgress: Float
     ) {
-        effectRenderer.renderCharacterWithEffects(
+        effectsManager.renderCharacterWithEffects(
             drawScope = drawScope,
             charLayout = charLayout,
             charX = charX,
