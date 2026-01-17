@@ -7,10 +7,6 @@ import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.presentation.player.PlayerController
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import com.karaokelyrics.app.presentation.shared.animation.AnimationDecisionCalculator
-import com.karaokelyrics.app.presentation.features.lyrics.calculator.*
-import com.karaokelyrics.app.presentation.features.lyrics.calculator.impl.*
-import com.karaokelyrics.app.presentation.features.lyrics.mapper.LyricsRenderMapper
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.presentation.features.lyrics.coordinator.PlaybackSyncCoordinator
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
@@ -55,13 +51,7 @@ object AppModule {
         return GroupSyllablesIntoWordsUseCase()
     }
 
-    @Provides
-    fun provideAnimationDecisionCalculator(): AnimationDecisionCalculator {
-        return AnimationDecisionCalculator()
-    }
-
-    // Presentation Helpers removed - now created locally in components
-    // TextCharacteristicsProcessor and TextLayoutCalculator no longer needed in DI
+    // Legacy presentation helpers removed - using library instead
 
     @Provides
     fun provideSyncLyricsUseCase(): SyncLyricsUseCase {
@@ -109,47 +99,6 @@ object AppModule {
         return UpdateUserSettingsUseCase(settingsRepository)
     }
 
-    @Provides
-    fun provideTimingCalculator(): TimingCalculator {
-        return DefaultTimingCalculator()
-    }
-
-    @Provides
-    fun provideVisualCalculator(): VisualCalculator {
-        return DefaultVisualCalculator()
-    }
-
-    @Provides
-    fun provideInteractionCalculator(): InteractionCalculator {
-        return DefaultInteractionCalculator()
-    }
-
-    @Provides
-    fun provideInstructionCalculator(): InstructionCalculator {
-        return DefaultInstructionCalculator()
-    }
-
-    @Provides
-    fun provideRenderCalculator(
-        timingCalculator: TimingCalculator,
-        visualCalculator: VisualCalculator,
-        interactionCalculator: InteractionCalculator,
-        instructionCalculator: InstructionCalculator
-    ): RenderCalculator {
-        return DefaultRenderCalculator(
-            timingCalculator,
-            visualCalculator,
-            interactionCalculator,
-            instructionCalculator
-        )
-    }
-
-    @Provides
-    fun provideLyricsRenderMapper(
-        renderCalculator: RenderCalculator
-    ): LyricsRenderMapper {
-        return LyricsRenderMapper(renderCalculator)
-    }
 
     // No presentation managers needed - clean architecture!
 }

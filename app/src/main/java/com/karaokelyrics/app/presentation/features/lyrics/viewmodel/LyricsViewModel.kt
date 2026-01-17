@@ -1,11 +1,5 @@
 package com.karaokelyrics.app.presentation.features.lyrics.viewmodel
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextMotion
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.model.LyricsSyncState
@@ -15,11 +9,10 @@ import com.karaokelyrics.app.presentation.player.PlayerController
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
-import com.karaokelyrics.app.presentation.features.lyrics.config.KaraokeConfig
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
-import com.karaokelyrics.app.presentation.features.lyrics.mapper.LyricsRenderMapper
-import com.karaokelyrics.app.presentation.features.lyrics.model.LyricsRenderState
+import com.karaokelyrics.app.presentation.mapper.LibraryConfigMapper
+import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -37,7 +30,7 @@ class LyricsViewModel @Inject constructor(
     private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
-    private val lyricsRenderMapper: LyricsRenderMapper
+    private val libraryConfigMapper: LibraryConfigMapper
 ) : ViewModel() {
 
     data class LyricsState(
@@ -46,20 +39,8 @@ class LyricsViewModel @Inject constructor(
         val isLoading: Boolean = false,
         val error: String? = null,
         val userSettings: UserSettings = UserSettings(),
-        val renderState: LyricsRenderState? = null,
         val currentTimeMs: Int = 0,
-        val textColor: Color = Color.White,
-        val normalTextStyle: TextStyle = TextStyle(
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
-            textMotion = TextMotion.Animated
-        ),
-        val accompanimentTextStyle: TextStyle = TextStyle(
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            textMotion = TextMotion.Animated
-        ),
-        val config: KaraokeConfig = KaraokeConfig.Default
+        val libraryConfig: KaraokeLibraryConfig = KaraokeLibraryConfig.Default
     )
 
     private val _state = MutableStateFlow(LyricsState())
@@ -152,22 +133,9 @@ class LyricsViewModel @Inject constructor(
                     // Map to UI state with all pre-calculated values
                     val currentTimeMs = (position + userSettings.lyricsTimingOffsetMs).toInt()
 
-                    val renderState = lyricsRenderMapper.mapToRenderState(
-                        lyrics = lyrics,
-                        currentTimeMs = currentTimeMs,
-                        userSettings = userSettings,
-                        textStyle = _state.value.normalTextStyle.copy(
-                            fontSize = userSettings.fontSize.sp.sp
-                        ),
-                        accompanimentTextStyle = _state.value.accompanimentTextStyle.copy(
-                            fontSize = (userSettings.fontSize.sp * 0.6f).sp
-                        )
-                    )
-
                     _state.update {
                         it.copy(
                             syncState = syncState,
-                            renderState = renderState,
                             currentTimeMs = currentTimeMs
                         )
                     }
@@ -179,7 +147,13 @@ class LyricsViewModel @Inject constructor(
     private fun observeUserSettings() {
         viewModelScope.launch {
             observeUserSettingsUseCase().collect { settings ->
-                _state.update { it.copy(userSettings = settings) }
+                val libraryConfig = libraryConfigMapper.mapToLibraryConfig(settings)
+                _state.update {
+                    it.copy(
+                        userSettings = settings,
+                        libraryConfig = libraryConfig
+                    )
+                }
             }
         }
     }
