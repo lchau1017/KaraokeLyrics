@@ -6,7 +6,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.ui.core.config.*
 import javax.inject.Inject
 
@@ -89,6 +88,13 @@ class LibraryConfigMapper @Inject constructor() {
 
     private fun mapLayoutConfig(userSettings: UserSettings): LayoutConfig {
         return LayoutConfig(
+            // Viewer configuration - use smooth scroll for app
+            viewerConfig = ViewerConfig(
+                type = ViewerType.SMOOTH_SCROLL,
+                scrollPosition = 0.33f, // Position active line at top third
+                smoothScrollDuration = 500
+            ),
+
             // Spacing - use defaults
             linePadding = androidx.compose.foundation.layout.PaddingValues(
                 horizontal = 24.dp,
@@ -102,7 +108,7 @@ class LibraryConfigMapper @Inject constructor() {
             lineHeightMultiplier = 1.2f,
             accompanimentLineHeightMultiplier = 1.0f,
 
-            // Container - use defaults
+            // Container - optimized for full-screen app
             containerPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
             maxLineWidth = null,
 

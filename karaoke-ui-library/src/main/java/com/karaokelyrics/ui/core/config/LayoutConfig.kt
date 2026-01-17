@@ -10,6 +10,9 @@ import androidx.compose.ui.unit.dp
  * Controls spacing, padding, and text direction.
  */
 data class LayoutConfig(
+    // Viewer configuration
+    val viewerConfig: ViewerConfig = ViewerConfig(),
+
     // Spacing
     val linePadding: PaddingValues = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
     val lineSpacing: Dp = 12.dp,
