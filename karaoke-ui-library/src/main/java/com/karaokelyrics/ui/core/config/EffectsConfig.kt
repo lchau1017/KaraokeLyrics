@@ -32,5 +32,11 @@ data class EffectsConfig(
     val playingLineOpacity: Float = 1f,
     val playedLineOpacity: Float = 0.25f,
     val upcomingLineOpacity: Float = 0.6f,
-    val distantLineOpacity: Float = 0.3f
+    val distantLineOpacity: Float = 0.3f,
+
+    // Visibility and Falloff (for viewers)
+    val visibleLineRange: Int = 3,
+    val opacityFalloff: Float = 0.1f,
+    val maxOpacityReduction: Float = 0.4f,
+    val distanceThreshold: Int = 3
 )

@@ -59,7 +59,7 @@ internal fun RadialBurstViewer(
             val distance = kotlin.math.abs(index - currentLineIndex)
             val lineUiState = uiState.getLineState(index)
 
-            if (distance <= 3) {
+            if (distance <= config.effects.visibleLineRange) {
                 val radiusMultiplier = when {
                     lineUiState.isPlaying -> 0f
                     else -> distance.toFloat()

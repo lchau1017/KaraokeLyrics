@@ -54,7 +54,6 @@ data class VisualConfig(
     val lineBackgroundColor: Color = Color.Transparent,
 
     // Gradient Configuration
-    val enableGradients: Boolean = true,
     val playingGradientColors: List<Color> = listOf(
         Color(0xFF00BCD4), // Cyan
         Color(0xFFE91E63)  // Pink

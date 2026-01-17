@@ -58,7 +58,7 @@ internal fun ElasticBounceViewer(
             val distance = index - currentLineIndex
             val lineUiState = uiState.getLineState(index)
 
-            if (kotlin.math.abs(distance) <= 2) {
+            if (kotlin.math.abs(distance) <= config.effects.visibleLineRange) {
                 // Position with bounce
                 val yOffset = when {
                     lineUiState.isPlaying -> 0f

@@ -42,14 +42,13 @@ internal fun Carousel3DViewer(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        val visibleRange = 5
         val radius = 300f
 
         uiState.lines.forEachIndexed { index, line ->
             val distance = index - currentLineIndex
             val lineUiState = uiState.getLineState(index)
 
-            if (kotlin.math.abs(distance) <= visibleRange) {
+            if (kotlin.math.abs(distance) <= config.effects.visibleLineRange) {
                 // Calculate position in 3D space
                 val itemAngle = (index * 360f / uiState.lines.size) + animatedRotation
                 val radians = Math.toRadians(itemAngle.toDouble())

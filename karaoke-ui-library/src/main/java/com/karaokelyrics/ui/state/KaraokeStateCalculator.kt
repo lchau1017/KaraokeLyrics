@@ -144,8 +144,7 @@ class KaraokeStateCalculator {
             hasPlayed -> effects.playedLineOpacity
             else -> {
                 // Upcoming line - reduce opacity based on distance
-                val opacityFalloff = 0.1f
-                val distanceReduction = (distance * opacityFalloff).coerceAtMost(0.4f)
+                val distanceReduction = (distance * effects.opacityFalloff).coerceAtMost(effects.maxOpacityReduction)
                 (effects.upcomingLineOpacity - distanceReduction).coerceAtLeast(0.2f)
             }
         }
@@ -176,19 +175,19 @@ class KaraokeStateCalculator {
         distance: Int,
         config: KaraokeLibraryConfig
     ): Float {
-        if (!config.effects.enableBlur) {
+        val effects = config.effects
+        if (!effects.enableBlur) {
             return 0f
         }
 
-        val distanceThreshold = 3
         val baseBlurRadius = when {
             isPlaying -> 0f
-            hasPlayed -> config.effects.playedLineBlur.value
-            distance > distanceThreshold -> config.effects.distantLineBlur.value
-            else -> config.effects.upcomingLineBlur.value
+            hasPlayed -> effects.playedLineBlur.value
+            distance > effects.distanceThreshold -> effects.distantLineBlur.value
+            else -> effects.upcomingLineBlur.value
         }
 
-        return baseBlurRadius * config.effects.blurIntensity
+        return baseBlurRadius * effects.blurIntensity
     }
 
     /**

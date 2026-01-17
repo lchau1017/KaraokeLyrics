@@ -49,7 +49,7 @@ internal fun WaveFlowViewer(
             val lineUiState = uiState.getLineState(index)
 
             // Show lines within range
-            if (kotlin.math.abs(distance) <= 3) {
+            if (kotlin.math.abs(distance) <= config.effects.visibleLineRange) {
                 // Calculate wave position
                 val wavePosition = distance * 60f
                 val waveHeight = sin(Math.toRadians((waveOffset + distance * 45).toDouble())).toFloat() * 30f

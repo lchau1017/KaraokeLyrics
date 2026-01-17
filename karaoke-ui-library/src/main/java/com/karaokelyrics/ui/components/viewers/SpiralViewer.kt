@@ -49,7 +49,7 @@ internal fun SpiralViewer(
             val lineUiState = uiState.getLineState(index)
 
             // Show lines within range
-            if (kotlin.math.abs(distance) <= 4) {
+            if (kotlin.math.abs(distance) <= config.effects.visibleLineRange) {
                 // Calculate spiral position
                 val angle = Math.toRadians((rotation + distance * 72).toDouble())
                 val radius = kotlin.math.abs(distance) * 80f + if (lineUiState.isPlaying) 0f else 50f
