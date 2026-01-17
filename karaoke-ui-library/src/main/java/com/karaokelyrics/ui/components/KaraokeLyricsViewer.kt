@@ -8,6 +8,9 @@ import com.karaokelyrics.ui.components.viewers.*
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.config.ViewerType
 import com.karaokelyrics.ui.core.models.ISyncedLine
+import com.karaokelyrics.ui.state.KaraokeStateHolder
+import com.karaokelyrics.ui.state.KaraokeUiState
+import com.karaokelyrics.ui.state.rememberKaraokeStateHolder
 
 /**
  * Complete karaoke lyrics viewer with automatic scrolling and synchronization.
@@ -33,7 +36,43 @@ fun KaraokeLyricsViewer(
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    // Delegate to the appropriate viewer based on config
+    // Create and manage state holder internally
+    val stateHolder = rememberKaraokeStateHolder(config)
+
+    // Update state when inputs change
+    LaunchedEffect(lines) {
+        stateHolder.setLines(lines)
+    }
+
+    LaunchedEffect(currentTimeMs) {
+        stateHolder.updateTime(currentTimeMs)
+    }
+
+    // Get current UI state
+    val uiState by stateHolder.uiState
+
+    // Render the viewer
+    KaraokeLyricsViewerContent(
+        uiState = uiState,
+        config = config,
+        modifier = modifier,
+        onLineClick = onLineClick,
+        onLineLongPress = onLineLongPress
+    )
+}
+
+/**
+ * Internal content renderer that uses KaraokeUiState.
+ * This separates state management from rendering.
+ */
+@Composable
+private fun KaraokeLyricsViewerContent(
+    uiState: KaraokeUiState,
+    config: KaraokeLibraryConfig,
+    modifier: Modifier = Modifier,
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
+    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -43,8 +82,7 @@ fun KaraokeLyricsViewer(
         when (config.layout.viewerConfig.type) {
             ViewerType.CENTER_FOCUSED -> {
                 CenterFocusedViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -52,8 +90,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.SMOOTH_SCROLL -> {
                 SmoothScrollViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -61,8 +98,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.STACKED -> {
                 StackedViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -70,8 +106,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.HORIZONTAL_PAGED -> {
                 HorizontalPagedViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -79,8 +114,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.WAVE_FLOW -> {
                 WaveFlowViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -88,8 +122,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.SPIRAL -> {
                 SpiralViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -97,8 +130,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.CAROUSEL_3D -> {
                 Carousel3DViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -106,8 +138,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.SPLIT_DUAL -> {
                 SplitDualViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -115,8 +146,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.ELASTIC_BOUNCE -> {
                 ElasticBounceViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -124,8 +154,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.FADE_THROUGH -> {
                 FadeThroughViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -133,8 +162,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.RADIAL_BURST -> {
                 RadialBurstViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
@@ -142,8 +170,7 @@ fun KaraokeLyricsViewer(
             }
             ViewerType.FLIP_CARD -> {
                 FlipCardViewer(
-                    lines = lines,
-                    currentTimeMs = currentTimeMs,
+                    uiState = uiState,
                     config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress

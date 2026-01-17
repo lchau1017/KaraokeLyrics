@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 
 /**
  * Horizontal paged viewer that shows one line at a time with horizontal swipe transitions.
@@ -17,24 +17,15 @@ import com.karaokelyrics.ui.rendering.AnimationManager
  */
 @Composable
 internal fun HorizontalPagedViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    // Find current line index
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
+    val currentLineIndex = uiState.currentLineIndex ?: 0
 
     // Track if we've shown this line before to maintain consistent direction
     var lastShownIndex by remember { mutableStateOf(-1) }
-
-    // Determine if this is a new line (always moving forward in time)
-    val isNewLine = currentLineIndex > lastShownIndex
 
     LaunchedEffect(currentLineIndex) {
         lastShownIndex = currentLineIndex
@@ -47,8 +38,6 @@ internal fun HorizontalPagedViewer(
         AnimatedContent(
             targetState = currentLineIndex,
             transitionSpec = {
-                // Always slide in from right, slide out to left for consistent flow
-                // This creates a natural reading direction regardless of index changes
                 (slideInHorizontally(
                     animationSpec = tween(500, easing = FastOutSlowInEasing)
                 ) { fullWidth -> fullWidth } + fadeIn(
@@ -63,22 +52,23 @@ internal fun HorizontalPagedViewer(
             },
             label = "HorizontalPageTransition"
         ) { lineIndex ->
-            val line = lines.getOrNull(lineIndex)
+            val line = uiState.lines.getOrNull(lineIndex)
+            val lineUiState = uiState.getLineState(lineIndex)
 
             if (line != null) {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    KaraokeSingleLine(
+                    KaraokeSingleLineStateless(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, lineIndex) } }
                     )
                 }
             } else {
-                // Empty state when no line
                 Spacer(modifier = Modifier.fillMaxWidth())
             }
         }

@@ -5,15 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 
 /**
  * Stacked viewer with z-layer overlapping effect.
@@ -21,68 +18,53 @@ import com.karaokelyrics.ui.rendering.AnimationManager
  */
 @Composable
 internal fun StackedViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    // Find current line index
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    }
+    val currentLineIndex = uiState.currentLineIndex
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        lines.forEachIndexed { index, line ->
-            val lineState = remember(line, currentTimeMs) {
-                animationManager.getLineState(line, currentTimeMs)
-            }
+        uiState.lines.forEachIndexed { index, line ->
+            val lineUiState = uiState.getLineState(index)
 
-            val distance = currentLineIndex?.let {
-                index - it
-            } ?: 999
+            val distance = currentLineIndex?.let { index - it } ?: 999
 
             // Determine if line should be shown - only show active and next upcoming line
             val shouldShow = when {
-                lineState.isPlaying -> true
-                lineState.isUpcoming && distance == 1 -> true // Show only the very next line
-                else -> false // Don't show played lines or other upcoming
+                lineUiState.isPlaying -> true
+                lineUiState.isUpcoming && distance == 1 -> true
+                else -> false
             }
 
             if (shouldShow) {
-                // Calculate z-index - active on top, next below
                 val zIndex = when {
-                    lineState.isPlaying -> 1000f // Active line on top
-                    else -> 999f // Next line below
+                    lineUiState.isPlaying -> 1000f
+                    else -> 999f
                 }
 
-                // Calculate vertical offset for stacking effect
                 val yOffset = when {
-                    lineState.isPlaying -> 0f
-                    lineState.isUpcoming && distance == 1 -> 60f // Next line below and back
+                    lineUiState.isPlaying -> 0f
+                    lineUiState.isUpcoming && distance == 1 -> 60f
                     else -> 0f
                 }
 
-                // Calculate opacity - next line much more transparent
                 val opacity = when {
-                    lineState.isPlaying -> 1f
-                    lineState.isUpcoming && distance == 1 -> 0.25f // Much more transparent
+                    lineUiState.isPlaying -> 1f
+                    lineUiState.isUpcoming && distance == 1 -> 0.25f
                     else -> 0f
                 }
 
-                // Calculate scale for depth effect - next line much smaller
                 val scale = when {
-                    lineState.isPlaying -> 1f
-                    lineState.isUpcoming && distance == 1 -> 0.7f // Much smaller for depth
+                    lineUiState.isPlaying -> 1f
+                    lineUiState.isUpcoming && distance == 1 -> 0.7f
                     else -> 1f
                 }
 
-                // Animate the transition
                 val animatedYOffset by animateFloatAsState(
                     targetValue = yOffset,
                     animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
@@ -112,9 +94,10 @@ internal fun StackedViewer(
                             alpha = animatedOpacity
                         }
                 ) {
-                    KaraokeSingleLine(
+                    KaraokeSingleLineStateless(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, index) } }
                     )

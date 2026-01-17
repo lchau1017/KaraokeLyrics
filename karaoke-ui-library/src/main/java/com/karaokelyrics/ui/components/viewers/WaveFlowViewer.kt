@@ -5,14 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 import kotlin.math.sin
 
 /**
@@ -21,18 +20,12 @@ import kotlin.math.sin
  */
 @Composable
 internal fun WaveFlowViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
-
+    val currentLineIndex = uiState.currentLineIndex ?: 0
     val density = LocalDensity.current
 
     // Animate wave motion
@@ -51,29 +44,26 @@ internal fun WaveFlowViewer(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        lines.forEachIndexed { index, line ->
+        uiState.lines.forEachIndexed { index, line ->
             val distance = index - currentLineIndex
+            val lineUiState = uiState.getLineState(index)
 
             // Show lines within range
             if (kotlin.math.abs(distance) <= 3) {
-                val lineState = remember(line, currentTimeMs) {
-                    animationManager.getLineState(line, currentTimeMs)
-                }
-
                 // Calculate wave position
                 val wavePosition = distance * 60f
                 val waveHeight = sin(Math.toRadians((waveOffset + distance * 45).toDouble())).toFloat() * 30f
 
                 // Calculate opacity based on distance
                 val opacity = when {
-                    lineState.isPlaying -> 1f
+                    lineUiState.isPlaying -> 1f
                     kotlin.math.abs(distance) == 1 -> 0.6f
                     kotlin.math.abs(distance) == 2 -> 0.4f
                     else -> 0.2f
                 }
 
                 // Scale based on position in wave
-                val scale = if (lineState.isPlaying) 1.1f else (1f - kotlin.math.abs(distance) * 0.1f)
+                val scale = if (lineUiState.isPlaying) 1.1f else (1f - kotlin.math.abs(distance) * 0.1f)
 
                 Box(
                     modifier = Modifier
@@ -86,9 +76,10 @@ internal fun WaveFlowViewer(
                             alpha = opacity
                         }
                 ) {
-                    KaraokeSingleLine(
+                    KaraokeSingleLineStateless(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, index) } }
                     )

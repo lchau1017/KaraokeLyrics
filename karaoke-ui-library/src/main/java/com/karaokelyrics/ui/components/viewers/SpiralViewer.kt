@@ -5,14 +5,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -22,18 +20,12 @@ import kotlin.math.sin
  */
 @Composable
 internal fun SpiralViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
-
+    val currentLineIndex = uiState.currentLineIndex ?: 0
     val density = LocalDensity.current
 
     // Animate spiral rotation
@@ -52,30 +44,27 @@ internal fun SpiralViewer(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        lines.forEachIndexed { index, line ->
+        uiState.lines.forEachIndexed { index, line ->
             val distance = index - currentLineIndex
+            val lineUiState = uiState.getLineState(index)
 
             // Show lines within range
             if (kotlin.math.abs(distance) <= 4) {
-                val lineState = remember(line, currentTimeMs) {
-                    animationManager.getLineState(line, currentTimeMs)
-                }
-
                 // Calculate spiral position
                 val angle = Math.toRadians((rotation + distance * 72).toDouble())
-                val radius = kotlin.math.abs(distance) * 80f + if (lineState.isPlaying) 0f else 50f
+                val radius = kotlin.math.abs(distance) * 80f + if (lineUiState.isPlaying) 0f else 50f
                 val spiralX = (cos(angle) * radius).toFloat()
                 val spiralY = (sin(angle) * radius).toFloat()
 
                 // Calculate opacity and scale
                 val opacity = when {
-                    lineState.isPlaying -> 1f
+                    lineUiState.isPlaying -> 1f
                     kotlin.math.abs(distance) == 1 -> 0.5f
                     kotlin.math.abs(distance) == 2 -> 0.3f
                     else -> 0.15f
                 }
 
-                val scale = if (lineState.isPlaying) 1f else (1f - kotlin.math.abs(distance) * 0.15f)
+                val scale = if (lineUiState.isPlaying) 1f else (1f - kotlin.math.abs(distance) * 0.15f)
 
                 Box(
                     modifier = Modifier
@@ -86,12 +75,13 @@ internal fun SpiralViewer(
                             scaleX = scale
                             scaleY = scale
                             alpha = opacity
-                            rotationZ = if (lineState.isPlaying) 0f else (distance * 15f)
+                            rotationZ = if (lineUiState.isPlaying) 0f else (distance * 15f)
                         }
                 ) {
-                    KaraokeSingleLine(
+                    KaraokeSingleLineStateless(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, index) } }
                     )

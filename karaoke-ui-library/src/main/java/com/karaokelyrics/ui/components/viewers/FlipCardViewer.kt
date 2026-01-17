@@ -6,10 +6,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
+import com.karaokelyrics.ui.state.LineUiState
 
 /**
  * Flip card viewer with 3D card flip transitions.
@@ -17,17 +18,12 @@ import com.karaokelyrics.ui.rendering.AnimationManager
  */
 @Composable
 internal fun FlipCardViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
+    val currentLineIndex = uiState.currentLineIndex ?: 0
 
     var previousIndex by remember { mutableStateOf(-1) }
     val flipAnimation = remember { Animatable(0f) }
@@ -62,7 +58,8 @@ internal fun FlipCardViewer(
             currentLineIndex
         }
 
-        val line = lines.getOrNull(showingIndex)
+        val line = uiState.lines.getOrNull(showingIndex)
+        val lineUiState = uiState.getLineState(showingIndex)
 
         line?.let {
             Box(
@@ -74,9 +71,10 @@ internal fun FlipCardViewer(
                         alpha = if (rotation > 85f && rotation < 95f) 0f else 1f
                     }
             ) {
-                KaraokeSingleLine(
+                KaraokeSingleLineStateless(
                     line = it,
-                    currentTimeMs = currentTimeMs,
+                    lineUiState = lineUiState,
+                    currentTimeMs = uiState.currentTimeMs,
                     config = config,
                     onLineClick = onLineClick?.let { click -> { click(it, showingIndex) } }
                 )

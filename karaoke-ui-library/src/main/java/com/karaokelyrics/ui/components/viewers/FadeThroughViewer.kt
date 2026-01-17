@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
+import com.karaokelyrics.ui.state.LineUiState
 
 /**
  * Fade through viewer with pure opacity transitions.
@@ -17,17 +18,12 @@ import com.karaokelyrics.ui.rendering.AnimationManager
  */
 @Composable
 internal fun FadeThroughViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
+    val currentLineIndex = uiState.currentLineIndex ?: 0
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -50,12 +46,14 @@ internal fun FadeThroughViewer(
             },
             label = "FadeThroughTransition"
         ) { lineIndex ->
-            val line = lines.getOrNull(lineIndex)
+            val line = uiState.lines.getOrNull(lineIndex)
+            val lineUiState = uiState.getLineState(lineIndex)
 
             if (line != null) {
-                KaraokeSingleLine(
+                KaraokeSingleLineStateless(
                     line = line,
-                    currentTimeMs = currentTimeMs,
+                    lineUiState = lineUiState,
+                    currentTimeMs = uiState.currentTimeMs,
                     config = config,
                     onLineClick = onLineClick?.let { { it(line, lineIndex) } }
                 )

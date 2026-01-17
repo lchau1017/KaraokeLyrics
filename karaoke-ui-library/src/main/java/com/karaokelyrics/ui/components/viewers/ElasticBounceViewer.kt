@@ -6,10 +6,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 
 /**
  * Elastic bounce viewer with physics-based spring animations.
@@ -17,18 +17,12 @@ import com.karaokelyrics.ui.rendering.AnimationManager
  */
 @Composable
 internal fun ElasticBounceViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
-
+    val currentLineIndex = uiState.currentLineIndex ?: 0
     var previousIndex by remember { mutableStateOf(0) }
 
     // Trigger bounce animation on line change
@@ -60,25 +54,22 @@ internal fun ElasticBounceViewer(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        lines.forEachIndexed { index, line ->
+        uiState.lines.forEachIndexed { index, line ->
             val distance = index - currentLineIndex
+            val lineUiState = uiState.getLineState(index)
 
             if (kotlin.math.abs(distance) <= 2) {
-                val lineState = remember(line, currentTimeMs) {
-                    animationManager.getLineState(line, currentTimeMs)
-                }
-
                 // Position with bounce
                 val yOffset = when {
-                    lineState.isPlaying -> 0f
-                    distance < 0 -> -200f // Above
-                    distance > 0 -> 200f // Below
+                    lineUiState.isPlaying -> 0f
+                    distance < 0 -> -200f
+                    distance > 0 -> 200f
                     else -> 0f
                 }
 
-                val scale = if (lineState.isPlaying) bounceAnimation.value else 0.8f
+                val scale = if (lineUiState.isPlaying) bounceAnimation.value else 0.8f
                 val alpha = when {
-                    lineState.isPlaying -> 1f
+                    lineUiState.isPlaying -> 1f
                     kotlin.math.abs(distance) == 1 -> 0.4f
                     else -> 0.2f
                 }
@@ -93,9 +84,10 @@ internal fun ElasticBounceViewer(
                             this.alpha = alpha
                         }
                 ) {
-                    KaraokeSingleLine(
+                    KaraokeSingleLineStateless(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, index) } }
                     )

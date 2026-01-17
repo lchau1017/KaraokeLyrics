@@ -6,10 +6,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.components.KaraokeSingleLineStateless
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 
 /**
  * Radial burst viewer with lines emerging from center.
@@ -17,17 +17,12 @@ import com.karaokelyrics.ui.rendering.AnimationManager
  */
 @Composable
 internal fun RadialBurstViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
+    uiState: KaraokeUiState,
     config: KaraokeLibraryConfig,
     onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
     onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
 ) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
+    val currentLineIndex = uiState.currentLineIndex ?: 0
 
     // Pulse animation for active line
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -60,27 +55,24 @@ internal fun RadialBurstViewer(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        lines.forEachIndexed { index, line ->
+        uiState.lines.forEachIndexed { index, line ->
             val distance = kotlin.math.abs(index - currentLineIndex)
+            val lineUiState = uiState.getLineState(index)
 
             if (distance <= 3) {
-                val lineState = remember(line, currentTimeMs) {
-                    animationManager.getLineState(line, currentTimeMs)
-                }
-
                 val radiusMultiplier = when {
-                    lineState.isPlaying -> 0f
+                    lineUiState.isPlaying -> 0f
                     else -> distance.toFloat()
                 }
 
                 val expandRadius = burstAnimation.value * 150f * radiusMultiplier
                 val opacity = when {
-                    lineState.isPlaying -> 1f
+                    lineUiState.isPlaying -> 1f
                     else -> (1f - burstAnimation.value) * 0.5f
                 }
 
                 val scale = when {
-                    lineState.isPlaying -> pulseScale
+                    lineUiState.isPlaying -> pulseScale
                     else -> 1f - (distance * 0.2f)
                 }
 
@@ -88,8 +80,7 @@ internal fun RadialBurstViewer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .graphicsLayer {
-                            // Create radial expansion
-                            val angle = (index * 137.5f) // Golden angle for better distribution
+                            val angle = (index * 137.5f)
                             val radians = Math.toRadians(angle.toDouble())
                             translationX = (kotlin.math.cos(radians) * expandRadius).toFloat()
                             translationY = (kotlin.math.sin(radians) * expandRadius).toFloat()
@@ -98,9 +89,10 @@ internal fun RadialBurstViewer(
                             alpha = opacity
                         }
                 ) {
-                    KaraokeSingleLine(
+                    KaraokeSingleLineStateless(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, index) } }
                     )
