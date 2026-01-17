@@ -278,37 +278,46 @@ class KaraokeStateCalculatorTest {
 
     @Test
     fun `calculateBlurRadius returns playedLineBlur when played`() {
+        val blurEnabledConfig = KaraokeLibraryConfig(
+            effects = EffectsConfig(enableBlur = true)
+        )
         val result = calculator.calculateBlurRadius(
             isPlaying = false,
             hasPlayed = true,
             distance = 1,
-            config = defaultConfig
+            config = blurEnabledConfig
         )
-        val expected = defaultConfig.effects.playedLineBlur.value * defaultConfig.effects.blurIntensity
+        val expected = blurEnabledConfig.effects.playedLineBlur.value * blurEnabledConfig.effects.blurIntensity
         assertThat(result).isEqualTo(expected)
     }
 
     @Test
     fun `calculateBlurRadius returns upcomingLineBlur for close upcoming`() {
+        val blurEnabledConfig = KaraokeLibraryConfig(
+            effects = EffectsConfig(enableBlur = true)
+        )
         val result = calculator.calculateBlurRadius(
             isPlaying = false,
             hasPlayed = false,
             distance = 2,
-            config = defaultConfig
+            config = blurEnabledConfig
         )
-        val expected = defaultConfig.effects.upcomingLineBlur.value * defaultConfig.effects.blurIntensity
+        val expected = blurEnabledConfig.effects.upcomingLineBlur.value * blurEnabledConfig.effects.blurIntensity
         assertThat(result).isEqualTo(expected)
     }
 
     @Test
     fun `calculateBlurRadius returns distantLineBlur for far lines`() {
+        val blurEnabledConfig = KaraokeLibraryConfig(
+            effects = EffectsConfig(enableBlur = true)
+        )
         val result = calculator.calculateBlurRadius(
             isPlaying = false,
             hasPlayed = false,
             distance = 5,
-            config = defaultConfig
+            config = blurEnabledConfig
         )
-        val expected = defaultConfig.effects.distantLineBlur.value * defaultConfig.effects.blurIntensity
+        val expected = blurEnabledConfig.effects.distantLineBlur.value * blurEnabledConfig.effects.blurIntensity
         assertThat(result).isEqualTo(expected)
     }
 
@@ -329,7 +338,7 @@ class KaraokeStateCalculatorTest {
     @Test
     fun `calculateBlurRadius respects blur intensity multiplier`() {
         val intensityConfig = KaraokeLibraryConfig(
-            effects = EffectsConfig(blurIntensity = 2.0f)
+            effects = EffectsConfig(enableBlur = true, blurIntensity = 2.0f)
         )
         val result = calculator.calculateBlurRadius(
             isPlaying = false,

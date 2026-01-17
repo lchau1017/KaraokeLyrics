@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("app.cash.paparazzi")
 }
 
 android {
@@ -59,11 +60,11 @@ dependencies {
     testImplementation("com.google.truth:truth:1.1.5")
     testImplementation("io.mockk:mockk:1.13.8")
 
-    // Testing - Android/Instrumented Tests
+    // Testing - Android/Instrumented Tests (Compose UI Testing)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation("com.google.truth:truth:1.1.5")
 
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
