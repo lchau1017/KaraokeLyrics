@@ -1,22 +1,18 @@
 package com.karaokelyrics.ui.rendering
 
-import androidx.compose.animation.core.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
-import com.karaokelyrics.ui.core.models.ISyncedLine
 import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * Unified animation manager for all karaoke animation effects.
- * Consolidates line-level and character-level animations, and line state calculations.
+ * Animation calculation utilities for karaoke effects.
+ * Contains pure functions for calculating animation states based on timing.
  */
-class AnimationManager {
+object AnimationManager {
 
     /**
-     * Combined animation state for both line and character levels.
+     * Combined animation state for character-level animations.
      */
     @Stable
     data class AnimationState(
@@ -31,76 +27,8 @@ class AnimationManager {
     )
 
     /**
-     * Animate a line based on timing with all effects combined.
-     */
-    @Composable
-    fun animateLine(
-        lineStartTime: Int,
-        lineEndTime: Int,
-        currentTime: Int,
-        scaleOnPlay: Float = 1.05f,
-        animationDuration: Int = 700
-    ): AnimationState {
-        var state by remember { mutableStateOf(AnimationState()) }
-
-        val scale by animateFloatAsState(
-            targetValue = when {
-                currentTime in lineStartTime..lineEndTime -> scaleOnPlay
-                else -> 1f
-            },
-            animationSpec = tween(
-                durationMillis = animationDuration,
-                easing = FastOutSlowInEasing
-            ),
-            label = "lineScale"
-        )
-
-        val opacity by animateFloatAsState(
-            targetValue = when {
-                currentTime < lineStartTime - 3000 -> 0f
-                currentTime < lineStartTime - 1000 -> 0.3f
-                currentTime < lineStartTime -> 0.6f
-                currentTime in lineStartTime..lineEndTime -> 1f
-                currentTime > lineEndTime + 2000 -> 0.1f
-                else -> 0.25f
-            },
-            animationSpec = tween(
-                durationMillis = 500,
-                easing = FastOutSlowInEasing
-            ),
-            label = "lineOpacity"
-        )
-
-        val blur by animateFloatAsState(
-            targetValue = when {
-                currentTime < lineStartTime - 2000 -> 5f
-                currentTime < lineStartTime -> 3f
-                currentTime in lineStartTime..lineEndTime -> 0f
-                else -> 2f
-            },
-            animationSpec = tween(
-                durationMillis = 500,
-                easing = FastOutSlowInEasing
-            ),
-            label = "lineBlur"
-        )
-
-        LaunchedEffect(currentTime, lineStartTime, lineEndTime) {
-            state = AnimationState(
-                scale = scale,
-                opacity = opacity,
-                blur = blur,
-                isPlaying = currentTime in lineStartTime..lineEndTime,
-                isUpcoming = currentTime < lineStartTime,
-                hasPlayed = currentTime > lineEndTime
-            )
-        }
-
-        return state
-    }
-
-    /**
      * Calculate character animation state based on timing.
+     * This is a pure function that calculates the animation state without any Compose state.
      */
     fun calculateCharacterAnimation(
         characterStartTime: Int,
@@ -150,54 +78,6 @@ class AnimationManager {
     }
 
     /**
-     * Create a pulsing animation for active elements.
-     */
-    @Composable
-    fun animatePulse(
-        enabled: Boolean,
-        minScale: Float = 0.95f,
-        maxScale: Float = 1.05f,
-        duration: Int = 1000
-    ): Float {
-        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-
-        val scale by infiniteTransition.animateFloat(
-            initialValue = minScale,
-            targetValue = maxScale,
-            animationSpec = infiniteRepeatable(
-                animation = tween(duration, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "pulseScale"
-        )
-
-        return if (enabled) scale else 1f
-    }
-
-    /**
-     * Create a shimmer effect animation.
-     */
-    @Composable
-    fun animateShimmer(
-        enabled: Boolean,
-        duration: Int = 2000
-    ): Float {
-        val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
-
-        val shimmerProgress by infiniteTransition.animateFloat(
-            initialValue = -1f,
-            targetValue = 2f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(duration, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "shimmerProgress"
-        )
-
-        return if (enabled) shimmerProgress else 0f
-    }
-
-    /**
      * Easing function for smooth animation curves.
      */
     private fun easeInOutCubic(t: Float): Float {
@@ -213,34 +93,5 @@ class AnimationManager {
      */
     private fun interpolate(start: Float, end: Float, progress: Float): Float {
         return start + (end - start) * progress
-    }
-
-    /**
-     * Data class representing the state of a line.
-     */
-    data class LineState(
-        val isPlaying: Boolean,
-        val hasPlayed: Boolean,
-        val isUpcoming: Boolean
-    )
-
-    /**
-     * Calculate the state of a line based on current time.
-     */
-    fun getLineState(line: ISyncedLine, currentTimeMs: Int): LineState {
-        return LineState(
-            isPlaying = currentTimeMs in line.start..line.end,
-            hasPlayed = currentTimeMs > line.end,
-            isUpcoming = currentTimeMs < line.start
-        )
-    }
-
-    /**
-     * Find the index of the currently playing line.
-     */
-    fun getCurrentLineIndex(lines: List<ISyncedLine>, currentTimeMs: Int): Int? {
-        return lines.indexOfFirst { line ->
-            currentTimeMs in line.start..line.end
-        }.takeIf { it != -1 }
     }
 }

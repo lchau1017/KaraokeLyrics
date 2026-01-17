@@ -26,11 +26,6 @@ data class AnimationConfig(
     val pulseMaxScale: Float = 1.02f,
     val pulseDuration: Int = 1500,
 
-    // Shimmer Animation (for highlighting effects)
-    val enableShimmer: Boolean = false,
-    val shimmerDuration: Int = 2000,
-    val shimmerIntensity: Float = 0.3f,
-
     // Color Transition Animation
     val enableColorTransition: Boolean = true,
     val colorTransitionDuration: Int = 300,

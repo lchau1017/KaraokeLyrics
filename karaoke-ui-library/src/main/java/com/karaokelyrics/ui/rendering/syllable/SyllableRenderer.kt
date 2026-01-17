@@ -25,7 +25,6 @@ fun SyllableRenderer(
     config: KaraokeLibraryConfig,
     textStyle: TextStyle,
     baseColor: Color,
-    shimmerProgress: Float = 0f,
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
@@ -70,7 +69,6 @@ fun SyllableRenderer(
                         config = config,
                         textStyle = textStyle,
                         baseColor = baseColor,
-                        shimmerProgress = shimmerProgress,
                         textMeasurer = textMeasurer
                     )
                 }

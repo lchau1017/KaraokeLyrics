@@ -1,14 +1,10 @@
 package com.karaokelyrics.ui.rendering.character
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.KaraokeSyllable
 import com.karaokelyrics.ui.rendering.AnimationManager
@@ -19,7 +15,6 @@ import com.karaokelyrics.ui.rendering.EffectsManager
  * Manages character timing, animation, and effects.
  */
 class CharacterRenderer {
-    private val animationManager = AnimationManager()
     private val effectsManager = EffectsManager()
 
     fun renderSyllableCharacters(
@@ -31,7 +26,6 @@ class CharacterRenderer {
         config: KaraokeLibraryConfig,
         textStyle: TextStyle,
         baseColor: Color,
-        shimmerProgress: Float,
         textMeasurer: TextMeasurer
     ) {
         with(drawScope) {
@@ -67,7 +61,6 @@ class CharacterRenderer {
                     // Render with animation
                     renderAnimatedCharacter(
                         drawScope = this,
-                        char = charText,
                         charLayout = charLayout,
                         charX = charX,
                         charY = yOffset,
@@ -75,14 +68,12 @@ class CharacterRenderer {
                         charEndTime = charEndTime,
                         currentTimeMs = currentTimeMs,
                         config = config,
-                        charColor = charColor,
-                        shimmerProgress = shimmerProgress
+                        charColor = charColor
                     )
                 } else {
                     // Render without animation
                     renderStaticCharacter(
                         drawScope = this,
-                        char = charText,
                         charLayout = charLayout,
                         charX = charX,
                         charY = yOffset,
@@ -90,9 +81,7 @@ class CharacterRenderer {
                         charEndTime = charEndTime,
                         currentTimeMs = currentTimeMs,
                         config = config,
-                        charColor = charColor,
-                        baseColor = baseColor,
-                        shimmerProgress = shimmerProgress
+                        charColor = charColor
                     )
                 }
 
@@ -103,18 +92,16 @@ class CharacterRenderer {
 
     private fun DrawScope.renderAnimatedCharacter(
         drawScope: DrawScope,
-        char: String,
-        charLayout: androidx.compose.ui.text.TextLayoutResult,
+        charLayout: TextLayoutResult,
         charX: Float,
         charY: Float,
         charStartTime: Int,
         charEndTime: Int,
         currentTimeMs: Int,
         config: KaraokeLibraryConfig,
-        charColor: Color,
-        shimmerProgress: Float
+        charColor: Color
     ) {
-        val animState = animationManager.calculateCharacterAnimation(
+        val animState = AnimationManager.calculateCharacterAnimation(
             characterStartTime = charStartTime,
             characterEndTime = charEndTime,
             currentTime = currentTimeMs,
@@ -133,24 +120,20 @@ class CharacterRenderer {
             charColor = charColor,
             config = config,
             charProgress = calculateProgress(currentTimeMs, charStartTime, charEndTime),
-            shimmerProgress = shimmerProgress,
             animationState = animState
         )
     }
 
     private fun DrawScope.renderStaticCharacter(
         drawScope: DrawScope,
-        char: String,
-        charLayout: androidx.compose.ui.text.TextLayoutResult,
+        charLayout: TextLayoutResult,
         charX: Float,
         charY: Float,
         charStartTime: Int,
         charEndTime: Int,
         currentTimeMs: Int,
         config: KaraokeLibraryConfig,
-        charColor: Color,
-        baseColor: Color,
-        shimmerProgress: Float
+        charColor: Color
     ) {
         effectsManager.renderCharacterWithEffects(
             drawScope = drawScope,
@@ -159,8 +142,7 @@ class CharacterRenderer {
             charY = charY,
             charColor = charColor,
             config = config,
-            charProgress = calculateProgress(currentTimeMs, charStartTime, charEndTime),
-            shimmerProgress = shimmerProgress
+            charProgress = calculateProgress(currentTimeMs, charStartTime, charEndTime)
         )
     }
 

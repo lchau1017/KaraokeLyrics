@@ -2,12 +2,9 @@ package com.karaokelyrics.ui.rendering
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -25,7 +22,7 @@ import kotlin.math.sin
 
 /**
  * Unified effects manager for all visual effects in karaoke display.
- * Consolidates gradients, shadows, glows, color calculations, and other visual effects.
+ * Consolidates gradients, color calculations, and other visual effects.
  */
 class EffectsManager {
 
@@ -40,7 +37,6 @@ class EffectsManager {
         charColor: Color,
         config: KaraokeLibraryConfig,
         charProgress: Float,
-        shimmerProgress: Float,
         animationState: AnimationManager.AnimationState? = null
     ) {
         with(drawScope) {
@@ -62,8 +58,7 @@ class EffectsManager {
                                 charY = charY + animationState.offset.y,
                                 charColor = charColor,
                                 config = config,
-                                charProgress = charProgress,
-                                shimmerProgress = shimmerProgress
+                                charProgress = charProgress
                             )
                         }
                     }
@@ -76,8 +71,7 @@ class EffectsManager {
                     charY = charY,
                     charColor = charColor,
                     config = config,
-                    charProgress = charProgress,
-                    shimmerProgress = shimmerProgress
+                    charProgress = charProgress
                 )
             }
         }
@@ -90,78 +84,28 @@ class EffectsManager {
         charY: Float,
         charColor: Color,
         config: KaraokeLibraryConfig,
-        charProgress: Float,
-        shimmerProgress: Float
+        charProgress: Float
     ) {
         with(drawScope) {
-            // 1. Draw shadow layer if enabled
-            if (config.visual.shadowEnabled) {
+            // Draw main character with appropriate effect
+            if (config.visual.gradientEnabled && charProgress > 0f) {
+                val gradient = createCharacterGradient(
+                    charLayout = charLayout,
+                    charProgress = charProgress,
+                    config = config,
+                    baseColor = charColor
+                )
                 drawText(
                     textLayoutResult = charLayout,
-                    color = config.visual.shadowColor.copy(alpha = 0.3f),
-                    topLeft = Offset(
-                        charX + config.visual.shadowOffset.x,
-                        charY + config.visual.shadowOffset.y
-                    )
+                    brush = gradient,
+                    topLeft = Offset(charX, charY)
                 )
-            }
-
-            // 2. Draw glow layers if enabled
-            if (config.visual.glowEnabled && charProgress > 0f) {
-                listOf(
-                    Offset(-2f, -2f) to 0.2f,
-                    Offset(2f, 2f) to 0.2f,
-                    Offset(-1f, -1f) to 0.3f,
-                    Offset(1f, 1f) to 0.3f
-                ).forEach { (offset, alpha) ->
-                    drawText(
-                        textLayoutResult = charLayout,
-                        color = config.visual.glowColor.copy(alpha = alpha),
-                        topLeft = Offset(charX + offset.x, charY + offset.y)
-                    )
-                }
-            }
-
-            // 3. Draw main character with appropriate effect
-            when {
-                config.animation.enableShimmer && shimmerProgress > 0f -> {
-                    val shimmerGradient = createShimmerGradient(
-                        progress = (charX / size.width + shimmerProgress) % 1f,
-                        baseColor = charColor,
-                        shimmerColor = Color(
-                            red = minOf(1f, charColor.red + 0.3f),
-                            green = minOf(1f, charColor.green + 0.3f),
-                            blue = minOf(1f, charColor.blue + 0.3f),
-                            alpha = charColor.alpha
-                        ),
-                        width = charLayout.size.width.toFloat()
-                    )
-                    drawText(
-                        textLayoutResult = charLayout,
-                        brush = shimmerGradient,
-                        topLeft = Offset(charX, charY)
-                    )
-                }
-                config.visual.gradientEnabled && charProgress > 0f -> {
-                    val gradient = createCharacterGradient(
-                        charLayout = charLayout,
-                        charProgress = charProgress,
-                        config = config,
-                        baseColor = charColor
-                    )
-                    drawText(
-                        textLayoutResult = charLayout,
-                        brush = gradient,
-                        topLeft = Offset(charX, charY)
-                    )
-                }
-                else -> {
-                    drawText(
-                        textLayoutResult = charLayout,
-                        color = charColor,
-                        topLeft = Offset(charX, charY)
-                    )
-                }
+            } else {
+                drawText(
+                    textLayoutResult = charLayout,
+                    color = charColor,
+                    topLeft = Offset(charX, charY)
+                )
             }
         }
     }
@@ -281,31 +225,6 @@ class EffectsManager {
     }
 
     /**
-     * Create a shimmer gradient effect.
-     */
-    private fun createShimmerGradient(
-        progress: Float,
-        baseColor: Color,
-        shimmerColor: Color,
-        width: Float = 1000f
-    ): Brush {
-        val shimmerWidth = 0.3f
-        val position = progress.coerceIn(0f, 1f)
-
-        return Brush.linearGradient(
-            colorStops = arrayOf(
-                0f to baseColor,
-                (position - shimmerWidth).coerceAtLeast(0f) to baseColor,
-                position to shimmerColor,
-                (position + shimmerWidth).coerceAtMost(1f) to baseColor,
-                1f to baseColor
-            ),
-            start = Offset.Zero,
-            end = Offset(width, 0f)
-        )
-    }
-
-    /**
      * Create a multi-color gradient.
      */
     private fun createMultiColorGradient(
@@ -406,26 +325,6 @@ class EffectsManager {
 
         return if (adjustedBlurRadius > 0.dp) {
             this.blur(radius = adjustedBlurRadius)
-        } else {
-            this
-        }
-    }
-
-    /**
-     * Apply shadow effect to modifier.
-     */
-    fun Modifier.applyShadow(
-        enableShadow: Boolean,
-        color: Color = Color.Black.copy(alpha = 0.3f),
-        elevation: Dp = 4.dp,
-        shape: Shape = RectangleShape
-    ): Modifier {
-        return if (enableShadow) {
-            this.shadow(
-                elevation = elevation,
-                shape = shape,
-                clip = false
-            )
         } else {
             this
         }

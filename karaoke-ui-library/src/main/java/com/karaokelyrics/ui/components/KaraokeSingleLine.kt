@@ -10,18 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
 import com.karaokelyrics.ui.core.models.KaraokeLine
-import com.karaokelyrics.ui.rendering.AnimationManager
-import com.karaokelyrics.ui.rendering.EffectsManager
+import com.karaokelyrics.ui.rendering.animatePulse
 import com.karaokelyrics.ui.rendering.syllable.SyllableRenderer
 import com.karaokelyrics.ui.state.LineUiState
 
@@ -45,9 +44,6 @@ internal fun KaraokeSingleLine(
     modifier: Modifier = Modifier,
     onLineClick: ((ISyncedLine) -> Unit)? = null
 ) {
-    val animationManager = remember(config.animation) { AnimationManager() }
-    val effectsManager = remember { EffectsManager() }
-
     // Use pre-calculated state for opacity and scale
     // But still need animated values for smooth transitions
     val animatedScale by animateFloatAsState(
@@ -66,7 +62,7 @@ internal fun KaraokeSingleLine(
     )
 
     val pulseScale = if (config.animation.enablePulse && lineUiState.isPlaying) {
-        animationManager.animatePulse(
+        animatePulse(
             enabled = true,
             minScale = config.animation.pulseMinScale,
             maxScale = config.animation.pulseMaxScale,
@@ -74,15 +70,8 @@ internal fun KaraokeSingleLine(
         )
     } else 1f
 
-    val shimmerProgress = if (config.animation.enableShimmer && lineUiState.isPlaying) {
-        animationManager.animateShimmer(
-            enabled = true,
-            duration = config.animation.shimmerDuration
-        )
-    } else 0f
-
     val textStyle = createTextStyle(line, config)
-    val textColor = calculateTextColor(line, lineUiState, config, effectsManager)
+    val textColor = calculateTextColor(line, lineUiState, config)
 
     Box(
         modifier = modifier
@@ -106,8 +95,7 @@ internal fun KaraokeSingleLine(
                     currentTimeMs = currentTimeMs,
                     config = config,
                     textStyle = textStyle,
-                    baseColor = textColor,
-                    shimmerProgress = shimmerProgress
+                    baseColor = textColor
                 )
             }
             else -> {
@@ -128,7 +116,7 @@ internal fun KaraokeSingleLine(
 private fun SimpleTextLine(
     text: String,
     textStyle: TextStyle,
-    textColor: androidx.compose.ui.graphics.Color
+    textColor: Color
 ) {
     Text(
         text = text,
@@ -167,20 +155,16 @@ private fun createTextStyle(
 private fun calculateTextColor(
     line: ISyncedLine,
     lineUiState: LineUiState,
-    config: KaraokeLibraryConfig,
-    effectsManager: EffectsManager
-): androidx.compose.ui.graphics.Color {
+    config: KaraokeLibraryConfig
+): Color {
     val isAccompaniment = line is KaraokeLine && line.isAccompaniment
 
-    return effectsManager.calculateLineColor(
-        isPlaying = lineUiState.isPlaying,
-        hasPlayed = lineUiState.hasPlayed,
-        isAccompaniment = isAccompaniment,
-        playingTextColor = config.visual.playingTextColor,
-        playedTextColor = config.visual.playedTextColor,
-        upcomingTextColor = config.visual.upcomingTextColor,
-        accompanimentTextColor = config.visual.accompanimentTextColor
-    )
+    return when {
+        isAccompaniment -> config.visual.accompanimentTextColor
+        lineUiState.isPlaying -> config.visual.upcomingTextColor // Base color for unplayed chars in active line
+        lineUiState.hasPlayed -> config.visual.playedTextColor
+        else -> config.visual.upcomingTextColor
+    }
 }
 
 /**

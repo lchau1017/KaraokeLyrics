@@ -1,10 +1,7 @@
 package com.karaokelyrics.ui.core.config
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -24,10 +21,7 @@ object LibraryPresets {
             upcomingTextColor = Color.White,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
-            gradientEnabled = false,
-            shadowEnabled = true,
-            shadowColor = Color.Black.copy(alpha = 0.3f),
-            glowEnabled = false
+            gradientEnabled = false
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = false,
@@ -40,7 +34,7 @@ object LibraryPresets {
     )
 
     /**
-     * Neon style with gradient and glow effects
+     * Neon style with gradient effects
      */
     val Neon = KaraokeLibraryConfig(
         visual = VisualConfig(
@@ -55,21 +49,13 @@ object LibraryPresets {
                 sung = Color.Magenta,
                 unsung = Color.Cyan,
                 active = Color.Yellow
-            ),
-            shadowEnabled = true,
-            shadowColor = Color.Black,
-            shadowOffset = Offset(3f, 3f),
-            glowEnabled = true,
-            glowColor = Color.Magenta
+            )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
             characterMaxScale = 1.2f,
             characterFloatOffset = 8f,
-            enableLineAnimations = true,
-            enableShimmer = true,
-            shimmerIntensity = 0.3f,
-            shimmerDuration = 1500
+            enableLineAnimations = true
         ),
         effects = EffectsConfig(
             enableBlur = true,
@@ -91,9 +77,6 @@ object LibraryPresets {
                 unsung = Color.Blue,
                 active = Color.Green
             ),
-            shadowEnabled = false,
-            glowEnabled = true,
-            glowColor = Color.Yellow.copy(alpha = 0.4f),
             playingGradientColors = listOf(
                 Color.Red,
                 Color(0xFFFFA500), // Orange
@@ -124,12 +107,7 @@ object LibraryPresets {
                 sung = Color(0xFFFF4500),  // Orange red
                 unsung = Color(0xFFFFD700), // Gold
                 active = Color(0xFFFF6347)  // Tomato
-            ),
-            shadowEnabled = true,
-            shadowColor = Color(0xFF8B0000),  // Dark red
-            shadowOffset = Offset(2f, 4f),
-            glowEnabled = true,
-            glowColor = Color(0xFFFFA500)  // Orange glow
+            )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
@@ -156,12 +134,7 @@ object LibraryPresets {
                 sung = Color(0xFF006994),  // Deep blue
                 unsung = Color(0xFF00CED1), // Dark turquoise
                 active = Color(0xFF00FFFF)  // Aqua
-            ),
-            shadowEnabled = true,
-            shadowColor = Color(0xFF000080),  // Navy
-            shadowOffset = Offset(1f, 2f),
-            glowEnabled = true,
-            glowColor = Color(0xFF87CEEB)  // Sky blue glow
+            )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
@@ -185,12 +158,7 @@ object LibraryPresets {
                 sung = Color(0xFFFF1493),  // Deep pink
                 unsung = Color(0xFF00FFFF), // Cyan
                 active = Color(0xFFFFFF00)  // Yellow
-            ),
-            shadowEnabled = true,
-            shadowColor = Color.Black,
-            shadowOffset = Offset(4f, 4f),
-            glowEnabled = true,
-            glowColor = Color(0xFFFF1493)
+            )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
@@ -215,8 +183,6 @@ object LibraryPresets {
             fontSize = 30.sp,
             fontWeight = FontWeight.Normal,
             gradientEnabled = false,
-            shadowEnabled = false,
-            glowEnabled = false,
             backgroundColor = Color.White
         ),
         animation = AnimationConfig(
@@ -244,11 +210,7 @@ object LibraryPresets {
                 sung = Color(0xFFC0C0C0),
                 unsung = Color(0xFFF5F5DC),
                 active = Color(0xFFFFD700)
-            ),
-            shadowEnabled = true,
-            shadowColor = Color.Black.copy(alpha = 0.2f),
-            shadowOffset = Offset(1f, 1f),
-            glowEnabled = false
+            )
         ),
         animation = AnimationConfig(
             enableCharacterAnimations = true,
@@ -278,11 +240,6 @@ object LibraryPresets {
                 unsung = Color.Magenta,
                 active = Color.Yellow
             ),
-            shadowEnabled = true,
-            shadowColor = Color.Red,
-            shadowOffset = Offset(5f, 5f),
-            glowEnabled = true,
-            glowColor = Color.Cyan,
             playingGradientColors = listOf(
                 Color.Red, Color.Yellow, Color.Green,
                 Color.Cyan, Color.Blue, Color.Magenta
@@ -299,9 +256,7 @@ object LibraryPresets {
             lineAnimationDuration = 400f,
             enablePulse = true,
             pulseMinScale = 0.95f,
-            pulseMaxScale = 1.05f,
-            enableShimmer = true,
-            shimmerIntensity = 0.5f
+            pulseMaxScale = 1.05f
         ),
         effects = EffectsConfig(
             enableBlur = true,
@@ -328,9 +283,6 @@ object LibraryPresets {
                 unsung = Color(0xFF00FF00).copy(alpha = 0.5f),
                 active = Color(0xFF00FF00)
             ),
-            shadowEnabled = false,
-            glowEnabled = true,
-            glowColor = Color(0xFF00FF00).copy(alpha = 0.6f),
             backgroundColor = Color.Black
         ),
         animation = AnimationConfig(

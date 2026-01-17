@@ -52,11 +52,6 @@ class LibraryConfigMapper @Inject constructor() {
 
             // Disable effects by default - let user enable them if needed
             gradientEnabled = false,
-            shadowEnabled = true,  // Keep subtle shadow for readability
-            shadowColor = Color.Black.copy(alpha = 0.5f),
-            shadowOffset = androidx.compose.ui.geometry.Offset(2f, 2f),
-            glowEnabled = false,  // Disable glow by default
-            glowColor = primaryColor.copy(alpha = 0.3f),
             colors = ColorConfig(
                 sung = primaryColor.copy(alpha = 0.7f),
                 unsung = primaryColor.copy(alpha = 0.4f),

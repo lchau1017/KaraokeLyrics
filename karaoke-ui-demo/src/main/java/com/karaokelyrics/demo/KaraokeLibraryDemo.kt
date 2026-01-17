@@ -12,9 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -24,8 +21,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.karaokelyrics.ui.api.KaraokeLibrary
 import com.karaokelyrics.ui.core.config.*
-import com.karaokelyrics.ui.core.models.KaraokeLine
-import com.karaokelyrics.ui.core.models.KaraokeSyllable
 import com.karaokelyrics.demo.data.DemoLyricsProvider
 import kotlinx.coroutines.delay
 
@@ -51,8 +46,6 @@ fun KaraokeLibraryDemo() {
                 unsungColor = Color.White,
                 activeColor = Color.Yellow,
                 backgroundColor = Color.Black,
-                shadowColor = Color.Black,
-                glowColor = Color.Yellow,
                 lineSpacing = 80f
             )
         )
@@ -81,11 +74,6 @@ fun KaraokeLibraryDemo() {
                 backgroundColor = settings.backgroundColor,
                 gradientEnabled = settings.gradientEnabled,
                 gradientAngle = settings.gradientAngle,
-                shadowEnabled = settings.shadowEnabled,
-                shadowColor = settings.shadowColor,
-                shadowOffset = Offset(settings.shadowOffsetX, settings.shadowOffsetY),
-                glowEnabled = settings.glowEnabled,
-                glowColor = settings.glowColor,
                 colors = ColorConfig(
                     sung = settings.sungColor,
                     unsung = settings.unsungColor,
@@ -104,8 +92,6 @@ fun KaraokeLibraryDemo() {
                 enablePulse = settings.pulseEnabled,
                 pulseMinScale = settings.pulseMinScale,
                 pulseMaxScale = settings.pulseMaxScale,
-                enableShimmer = settings.shimmerEnabled,
-                shimmerIntensity = settings.shimmerIntensity
             ),
             effects = EffectsConfig(
                 enableBlur = settings.blurEnabled,
@@ -385,42 +371,6 @@ fun KaraokeLibraryDemo() {
                         )
                     }
 
-                    // Shadow
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = settings.shadowEnabled, onCheckedChange = { settings = settings.copy(shadowEnabled = it) })
-                        Text("Shadow", modifier = Modifier.padding(start = 8.dp))
-                    }
-                    if (settings.shadowEnabled) {
-                        ColorRow("Shadow Color", settings.shadowColor) {
-                            colorPickerTarget = "shadow"
-                            showColorPicker = true
-                        }
-                        Text("Offset X: ${settings.shadowOffsetX.toInt()}", fontSize = 12.sp)
-                        Slider(
-                            value = settings.shadowOffsetX,
-                            onValueChange = { settings = settings.copy(shadowOffsetX = it) },
-                            valueRange = -10f..10f
-                        )
-                        Text("Offset Y: ${settings.shadowOffsetY.toInt()}", fontSize = 12.sp)
-                        Slider(
-                            value = settings.shadowOffsetY,
-                            onValueChange = { settings = settings.copy(shadowOffsetY = it) },
-                            valueRange = -10f..10f
-                        )
-                    }
-
-                    // Glow
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = settings.glowEnabled, onCheckedChange = { settings = settings.copy(glowEnabled = it) })
-                        Text("Glow", modifier = Modifier.padding(start = 8.dp))
-                    }
-                    if (settings.glowEnabled) {
-                        ColorRow("Glow Color", settings.glowColor) {
-                            colorPickerTarget = "glow"
-                            showColorPicker = true
-                        }
-                    }
-
                     // Blur
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Switch(checked = settings.blurEnabled, onCheckedChange = { settings = settings.copy(blurEnabled = it) })
@@ -499,20 +449,6 @@ fun KaraokeLibraryDemo() {
                         )
                     }
 
-                    // Shimmer animation
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = settings.shimmerEnabled, onCheckedChange = { settings = settings.copy(shimmerEnabled = it) })
-                        Text("Shimmer Effect", modifier = Modifier.padding(start = 8.dp))
-                    }
-                    if (settings.shimmerEnabled) {
-                        Text("Intensity: ${String.format("%.2f", settings.shimmerIntensity)}", fontSize = 12.sp)
-                        Slider(
-                            value = settings.shimmerIntensity,
-                            onValueChange = { settings = settings.copy(shimmerIntensity = it) },
-                            valueRange = 0.1f..1f
-                        )
-                    }
-
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
 
                     // Preset buttons
@@ -533,11 +469,7 @@ fun KaraokeLibraryDemo() {
                                         pulseEnabled = preset.animation.enablePulse,
                                         pulseMinScale = preset.animation.pulseMinScale,
                                         pulseMaxScale = preset.animation.pulseMaxScale,
-                                        shimmerEnabled = preset.animation.enableShimmer,
-                                        shimmerIntensity = preset.animation.shimmerIntensity,
                                         gradientEnabled = false,
-                                        shadowEnabled = true,
-                                        glowEnabled = false,
                                         blurEnabled = false
                                     )
                                 },
@@ -555,13 +487,9 @@ fun KaraokeLibraryDemo() {
                                         unsungColor = preset.visual.upcomingTextColor,
                                         activeColor = preset.visual.playingTextColor,
                                         gradientEnabled = preset.visual.gradientEnabled,
-                                        shadowEnabled = preset.visual.shadowEnabled,
-                                        glowEnabled = preset.visual.glowEnabled,
                                         charAnimEnabled = preset.animation.enableCharacterAnimations,
                                         lineAnimEnabled = preset.animation.enableLineAnimations,
                                         pulseEnabled = preset.animation.enablePulse,
-                                        shimmerEnabled = preset.animation.enableShimmer,
-                                        shimmerIntensity = preset.animation.shimmerIntensity,
                                         blurEnabled = preset.effects.enableBlur,
                                         blurIntensity = preset.effects.blurIntensity
                                     )
@@ -580,8 +508,6 @@ fun KaraokeLibraryDemo() {
                                         activeColor = Color.Black,
                                         backgroundColor = Color.White,
                                         gradientEnabled = false,
-                                        shadowEnabled = false,
-                                        glowEnabled = false,
                                         blurEnabled = false,
                                         charAnimEnabled = false,
                                         lineAnimEnabled = false
@@ -606,8 +532,6 @@ fun KaraokeLibraryDemo() {
                 "unsung" -> settings.unsungColor
                 "active" -> settings.activeColor
                 "background" -> settings.backgroundColor
-                "shadow" -> settings.shadowColor
-                "glow" -> settings.glowColor
                 else -> Color.White
             },
             onColorSelected = { color ->
@@ -616,8 +540,6 @@ fun KaraokeLibraryDemo() {
                     "unsung" -> settings.copy(unsungColor = color)
                     "active" -> settings.copy(activeColor = color)
                     "background" -> settings.copy(backgroundColor = color)
-                    "shadow" -> settings.copy(shadowColor = color)
-                    "glow" -> settings.copy(glowColor = color)
                     else -> settings
                 }
                 showColorPicker = false
