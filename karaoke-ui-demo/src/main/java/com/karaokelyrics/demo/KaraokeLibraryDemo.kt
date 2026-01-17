@@ -37,47 +37,24 @@ fun KaraokeLibraryDemo() {
     var currentTimeMs by remember { mutableStateOf(0) }
     var isPlaying by remember { mutableStateOf(false) }
 
-    // Visual settings
-    var fontSize by remember { mutableStateOf(32f) }
-    var fontWeight by remember { mutableStateOf(FontWeight.Bold) }
-    var fontFamily by remember { mutableStateOf<FontFamily?>(null) }
-    var textAlign by remember { mutableStateOf(TextAlign.Center) }
-
-    // Colors
-    var sungColor by remember { mutableStateOf(Color.Green) }
-    var unsungColor by remember { mutableStateOf(Color.White) }
-    var activeColor by remember { mutableStateOf(Color.Yellow) }
-    var backgroundColor by remember { mutableStateOf(Color.Black) }
-
-    // Effects toggles
-    var gradientEnabled by remember { mutableStateOf(false) }
-    var gradientAngle by remember { mutableStateOf(45f) }
-    var shadowEnabled by remember { mutableStateOf(false) }
-    var shadowColor by remember { mutableStateOf(Color.Black) }
-    var shadowOffsetX by remember { mutableStateOf(2f) }
-    var shadowOffsetY by remember { mutableStateOf(2f) }
-    var glowEnabled by remember { mutableStateOf(false) }
-    var glowColor by remember { mutableStateOf(Color.Yellow) }
-    var blurEnabled by remember { mutableStateOf(false) }
-    var blurIntensity by remember { mutableStateOf(1.0f) }
-
-    // Animation settings
-    var charAnimEnabled by remember { mutableStateOf(false) }
-    var charMaxScale by remember { mutableStateOf(1.2f) }
-    var charFloatOffset by remember { mutableStateOf(8f) }
-    var charRotationDegrees by remember { mutableStateOf(5f) }
-    var lineAnimEnabled by remember { mutableStateOf(false) }
-    var lineScaleOnPlay by remember { mutableStateOf(1.05f) }
-
-    // New animation settings
-    var pulseEnabled by remember { mutableStateOf(false) }
-    var pulseMinScale by remember { mutableStateOf(0.98f) }
-    var pulseMaxScale by remember { mutableStateOf(1.02f) }
-    var shimmerEnabled by remember { mutableStateOf(false) }
-    var shimmerIntensity by remember { mutableStateOf(0.3f) }
-
-    // Line spacing
-    var lineSpacing by remember { mutableStateOf(80f) } // Very large spacing to show only active line
+    // Use a single settings state for all configuration
+    var settings by remember {
+        mutableStateOf(
+            DemoSettings(
+                fontSize = 32f,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Center,
+                sungColor = Color.Green,
+                unsungColor = Color.White,
+                activeColor = Color.Yellow,
+                backgroundColor = Color.Black,
+                shadowColor = Color.Black,
+                glowColor = Color.Yellow,
+                lineSpacing = 80f
+            )
+        )
+    }
 
     // Show color picker dialog
     var showColorPicker by remember { mutableStateOf(false) }
@@ -87,64 +64,55 @@ fun KaraokeLibraryDemo() {
     val demoLines = remember { DemoLyricsProvider.createDemoLyrics() }
     var selectedLineIndex by remember { mutableStateOf(0) }
 
-    // Build config from current settings
-    val currentConfig = remember(
-        fontSize, fontWeight, fontFamily, textAlign,
-        sungColor, unsungColor, activeColor, backgroundColor,
-        gradientEnabled, gradientAngle, shadowEnabled, shadowColor,
-        shadowOffsetX, shadowOffsetY, glowEnabled, glowColor,
-        blurEnabled, blurIntensity, charAnimEnabled, charMaxScale,
-        charFloatOffset, charRotationDegrees, lineAnimEnabled, lineScaleOnPlay,
-        pulseEnabled, pulseMinScale, pulseMaxScale,
-        shimmerEnabled, shimmerIntensity,
-        lineSpacing
-    ) {
-        KaraokeLibraryConfig(
+    // Build config from current settings - use derivedStateOf for optimization
+    val currentConfig by remember {
+        derivedStateOf {
+            KaraokeLibraryConfig(
             visual = VisualConfig(
-                fontSize = fontSize.sp,
-                fontWeight = fontWeight,
-                fontFamily = fontFamily,
-                textAlign = textAlign,
-                playingTextColor = activeColor,
-                playedTextColor = sungColor,
-                upcomingTextColor = unsungColor,
-                backgroundColor = backgroundColor,
-                gradientEnabled = gradientEnabled,
-                gradientAngle = gradientAngle,
-                shadowEnabled = shadowEnabled,
-                shadowColor = shadowColor,
-                shadowOffset = Offset(shadowOffsetX, shadowOffsetY),
-                glowEnabled = glowEnabled,
-                glowColor = glowColor,
+                fontSize = settings.fontSize.sp,
+                fontWeight = settings.fontWeight,
+                fontFamily = settings.fontFamily,
+                textAlign = settings.textAlign,
+                playingTextColor = settings.activeColor,
+                playedTextColor = settings.sungColor,
+                upcomingTextColor = settings.unsungColor,
+                backgroundColor = settings.backgroundColor,
+                gradientEnabled = settings.gradientEnabled,
+                gradientAngle = settings.gradientAngle,
+                shadowEnabled = settings.shadowEnabled,
+                shadowColor = settings.shadowColor,
+                shadowOffset = Offset(settings.shadowOffsetX, settings.shadowOffsetY),
+                glowEnabled = settings.glowEnabled,
+                glowColor = settings.glowColor,
                 colors = ColorConfig(
-                    sung = sungColor,
-                    unsung = unsungColor,
-                    active = activeColor
+                    sung = settings.sungColor,
+                    unsung = settings.unsungColor,
+                    active = settings.activeColor
                 )
             ),
             animation = AnimationConfig(
-                enableCharacterAnimations = charAnimEnabled,
-                characterMaxScale = charMaxScale,
-                characterFloatOffset = charFloatOffset,
-                characterRotationDegrees = charRotationDegrees,
+                enableCharacterAnimations = settings.charAnimEnabled,
+                characterMaxScale = settings.charMaxScale,
+                characterFloatOffset = settings.charFloatOffset,
+                characterRotationDegrees = settings.charRotationDegrees,
                 characterAnimationDuration = 800f,
-                enableLineAnimations = lineAnimEnabled,
-                lineScaleOnPlay = lineScaleOnPlay,
+                enableLineAnimations = settings.lineAnimEnabled,
+                lineScaleOnPlay = settings.lineScaleOnPlay,
                 lineAnimationDuration = 700f,
-                enablePulse = pulseEnabled,
-                pulseMinScale = pulseMinScale,
-                pulseMaxScale = pulseMaxScale,
-                enableShimmer = shimmerEnabled,
-                shimmerIntensity = shimmerIntensity
+                enablePulse = settings.pulseEnabled,
+                pulseMinScale = settings.pulseMinScale,
+                pulseMaxScale = settings.pulseMaxScale,
+                enableShimmer = settings.shimmerEnabled,
+                shimmerIntensity = settings.shimmerIntensity
             ),
             effects = EffectsConfig(
-                enableBlur = blurEnabled,
-                blurIntensity = blurIntensity,
-                upcomingLineBlur = (3 * blurIntensity).dp,
-                distantLineBlur = (6 * blurIntensity).dp
+                enableBlur = settings.blurEnabled,
+                blurIntensity = settings.blurIntensity,
+                upcomingLineBlur = (3 * settings.blurIntensity).dp,
+                distantLineBlur = (6 * settings.blurIntensity).dp
             ),
             layout = LayoutConfig(
-                lineSpacing = lineSpacing.dp,
+                lineSpacing = settings.lineSpacing.dp,
                 // Adapt padding for demo's smaller viewport (1/3 of screen)
                 contentTopPadding = 30.dp, // Smaller top padding for demo
                 scrollTopOffset = 30.dp, // Match content top padding
@@ -154,6 +122,7 @@ fun KaraokeLibraryDemo() {
                 containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
             )
         )
+        }
     }
 
     // Auto-play timer
@@ -198,7 +167,7 @@ fun KaraokeLibraryDemo() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.33f)
-                    .background(backgroundColor)
+                    .background(settings.backgroundColor)
             ) {
                 // Use KaraokeLyricsViewer for automatic scrolling
                 KaraokeLibrary.KaraokeLyricsViewer(
@@ -255,33 +224,33 @@ fun KaraokeLibraryDemo() {
                     // Font settings
                     Text("Font Settings", style = MaterialTheme.typography.titleMedium)
 
-                    Text("Size: ${fontSize.toInt()}sp")
+                    Text("Size: ${settings.fontSize.toInt()}sp")
                     Slider(
-                        value = fontSize,
-                        onValueChange = { fontSize = it },
+                        value = settings.fontSize,
+                        onValueChange = { settings = settings.copy(fontSize = it) },
                         valueRange = 12f..60f
                     )
 
                     Text("Font Weight")
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         FilterChip(
-                            selected = fontWeight == FontWeight.Light,
-                            onClick = { fontWeight = FontWeight.Light },
+                            selected = settings.fontWeight == FontWeight.Light,
+                            onClick = { settings = settings.copy(fontWeight = FontWeight.Light) },
                             label = { Text("Light", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = fontWeight == FontWeight.Normal,
-                            onClick = { fontWeight = FontWeight.Normal },
+                            selected = settings.fontWeight == FontWeight.Normal,
+                            onClick = { settings = settings.copy(fontWeight = FontWeight.Normal) },
                             label = { Text("Normal", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = fontWeight == FontWeight.Bold,
-                            onClick = { fontWeight = FontWeight.Bold },
+                            selected = settings.fontWeight == FontWeight.Bold,
+                            onClick = { settings = settings.copy(fontWeight = FontWeight.Bold) },
                             label = { Text("Bold", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = fontWeight == FontWeight.Black,
-                            onClick = { fontWeight = FontWeight.Black },
+                            selected = settings.fontWeight == FontWeight.Black,
+                            onClick = { settings = settings.copy(fontWeight = FontWeight.Black) },
                             label = { Text("Black", fontSize = 10.sp) }
                         )
                     }
@@ -289,23 +258,23 @@ fun KaraokeLibraryDemo() {
                     Text("Font Family")
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         FilterChip(
-                            selected = fontFamily == null,
-                            onClick = { fontFamily = null },
+                            selected = settings.fontFamily == FontFamily.Default,
+                            onClick = { settings = settings.copy(fontFamily = FontFamily.Default) },
                             label = { Text("Default", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = fontFamily == FontFamily.Serif,
-                            onClick = { fontFamily = FontFamily.Serif },
+                            selected = settings.fontFamily == FontFamily.Serif,
+                            onClick = { settings = settings.copy(fontFamily = FontFamily.Serif) },
                             label = { Text("Serif", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = fontFamily == FontFamily.Monospace,
-                            onClick = { fontFamily = FontFamily.Monospace },
+                            selected = settings.fontFamily == FontFamily.Monospace,
+                            onClick = { settings = settings.copy(fontFamily = FontFamily.Monospace) },
                             label = { Text("Mono", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = fontFamily == FontFamily.Cursive,
-                            onClick = { fontFamily = FontFamily.Cursive },
+                            selected = settings.fontFamily == FontFamily.Cursive,
+                            onClick = { settings = settings.copy(fontFamily = FontFamily.Cursive) },
                             label = { Text("Cursive", fontSize = 10.sp) }
                         )
                     }
@@ -313,26 +282,26 @@ fun KaraokeLibraryDemo() {
                     Text("Text Alignment")
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         FilterChip(
-                            selected = textAlign == TextAlign.Start,
-                            onClick = { textAlign = TextAlign.Start },
+                            selected = settings.textAlign == TextAlign.Start,
+                            onClick = { settings = settings.copy(textAlign = TextAlign.Start) },
                             label = { Text("Left", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = textAlign == TextAlign.Center,
-                            onClick = { textAlign = TextAlign.Center },
+                            selected = settings.textAlign == TextAlign.Center,
+                            onClick = { settings = settings.copy(textAlign = TextAlign.Center) },
                             label = { Text("Center", fontSize = 10.sp) }
                         )
                         FilterChip(
-                            selected = textAlign == TextAlign.End,
-                            onClick = { textAlign = TextAlign.End },
+                            selected = settings.textAlign == TextAlign.End,
+                            onClick = { settings = settings.copy(textAlign = TextAlign.End) },
                             label = { Text("Right", fontSize = 10.sp) }
                         )
                     }
 
-                    Text("Line Spacing: ${lineSpacing.toInt()}dp")
+                    Text("Line Spacing: ${settings.lineSpacing.toInt()}dp")
                     Slider(
-                        value = lineSpacing,
-                        onValueChange = { lineSpacing = it },
+                        value = settings.lineSpacing,
+                        onValueChange = { settings = settings.copy(lineSpacing = it) },
                         valueRange = 0f..150f  // Allow much larger spacing
                     )
 
@@ -341,19 +310,19 @@ fun KaraokeLibraryDemo() {
                     // Colors
                     Text("Colors", style = MaterialTheme.typography.titleMedium)
 
-                    ColorRow("Sung", sungColor) {
+                    ColorRow("Sung", settings.sungColor) {
                         colorPickerTarget = "sung"
                         showColorPicker = true
                     }
-                    ColorRow("Unsung", unsungColor) {
+                    ColorRow("Unsung", settings.unsungColor) {
                         colorPickerTarget = "unsung"
                         showColorPicker = true
                     }
-                    ColorRow("Active", activeColor) {
+                    ColorRow("Active", settings.activeColor) {
                         colorPickerTarget = "active"
                         showColorPicker = true
                     }
-                    ColorRow("Background", backgroundColor) {
+                    ColorRow("Background", settings.backgroundColor) {
                         colorPickerTarget = "background"
                         showColorPicker = true
                     }
@@ -365,49 +334,49 @@ fun KaraokeLibraryDemo() {
 
                     // Gradient
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = gradientEnabled, onCheckedChange = { gradientEnabled = it })
+                        Switch(checked = settings.gradientEnabled, onCheckedChange = { settings = settings.copy(gradientEnabled = it) })
                         Text("Gradient", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (gradientEnabled) {
-                        Text("Angle: ${gradientAngle.toInt()}°", fontSize = 12.sp)
+                    if (settings.gradientEnabled) {
+                        Text("Angle: ${settings.gradientAngle.toInt()}°", fontSize = 12.sp)
                         Slider(
-                            value = gradientAngle,
-                            onValueChange = { gradientAngle = it },
+                            value = settings.gradientAngle,
+                            onValueChange = { settings = settings.copy(gradientAngle = it) },
                             valueRange = 0f..360f
                         )
                     }
 
                     // Shadow
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = shadowEnabled, onCheckedChange = { shadowEnabled = it })
+                        Switch(checked = settings.shadowEnabled, onCheckedChange = { settings = settings.copy(shadowEnabled = it) })
                         Text("Shadow", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (shadowEnabled) {
-                        ColorRow("Shadow Color", shadowColor) {
+                    if (settings.shadowEnabled) {
+                        ColorRow("Shadow Color", settings.shadowColor) {
                             colorPickerTarget = "shadow"
                             showColorPicker = true
                         }
-                        Text("Offset X: ${shadowOffsetX.toInt()}", fontSize = 12.sp)
+                        Text("Offset X: ${settings.shadowOffsetX.toInt()}", fontSize = 12.sp)
                         Slider(
-                            value = shadowOffsetX,
-                            onValueChange = { shadowOffsetX = it },
+                            value = settings.shadowOffsetX,
+                            onValueChange = { settings = settings.copy(shadowOffsetX = it) },
                             valueRange = -10f..10f
                         )
-                        Text("Offset Y: ${shadowOffsetY.toInt()}", fontSize = 12.sp)
+                        Text("Offset Y: ${settings.shadowOffsetY.toInt()}", fontSize = 12.sp)
                         Slider(
-                            value = shadowOffsetY,
-                            onValueChange = { shadowOffsetY = it },
+                            value = settings.shadowOffsetY,
+                            onValueChange = { settings = settings.copy(shadowOffsetY = it) },
                             valueRange = -10f..10f
                         )
                     }
 
                     // Glow
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = glowEnabled, onCheckedChange = { glowEnabled = it })
+                        Switch(checked = settings.glowEnabled, onCheckedChange = { settings = settings.copy(glowEnabled = it) })
                         Text("Glow", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (glowEnabled) {
-                        ColorRow("Glow Color", glowColor) {
+                    if (settings.glowEnabled) {
+                        ColorRow("Glow Color", settings.glowColor) {
                             colorPickerTarget = "glow"
                             showColorPicker = true
                         }
@@ -415,14 +384,14 @@ fun KaraokeLibraryDemo() {
 
                     // Blur
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = blurEnabled, onCheckedChange = { blurEnabled = it })
+                        Switch(checked = settings.blurEnabled, onCheckedChange = { settings = settings.copy(blurEnabled = it) })
                         Text("Blur (for non-active lines)", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (blurEnabled) {
-                        Text("Intensity: ${String.format("%.1f", blurIntensity)}", fontSize = 12.sp)
+                    if (settings.blurEnabled) {
+                        Text("Intensity: ${String.format("%.1f", settings.blurIntensity)}", fontSize = 12.sp)
                         Slider(
-                            value = blurIntensity,
-                            onValueChange = { blurIntensity = it },
+                            value = settings.blurIntensity,
+                            onValueChange = { settings = settings.copy(blurIntensity = it) },
                             valueRange = 0.1f..3f
                         )
                     }
@@ -434,73 +403,73 @@ fun KaraokeLibraryDemo() {
 
                     // Character animations
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = charAnimEnabled, onCheckedChange = { charAnimEnabled = it })
+                        Switch(checked = settings.charAnimEnabled, onCheckedChange = { settings = settings.copy(charAnimEnabled = it) })
                         Text("Character Animation", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (charAnimEnabled) {
-                        Text("Max Scale: ${String.format("%.2f", charMaxScale)}", fontSize = 12.sp)
+                    if (settings.charAnimEnabled) {
+                        Text("Max Scale: ${String.format("%.2f", settings.charMaxScale)}", fontSize = 12.sp)
                         Slider(
-                            value = charMaxScale,
-                            onValueChange = { charMaxScale = it },
+                            value = settings.charMaxScale,
+                            onValueChange = { settings = settings.copy(charMaxScale = it) },
                             valueRange = 1f..2f
                         )
-                        Text("Float Offset: ${charFloatOffset.toInt()}", fontSize = 12.sp)
+                        Text("Float Offset: ${settings.charFloatOffset.toInt()}", fontSize = 12.sp)
                         Slider(
-                            value = charFloatOffset,
-                            onValueChange = { charFloatOffset = it },
+                            value = settings.charFloatOffset,
+                            onValueChange = { settings = settings.copy(charFloatOffset = it) },
                             valueRange = 0f..20f
                         )
-                        Text("Rotation: ${charRotationDegrees.toInt()}°", fontSize = 12.sp)
+                        Text("Rotation: ${settings.charRotationDegrees.toInt()}°", fontSize = 12.sp)
                         Slider(
-                            value = charRotationDegrees,
-                            onValueChange = { charRotationDegrees = it },
+                            value = settings.charRotationDegrees,
+                            onValueChange = { settings = settings.copy(charRotationDegrees = it) },
                             valueRange = 0f..15f
                         )
                     }
 
                     // Line animations
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = lineAnimEnabled, onCheckedChange = { lineAnimEnabled = it })
+                        Switch(checked = settings.lineAnimEnabled, onCheckedChange = { settings = settings.copy(lineAnimEnabled = it) })
                         Text("Line Animation", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (lineAnimEnabled) {
-                        Text("Scale on Play: ${String.format("%.2f", lineScaleOnPlay)}", fontSize = 12.sp)
+                    if (settings.lineAnimEnabled) {
+                        Text("Scale on Play: ${String.format("%.2f", settings.lineScaleOnPlay)}", fontSize = 12.sp)
                         Slider(
-                            value = lineScaleOnPlay,
-                            onValueChange = { lineScaleOnPlay = it },
+                            value = settings.lineScaleOnPlay,
+                            onValueChange = { settings = settings.copy(lineScaleOnPlay = it) },
                             valueRange = 1f..1.5f
                         )
                     }
 
                     // Pulse animation
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = pulseEnabled, onCheckedChange = { pulseEnabled = it })
+                        Switch(checked = settings.pulseEnabled, onCheckedChange = { settings = settings.copy(pulseEnabled = it) })
                         Text("Pulse Effect", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (pulseEnabled) {
-                        Text("Pulse Range: ${String.format("%.2f", pulseMinScale)} - ${String.format("%.2f", pulseMaxScale)}", fontSize = 12.sp)
+                    if (settings.pulseEnabled) {
+                        Text("Pulse Range: ${String.format("%.2f", settings.pulseMinScale)} - ${String.format("%.2f", settings.pulseMaxScale)}", fontSize = 12.sp)
                         Slider(
-                            value = pulseMinScale,
-                            onValueChange = { pulseMinScale = it },
+                            value = settings.pulseMinScale,
+                            onValueChange = { settings = settings.copy(pulseMinScale = it) },
                             valueRange = 0.9f..1f
                         )
                         Slider(
-                            value = pulseMaxScale,
-                            onValueChange = { pulseMaxScale = it },
+                            value = settings.pulseMaxScale,
+                            onValueChange = { settings = settings.copy(pulseMaxScale = it) },
                             valueRange = 1f..1.1f
                         )
                     }
 
                     // Shimmer animation
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = shimmerEnabled, onCheckedChange = { shimmerEnabled = it })
+                        Switch(checked = settings.shimmerEnabled, onCheckedChange = { settings = settings.copy(shimmerEnabled = it) })
                         Text("Shimmer Effect", modifier = Modifier.padding(start = 8.dp))
                     }
-                    if (shimmerEnabled) {
-                        Text("Intensity: ${String.format("%.2f", shimmerIntensity)}", fontSize = 12.sp)
+                    if (settings.shimmerEnabled) {
+                        Text("Intensity: ${String.format("%.2f", settings.shimmerIntensity)}", fontSize = 12.sp)
                         Slider(
-                            value = shimmerIntensity,
-                            onValueChange = { shimmerIntensity = it },
+                            value = settings.shimmerIntensity,
+                            onValueChange = { settings = settings.copy(shimmerIntensity = it) },
                             valueRange = 0.1f..1f
                         )
                     }
@@ -514,26 +483,24 @@ fun KaraokeLibraryDemo() {
                             Button(
                                 onClick = {
                                     val preset = LibraryPresets.Classic
-                                    preset.visual.let {
-                                        fontSize = it.fontSize.value
-                                        fontWeight = it.fontWeight
-                                        sungColor = it.playedTextColor
-                                        unsungColor = it.upcomingTextColor
-                                        activeColor = it.playingTextColor
-                                    }
-                                    preset.animation.let {
-                                        charAnimEnabled = it.enableCharacterAnimations
-                                        lineAnimEnabled = it.enableLineAnimations
-                                        pulseEnabled = it.enablePulse
-                                        pulseMinScale = it.pulseMinScale
-                                        pulseMaxScale = it.pulseMaxScale
-                                        shimmerEnabled = it.enableShimmer
-                                        shimmerIntensity = it.shimmerIntensity
-                                    }
-                                    gradientEnabled = false
-                                    shadowEnabled = true
-                                    glowEnabled = false
-                                    blurEnabled = false
+                                    settings = settings.copy(
+                                        fontSize = preset.visual.fontSize.value,
+                                        fontWeight = preset.visual.fontWeight,
+                                        sungColor = preset.visual.playedTextColor,
+                                        unsungColor = preset.visual.upcomingTextColor,
+                                        activeColor = preset.visual.playingTextColor,
+                                        charAnimEnabled = preset.animation.enableCharacterAnimations,
+                                        lineAnimEnabled = preset.animation.enableLineAnimations,
+                                        pulseEnabled = preset.animation.enablePulse,
+                                        pulseMinScale = preset.animation.pulseMinScale,
+                                        pulseMaxScale = preset.animation.pulseMaxScale,
+                                        shimmerEnabled = preset.animation.enableShimmer,
+                                        shimmerIntensity = preset.animation.shimmerIntensity,
+                                        gradientEnabled = false,
+                                        shadowEnabled = true,
+                                        glowEnabled = false,
+                                        blurEnabled = false
+                                    )
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -542,27 +509,23 @@ fun KaraokeLibraryDemo() {
                             Button(
                                 onClick = {
                                     val preset = LibraryPresets.Neon
-                                    preset.visual.let {
-                                        fontSize = it.fontSize.value
-                                        fontWeight = it.fontWeight
-                                        sungColor = it.playedTextColor
-                                        unsungColor = it.upcomingTextColor
-                                        activeColor = it.playingTextColor
-                                        gradientEnabled = it.gradientEnabled
-                                        shadowEnabled = it.shadowEnabled
-                                        glowEnabled = it.glowEnabled
-                                    }
-                                    preset.animation.let {
-                                        charAnimEnabled = it.enableCharacterAnimations
-                                        lineAnimEnabled = it.enableLineAnimations
-                                        pulseEnabled = it.enablePulse
-                                        shimmerEnabled = it.enableShimmer
-                                        shimmerIntensity = it.shimmerIntensity
-                                    }
-                                    preset.effects.let {
-                                        blurEnabled = it.enableBlur
-                                        blurIntensity = it.blurIntensity
-                                    }
+                                    settings = settings.copy(
+                                        fontSize = preset.visual.fontSize.value,
+                                        fontWeight = preset.visual.fontWeight,
+                                        sungColor = preset.visual.playedTextColor,
+                                        unsungColor = preset.visual.upcomingTextColor,
+                                        activeColor = preset.visual.playingTextColor,
+                                        gradientEnabled = preset.visual.gradientEnabled,
+                                        shadowEnabled = preset.visual.shadowEnabled,
+                                        glowEnabled = preset.visual.glowEnabled,
+                                        charAnimEnabled = preset.animation.enableCharacterAnimations,
+                                        lineAnimEnabled = preset.animation.enableLineAnimations,
+                                        pulseEnabled = preset.animation.enablePulse,
+                                        shimmerEnabled = preset.animation.enableShimmer,
+                                        shimmerIntensity = preset.animation.shimmerIntensity,
+                                        blurEnabled = preset.effects.enableBlur,
+                                        blurIntensity = preset.effects.blurIntensity
+                                    )
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -570,18 +533,20 @@ fun KaraokeLibraryDemo() {
                             }
                             Button(
                                 onClick = {
-                                    fontSize = 30f
-                                    fontWeight = FontWeight.Normal
-                                    sungColor = Color.Gray
-                                    unsungColor = Color.LightGray
-                                    activeColor = Color.Black
-                                    backgroundColor = Color.White
-                                    gradientEnabled = false
-                                    shadowEnabled = false
-                                    glowEnabled = false
-                                    blurEnabled = false
-                                    charAnimEnabled = false
-                                    lineAnimEnabled = false
+                                    settings = settings.copy(
+                                        fontSize = 30f,
+                                        fontWeight = FontWeight.Normal,
+                                        sungColor = Color.Gray,
+                                        unsungColor = Color.LightGray,
+                                        activeColor = Color.Black,
+                                        backgroundColor = Color.White,
+                                        gradientEnabled = false,
+                                        shadowEnabled = false,
+                                        glowEnabled = false,
+                                        blurEnabled = false,
+                                        charAnimEnabled = false,
+                                        lineAnimEnabled = false
+                                    )
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -598,22 +563,23 @@ fun KaraokeLibraryDemo() {
     if (showColorPicker) {
         ColorPickerDialog(
             currentColor = when (colorPickerTarget) {
-                "sung" -> sungColor
-                "unsung" -> unsungColor
-                "active" -> activeColor
-                "background" -> backgroundColor
-                "shadow" -> shadowColor
-                "glow" -> glowColor
+                "sung" -> settings.sungColor
+                "unsung" -> settings.unsungColor
+                "active" -> settings.activeColor
+                "background" -> settings.backgroundColor
+                "shadow" -> settings.shadowColor
+                "glow" -> settings.glowColor
                 else -> Color.White
             },
             onColorSelected = { color ->
-                when (colorPickerTarget) {
-                    "sung" -> sungColor = color
-                    "unsung" -> unsungColor = color
-                    "active" -> activeColor = color
-                    "background" -> backgroundColor = color
-                    "shadow" -> shadowColor = color
-                    "glow" -> glowColor = color
+                settings = when (colorPickerTarget) {
+                    "sung" -> settings.copy(sungColor = color)
+                    "unsung" -> settings.copy(unsungColor = color)
+                    "active" -> settings.copy(activeColor = color)
+                    "background" -> settings.copy(backgroundColor = color)
+                    "shadow" -> settings.copy(shadowColor = color)
+                    "glow" -> settings.copy(glowColor = color)
+                    else -> settings
                 }
                 showColorPicker = false
             },

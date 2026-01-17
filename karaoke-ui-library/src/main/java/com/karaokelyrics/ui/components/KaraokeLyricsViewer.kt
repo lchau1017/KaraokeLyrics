@@ -47,17 +47,22 @@ fun KaraokeLyricsViewer(
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
-    // Find the current playing line index (for distance calculation)
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+    // Use derivedStateOf for efficient index calculation
+    // This will only recompute when the actual index changes, not on every time update
+    val currentLineIndex by remember {
+        derivedStateOf {
+            LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+        }
     }
 
     // Find the next upcoming line when no active line
-    val nextUpcomingIndex = remember(currentTimeMs, lines) {
-        if (currentLineIndex == null) {
-            // Find first line that hasn't started yet
-            lines.indexOfFirst { line -> currentTimeMs < line.start }.takeIf { it >= 0 }
-        } else null
+    val nextUpcomingIndex by remember {
+        derivedStateOf {
+            if (currentLineIndex == null) {
+                // Find first line that hasn't started yet
+                lines.indexOfFirst { line -> currentTimeMs < line.start }.takeIf { it >= 0 }
+            } else null
+        }
     }
 
     // Track previous indices to detect changes
@@ -90,7 +95,7 @@ fun KaraokeLyricsViewer(
                 coroutineScope.launch {
                     // Always use same positioning for consistency
                     listState.animateScrollToItem(
-                        index = currentLineIndex,
+                        index = currentLineIndex!!,
                         scrollOffset = 0  // Position at top (contentPadding handles the offset)
                     )
                 }
@@ -104,7 +109,7 @@ fun KaraokeLyricsViewer(
                 coroutineScope.launch {
                     // Scroll to upcoming line to move played lines out
                     listState.animateScrollToItem(
-                        index = nextUpcomingIndex,
+                        index = nextUpcomingIndex!!,
                         scrollOffset = 0  // Upcoming at top, played lines scroll out
                     )
                 }
@@ -133,18 +138,28 @@ fun KaraokeLyricsViewer(
                 items = lines,
                 key = { index, line -> "$index-${line.start}" }
             ) { index, line ->
-                // Check line states using utility
-                val lineState = LineStateUtils.getLineState(line, currentTimeMs)
+                // Use remember with keys to avoid recalculation when only other lines change
+                val lineState = remember(line, currentTimeMs) {
+                    LineStateUtils.getLineState(line, currentTimeMs)
+                }
 
-                // Check special positions
-                val isLastPlayed = LineStateUtils.isLastPlayedLine(index, lines, currentTimeMs)
-                val isFirstUpcoming = LineStateUtils.isFirstUpcomingLine(index, lines, currentTimeMs)
-                val isFirstActive = LineStateUtils.isFirstActiveLine(index, lines, currentTimeMs)
+                // Check special positions - only recalculate when necessary
+                val isLastPlayed = remember(index, lines.size, currentTimeMs) {
+                    LineStateUtils.isLastPlayedLine(index, lines, currentTimeMs)
+                }
+                val isFirstUpcoming = remember(index, currentTimeMs) {
+                    LineStateUtils.isFirstUpcomingLine(index, lines, currentTimeMs)
+                }
+                val isFirstActive = remember(index, currentTimeMs) {
+                    LineStateUtils.isFirstActiveLine(index, lines, currentTimeMs)
+                }
 
                 Column {
                     // Add spacing before line
                     if (index > 0) {
-                        val hasActiveLine = LineStateUtils.hasActiveLine(lines, currentTimeMs)
+                        val hasActiveLine = remember(currentTimeMs) {
+                            LineStateUtils.hasActiveLine(lines, currentTimeMs)
+                        }
 
                         val spaceBefore = when {
                             // Large space before first active line (separation from played lines)
