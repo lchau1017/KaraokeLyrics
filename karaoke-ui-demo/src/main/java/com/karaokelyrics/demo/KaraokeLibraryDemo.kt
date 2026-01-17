@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -112,25 +114,23 @@ fun KaraokeLibraryDemo() {
                 distantLineBlur = (6 * settings.blurIntensity).dp
             ),
             layout = LayoutConfig(
-                viewerConfig = when (settings.viewerTypeIndex) {
-                    1 -> ViewerConfig(
-                        type = ViewerType.SMOOTH_SCROLL,
-                        scrollPosition = 0.33f,
-                        smoothScrollDuration = 500
-                    )
-                    2 -> ViewerConfig(
-                        type = ViewerType.STACKED
-                    )
-                    3 -> ViewerConfig(
-                        type = ViewerType.HORIZONTAL_PAGED
-                    )
-                    else -> ViewerConfig(
-                        type = ViewerType.CENTER_FOCUSED,
-                        centerOffset = 0.5f,
-                        visibleLinesBefore = 0,
-                        visibleLinesAfter = 0
-                    )
-                },
+                viewerConfig = ViewerConfig(
+                    type = when (settings.viewerTypeIndex) {
+                        0 -> ViewerType.CENTER_FOCUSED
+                        1 -> ViewerType.SMOOTH_SCROLL
+                        2 -> ViewerType.STACKED
+                        3 -> ViewerType.HORIZONTAL_PAGED
+                        4 -> ViewerType.WAVE_FLOW
+                        5 -> ViewerType.SPIRAL
+                        6 -> ViewerType.CAROUSEL_3D
+                        7 -> ViewerType.SPLIT_DUAL
+                        8 -> ViewerType.ELASTIC_BOUNCE
+                        9 -> ViewerType.FADE_THROUGH
+                        10 -> ViewerType.RADIAL_BURST
+                        11 -> ViewerType.FLIP_CARD
+                        else -> ViewerType.CENTER_FOCUSED
+                    }
+                ),
                 lineSpacing = settings.lineSpacing.dp,
                 containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
             )
@@ -236,27 +236,26 @@ fun KaraokeLibraryDemo() {
 
                     // Viewer Type
                     Text("Viewer Type", style = MaterialTheme.typography.titleMedium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        FilterChip(
-                            selected = settings.viewerTypeIndex == 0,
-                            onClick = { settings = settings.copy(viewerTypeIndex = 0) },
-                            label = { Text("Center", fontSize = 10.sp) }
-                        )
-                        FilterChip(
-                            selected = settings.viewerTypeIndex == 1,
-                            onClick = { settings = settings.copy(viewerTypeIndex = 1) },
-                            label = { Text("Smooth", fontSize = 10.sp) }
-                        )
-                        FilterChip(
-                            selected = settings.viewerTypeIndex == 2,
-                            onClick = { settings = settings.copy(viewerTypeIndex = 2) },
-                            label = { Text("Stacked", fontSize = 10.sp) }
-                        )
-                        FilterChip(
-                            selected = settings.viewerTypeIndex == 3,
-                            onClick = { settings = settings.copy(viewerTypeIndex = 3) },
-                            label = { Text("H-Paged", fontSize = 10.sp) }
-                        )
+
+                    // List of viewer types (12 total now)
+                    val viewerTypes = listOf(
+                        "Center", "Smooth", "Stacked", "H-Paged",
+                        "Wave", "Spiral", "3D-Carousel", "Split",
+                        "Bounce", "Fade", "Burst", "Flip"
+                    )
+
+                    // Scrollable row for all viewer types
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        itemsIndexed(viewerTypes) { index, name ->
+                            FilterChip(
+                                selected = settings.viewerTypeIndex == index,
+                                onClick = { settings = settings.copy(viewerTypeIndex = index) },
+                                label = { Text(name, fontSize = 10.sp) }
+                            )
+                        }
                     }
 
                     Divider(modifier = Modifier.padding(vertical = 8.dp))

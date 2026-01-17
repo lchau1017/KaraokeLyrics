@@ -1,0 +1,97 @@
+package com.karaokelyrics.ui.components.viewers
+
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import com.karaokelyrics.ui.components.KaraokeSingleLine
+import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+import com.karaokelyrics.ui.core.models.ISyncedLine
+import com.karaokelyrics.ui.utils.LineStateUtils
+
+/**
+ * Flip card viewer with 3D card flip transitions.
+ * Creates a page-turning effect with front/back metaphor.
+ */
+@Composable
+internal fun FlipCardViewer(
+    lines: List<ISyncedLine>,
+    currentTimeMs: Int,
+    config: KaraokeLibraryConfig,
+    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
+    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
+) {
+    val currentLineIndex = remember(currentTimeMs, lines) {
+        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
+    } ?: 0
+
+    var previousIndex by remember { mutableStateOf(-1) }
+    val flipAnimation = remember { Animatable(0f) }
+
+    LaunchedEffect(currentLineIndex) {
+        if (currentLineIndex != previousIndex && previousIndex != -1) {
+            // Flip animation
+            flipAnimation.animateTo(
+                targetValue = 180f,
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = FastOutSlowInEasing
+                )
+            )
+            previousIndex = currentLineIndex
+            flipAnimation.snapTo(0f)
+        } else {
+            previousIndex = currentLineIndex
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        val rotation = flipAnimation.value
+
+        // Show current or previous line based on rotation
+        val showingIndex = if (rotation < 90f) {
+            if (previousIndex == -1) currentLineIndex else previousIndex
+        } else {
+            currentLineIndex
+        }
+
+        val line = lines.getOrNull(showingIndex)
+
+        line?.let {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .graphicsLayer {
+                        rotationY = if (rotation > 90f) rotation - 180f else rotation
+                        cameraDistance = 12f * density
+                        alpha = if (rotation > 85f && rotation < 95f) 0f else 1f
+                    }
+            ) {
+                KaraokeSingleLine(
+                    line = it,
+                    currentTimeMs = currentTimeMs,
+                    config = config,
+                    onLineClick = onLineClick?.let { click -> { click(it, showingIndex) } }
+                )
+            }
+        }
+
+        // Shadow/depth effect
+        if (rotation > 0f && rotation < 180f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .graphicsLayer {
+                        alpha = (kotlin.math.sin(Math.toRadians(rotation.toDouble())) * 0.3).toFloat()
+                        scaleX = 1f - (kotlin.math.sin(Math.toRadians(rotation.toDouble())) * 0.1).toFloat()
+                        scaleY = 1f - (kotlin.math.sin(Math.toRadians(rotation.toDouble())) * 0.1).toFloat()
+                    }
+            )
+        }
+    }
+}

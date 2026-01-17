@@ -6,7 +6,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.ui.core.config.*
 import javax.inject.Inject
 
