@@ -8,7 +8,7 @@ The **karaoke-ui-library** module is successfully created and compilable!
 ### Core Features
 - **Syllable-level synchronization** with smooth highlighting
 - **Rich animations** (character scale, float, rotation)
-- **Visual effects** (blur, shadows, glow, gradients)
+- **Visual effects** (blur [opt-in], shadows, gradients)
 - **Fully configurable** via structured configuration
 - **Performance optimized** with lazy loading
 - **RTL/LTR support** with text direction detection
@@ -43,7 +43,7 @@ KaraokeLibraryConfig(
     visual = VisualConfig(...),      // Colors, fonts, alignment
     animation = AnimationConfig(...), // Animation settings
     layout = LayoutConfig(...),       // Spacing, padding
-    effects = EffectsConfig(...),     // Blur, shadows, glow
+    effects = EffectsConfig(...),     // Blur (opt-in), shadows, opacity
     behavior = BehaviorConfig(...)    // Scrolling, interaction
 )
 ```

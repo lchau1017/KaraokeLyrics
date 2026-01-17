@@ -8,7 +8,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.KaraokeLine
 import com.karaokelyrics.ui.rendering.character.CharacterRenderer
@@ -25,12 +24,10 @@ fun SyllableRenderer(
     config: KaraokeLibraryConfig,
     textStyle: TextStyle,
     baseColor: Color,
-    shimmerProgress: Float = 0f,
     modifier: Modifier = Modifier
 ) {
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
-    val characterRenderer = remember { CharacterRenderer() }
 
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth()
@@ -50,9 +47,11 @@ fun SyllableRenderer(
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(with(density) {
-                    (layoutInfo.totalHeight).toDp()
-                })
+                .height(
+                    with(density) {
+                        (layoutInfo.totalHeight).toDp()
+                    }
+                )
         ) {
             // Render each line of text
             layoutInfo.lines.forEachIndexed { lineIndex, lineData ->
@@ -61,7 +60,7 @@ fun SyllableRenderer(
                 // Render each syllable in the line
                 lineData.syllables.forEach { syllableData ->
                     // Render each character in the syllable
-                    characterRenderer.renderSyllableCharacters(
+                    CharacterRenderer.renderSyllableCharacters(
                         drawScope = this,
                         syllable = syllableData.syllable,
                         xOffset = syllableData.xOffset,
@@ -70,7 +69,6 @@ fun SyllableRenderer(
                         config = config,
                         textStyle = textStyle,
                         baseColor = baseColor,
-                        shimmerProgress = shimmerProgress,
                         textMeasurer = textMeasurer
                     )
                 }

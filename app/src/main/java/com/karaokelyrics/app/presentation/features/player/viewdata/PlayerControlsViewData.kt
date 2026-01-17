@@ -60,11 +60,7 @@ data class SliderColorsViewData(
     }
 }
 
-data class PlayButtonColorsViewData(
-    val backgroundColor: Color,
-    val contentColor: Color,
-    val pauseIconColor: Color
-) {
+data class PlayButtonColorsViewData(val backgroundColor: Color, val contentColor: Color, val pauseIconColor: Color) {
     companion object {
         @Composable
         fun default() = PlayButtonColorsViewData(

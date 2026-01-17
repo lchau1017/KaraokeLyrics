@@ -14,7 +14,7 @@ data class UserSettings(
 
     // Features
     val enableAnimations: Boolean = true,
-    val enableBlurEffect: Boolean = true,
+    val enableBlurEffect: Boolean = false,
     val enableCharacterAnimations: Boolean = true,
 
     // Timing

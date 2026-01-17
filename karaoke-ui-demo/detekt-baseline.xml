@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CognitiveComplexMethod:KaraokeLibraryDemo.kt$@Composable private fun ColorPickerDialog(currentColor: Color, onColorSelected: (Color) -&gt; Unit, onDismiss: () -&gt; Unit)</ID>
+    <ID>CognitiveComplexMethod:KaraokeLibraryDemo.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun KaraokeLibraryDemo()</ID>
+    <ID>CyclomaticComplexMethod:KaraokeLibraryDemo.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun KaraokeLibraryDemo()</ID>
+    <ID>ImplicitDefaultLocale:KaraokeLibraryDemo.kt$String.format( "%.2f", settings.pulseMinScale )</ID>
+    <ID>ImplicitDefaultLocale:KaraokeLibraryDemo.kt$String.format("%.1f", settings.blurIntensity)</ID>
+    <ID>ImplicitDefaultLocale:KaraokeLibraryDemo.kt$String.format("%.2f", settings.charMaxScale)</ID>
+    <ID>ImplicitDefaultLocale:KaraokeLibraryDemo.kt$String.format("%.2f", settings.lineScaleOnPlay)</ID>
+    <ID>ImplicitDefaultLocale:KaraokeLibraryDemo.kt$String.format("%.2f", settings.pulseMaxScale)</ID>
+    <ID>LongMethod:DemoLyricsProvider.kt$DemoLyricsProvider$fun createDemoLyrics(): List&lt;KaraokeLine&gt;</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$10500</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$10900</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$11300</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$11700</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$12500</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$13000</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$13200</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$13400</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$13600</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$14000</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$14400</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$14600</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$15500</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$15700</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$16100</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$16300</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$16500</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$17500</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$18000</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$18200</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$18400</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$18800</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$19000</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$19200</ID>
+    <ID>UnderscoresInNumericLiterals:DemoLyricsProvider.kt$DemoLyricsProvider$20000</ID>
+    <ID>UnderscoresInNumericLiterals:KaraokeLibraryDemo.kt$20000</ID>
+    <ID>UnderscoresInNumericLiterals:KaraokeLibraryDemo.kt$20000f</ID>
+  </CurrentIssues>
+</SmellBaseline>

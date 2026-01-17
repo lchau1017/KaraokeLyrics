@@ -26,23 +26,14 @@ data class AnimationConfig(
     val pulseMaxScale: Float = 1.02f,
     val pulseDuration: Int = 1500,
 
-    // Shimmer Animation (for highlighting effects)
-    val enableShimmer: Boolean = false,
-    val shimmerDuration: Int = 2000,
-    val shimmerIntensity: Float = 0.3f,
-
     // Color Transition Animation
     val enableColorTransition: Boolean = true,
     val colorTransitionDuration: Int = 300,
-
-    // Orchestrated Animations (for staggered effects)
-    val enableOrchestratedAnimations: Boolean = false,
-    val orchestrationDelayPerItem: Long = 50L,
 
     // Transition Animations
     val fadeInDuration: Float = 300f,
     val fadeOutDuration: Float = 500f,
 
-    // Easing
-    val animationEasing: Easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f) // FastOutSlowIn
+    // Easing (FastOutSlowIn)
+    val animationEasing: Easing = CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
 )

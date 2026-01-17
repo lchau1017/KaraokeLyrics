@@ -25,8 +25,9 @@ data class LayoutConfig(
 
     // Container
     val containerPadding: PaddingValues = PaddingValues(16.dp),
-    val maxLineWidth: Dp? = null, // null means full width
+    // null means full width
+    val maxLineWidth: Dp? = null,
 
-    // RTL/LTR Support
-    val forceTextDirection: LayoutDirection? = null // null means auto-detect
+    // RTL/LTR Support (null means auto-detect)
+    val forceTextDirection: LayoutDirection? = null
 )

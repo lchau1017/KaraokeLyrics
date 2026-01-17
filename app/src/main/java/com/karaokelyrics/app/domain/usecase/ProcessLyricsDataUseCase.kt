@@ -1,8 +1,8 @@
 package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.KaraokeLine
+import com.karaokelyrics.app.domain.model.SyncedLyrics
 import javax.inject.Inject
 
 /**
@@ -107,17 +107,15 @@ class ProcessLyricsDataUseCase @Inject constructor() {
     private fun shouldMergeLines(line1: KaraokeLine, line2: KaraokeLine): Boolean {
         // Business rule: Merge if lines overlap and have same metadata
         return line1.end > line2.start &&
-               line1.metadata == line2.metadata &&
-               line1.isAccompaniment == line2.isAccompaniment
+            line1.metadata == line2.metadata &&
+            line1.isAccompaniment == line2.isAccompaniment
     }
 
-    private fun mergeTwoLines(line1: KaraokeLine, line2: KaraokeLine): KaraokeLine {
-        return KaraokeLine(
-            syllables = line1.syllables + line2.syllables,
-            start = line1.start,
-            end = maxOf(line1.end, line2.end),
-            metadata = line1.metadata,
-            isAccompaniment = line1.isAccompaniment
-        )
-    }
+    private fun mergeTwoLines(line1: KaraokeLine, line2: KaraokeLine): KaraokeLine = KaraokeLine(
+        syllables = line1.syllables + line2.syllables,
+        start = line1.start,
+        end = maxOf(line1.end, line2.end),
+        metadata = line1.metadata,
+        isAccompaniment = line1.isAccompaniment
+    )
 }

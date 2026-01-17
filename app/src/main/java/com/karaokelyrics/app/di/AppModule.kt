@@ -2,20 +2,19 @@ package com.karaokelyrics.app.di
 
 import android.content.Context
 import com.karaokelyrics.app.data.repository.LyricsRepositoryImpl
-import com.karaokelyrics.app.presentation.player.MediaPlayerController
 import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
-import com.karaokelyrics.app.presentation.player.PlayerController
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
-import com.karaokelyrics.app.presentation.features.lyrics.coordinator.PlaybackSyncCoordinator
-import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
-import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
-import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
+import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
+import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
+import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-// No managers needed anymore!
+import com.karaokelyrics.app.presentation.features.lyrics.coordinator.PlaybackSyncCoordinator
+import com.karaokelyrics.app.presentation.player.MediaPlayerController
+import com.karaokelyrics.app.presentation.player.PlayerController
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,9 +29,7 @@ object AppModule {
     // Data Sources
     @Provides
     @Singleton
-    fun provideAssetDataSource(
-        @ApplicationContext context: Context
-    ): com.karaokelyrics.app.data.source.local.AssetDataSource =
+    fun provideAssetDataSource(@ApplicationContext context: Context): com.karaokelyrics.app.data.source.local.AssetDataSource =
         com.karaokelyrics.app.data.source.local.AssetDataSource(context)
 
     @Provides
@@ -42,9 +39,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePreferencesDataSource(
-        @ApplicationContext context: Context
-    ): com.karaokelyrics.app.data.source.local.PreferencesDataSource =
+    fun providePreferencesDataSource(@ApplicationContext context: Context): com.karaokelyrics.app.data.source.local.PreferencesDataSource =
         com.karaokelyrics.app.data.source.local.PreferencesDataSource(context)
 
     // Repositories
@@ -63,85 +58,57 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePlayerController(
-        @ApplicationContext context: Context
-    ): PlayerController = MediaPlayerController(context)
+    fun providePlayerController(@ApplicationContext context: Context): PlayerController = MediaPlayerController(context)
 
     // Domain Use Cases
     @Provides
-    fun provideGroupSyllablesIntoWordsUseCase(): GroupSyllablesIntoWordsUseCase {
-        return GroupSyllablesIntoWordsUseCase()
-    }
+    fun provideGroupSyllablesIntoWordsUseCase(): GroupSyllablesIntoWordsUseCase = GroupSyllablesIntoWordsUseCase()
 
     // Legacy presentation helpers removed - using library instead
 
     @Provides
-    fun provideSyncLyricsUseCase(): SyncLyricsUseCase {
-        return SyncLyricsUseCase()
-    }
+    fun provideSyncLyricsUseCase(): SyncLyricsUseCase = SyncLyricsUseCase()
 
     @Provides
-    fun providePlaybackSyncCoordinator(
-        playerController: PlayerController,
-        syncLyricsUseCase: SyncLyricsUseCase
-    ): PlaybackSyncCoordinator {
-        return PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
-    }
+    fun providePlaybackSyncCoordinator(playerController: PlayerController, syncLyricsUseCase: SyncLyricsUseCase): PlaybackSyncCoordinator =
+        PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
 
     @Provides
     @Singleton
-    fun provideTtmlParser(): com.karaokelyrics.app.domain.parser.TtmlParser =
-        com.karaokelyrics.app.data.parser.TtmlParserImpl()
+    fun provideTtmlParser(): com.karaokelyrics.app.domain.parser.TtmlParser = com.karaokelyrics.app.data.parser.TtmlParserImpl()
 
     @Provides
-    fun provideParseTtmlUseCase(
-        ttmlParser: com.karaokelyrics.app.domain.parser.TtmlParser
-    ): ParseTtmlUseCase {
-        return ParseTtmlUseCase(ttmlParser)
-    }
+    fun provideParseTtmlUseCase(ttmlParser: com.karaokelyrics.app.domain.parser.TtmlParser): ParseTtmlUseCase = ParseTtmlUseCase(ttmlParser)
 
     @Provides
-    fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase {
-        return ProcessLyricsDataUseCase()
-    }
+    fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase = ProcessLyricsDataUseCase()
 
     @Provides
     fun provideLoadLyricsUseCase(
         lyricsRepository: LyricsRepository,
         parseTtmlUseCase: ParseTtmlUseCase,
         processLyricsDataUseCase: ProcessLyricsDataUseCase
-    ): LoadLyricsUseCase {
-        return LoadLyricsUseCase(lyricsRepository, parseTtmlUseCase, processLyricsDataUseCase)
-    }
+    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, parseTtmlUseCase, processLyricsDataUseCase)
 
     @Provides
-    fun provideObserveUserSettingsUseCase(
-        settingsRepository: SettingsRepository
-    ): ObserveUserSettingsUseCase {
-        return ObserveUserSettingsUseCase(settingsRepository)
-    }
+    fun provideObserveUserSettingsUseCase(settingsRepository: SettingsRepository): ObserveUserSettingsUseCase =
+        ObserveUserSettingsUseCase(settingsRepository)
 
     @Provides
-    fun provideUpdateUserSettingsUseCase(
-        settingsRepository: SettingsRepository
-    ): UpdateUserSettingsUseCase {
-        return UpdateUserSettingsUseCase(settingsRepository)
-    }
+    fun provideUpdateUserSettingsUseCase(settingsRepository: SettingsRepository): UpdateUserSettingsUseCase =
+        UpdateUserSettingsUseCase(settingsRepository)
 
     @Provides
     fun provideGetDefaultMediaContentUseCase(
         lyricsRepository: LyricsRepository
-    ): com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase {
-        return com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase(lyricsRepository)
-    }
+    ): com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase =
+        com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase(lyricsRepository)
 
     @Provides
     fun provideGetAvailableMediaContentUseCase(
         lyricsRepository: LyricsRepository
-    ): com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase {
-        return com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase(lyricsRepository)
-    }
-
+    ): com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase =
+        com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase(lyricsRepository)
 
     // No presentation managers needed - clean architecture!
 }

@@ -11,7 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 /**
  * View data class for text styling
@@ -89,11 +88,7 @@ data class ButtonViewData(
         )
 
         @Composable
-        fun outlined(
-            text: String,
-            enabled: Boolean = true,
-            borderColor: Color = MaterialTheme.colorScheme.outline
-        ) = ButtonViewData(
+        fun outlined(text: String, enabled: Boolean = true, borderColor: Color = MaterialTheme.colorScheme.outline) = ButtonViewData(
             text = text,
             enabled = enabled,
             backgroundColor = Color.Transparent,
@@ -132,11 +127,7 @@ data class ChipViewData(
 ) {
     companion object {
         @Composable
-        fun default(
-            text: String,
-            selected: Boolean = false,
-            enabled: Boolean = true
-        ) = ChipViewData(
+        fun default(text: String, selected: Boolean = false, enabled: Boolean = true) = ChipViewData(
             text = text,
             selected = selected,
             enabled = enabled,
@@ -148,10 +139,7 @@ data class ChipViewData(
         )
 
         @Composable
-        fun filter(
-            text: String,
-            selected: Boolean = false
-        ) = ChipViewData(
+        fun filter(text: String, selected: Boolean = false) = ChipViewData(
             text = text,
             selected = selected,
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,

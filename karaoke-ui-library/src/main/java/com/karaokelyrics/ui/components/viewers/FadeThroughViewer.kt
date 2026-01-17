@@ -9,25 +9,15 @@ import androidx.compose.ui.Modifier
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 
 /**
  * Fade through viewer with pure opacity transitions.
  * Minimalist approach with no movement, just fades.
  */
 @Composable
-internal fun FadeThroughViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
-) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
+internal fun FadeThroughViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
+    val currentLineIndex = uiState.currentLineIndex ?: 0
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -50,12 +40,14 @@ internal fun FadeThroughViewer(
             },
             label = "FadeThroughTransition"
         ) { lineIndex ->
-            val line = lines.getOrNull(lineIndex)
+            val line = uiState.lines.getOrNull(lineIndex)
+            val lineUiState = uiState.getLineState(lineIndex)
 
             if (line != null) {
                 KaraokeSingleLine(
                     line = line,
-                    currentTimeMs = currentTimeMs,
+                    lineUiState = lineUiState,
+                    currentTimeMs = uiState.currentTimeMs,
                     config = config,
                     onLineClick = onLineClick?.let { { it(line, lineIndex) } }
                 )

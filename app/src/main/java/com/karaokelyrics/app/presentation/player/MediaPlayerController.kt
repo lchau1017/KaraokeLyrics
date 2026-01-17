@@ -6,9 +6,12 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.karaokelyrics.app.infrastructure.service.PlaybackService
 import com.google.common.util.concurrent.ListenableFuture
+import com.karaokelyrics.app.infrastructure.service.PlaybackService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.Executors
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -17,18 +20,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Media player controller for presentation layer.
  * Handles Android MediaController and MediaSession interaction.
  */
 @Singleton
-class MediaPlayerController @Inject constructor(
-    @ApplicationContext private val context: Context
-) : PlayerController {
+class MediaPlayerController @Inject constructor(@ApplicationContext private val context: Context) : PlayerController {
 
     private var mediaController: MediaController? = null
     private val controllerFuture: ListenableFuture<MediaController>

@@ -119,20 +119,6 @@ enum class ViewerType {
  */
 data class ViewerConfig(
     val type: ViewerType = ViewerType.SMOOTH_SCROLL,
-
-    // CENTER_FOCUSED specific
-    val centerOffset: Float = 0.5f, // 0.5 = exact center, 0.3 = upper third
-    val visibleLinesBefore: Int = 1, // How many played lines to keep visible
-    val visibleLinesAfter: Int = 1, // How many upcoming lines to show
-
-    // SMOOTH_SCROLL specific
-    val scrollPosition: Float = 0.33f, // Where to position active line (0.33 = top third)
-    val smoothScrollDuration: Int = 500, // Animation duration in ms
-
-    // SINGLE_LINE specific
-    val transitionAnimation: Boolean = true, // Animate line changes
-
-    // PAGED specific
-    val autoAdvancePages: Boolean = true, // Auto-advance to next page
-    val pageTransitionDelay: Int = 500 // Delay before advancing pages
+    // SMOOTH_SCROLL specific: Where to position active line (0.33 = top third)
+    val scrollPosition: Float = 0.33f
 )

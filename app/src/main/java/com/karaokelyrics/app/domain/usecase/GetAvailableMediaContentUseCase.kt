@@ -7,8 +7,6 @@ import javax.inject.Inject
 /**
  * Use case to get all available media content.
  */
-class GetAvailableMediaContentUseCase @Inject constructor(
-    private val lyricsRepository: LyricsRepository
-) {
+class GetAvailableMediaContentUseCase @Inject constructor(private val lyricsRepository: LyricsRepository) {
     operator fun invoke(): List<MediaContent> = lyricsRepository.getAvailableContent()
 }

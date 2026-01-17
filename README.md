@@ -3,7 +3,7 @@
 **A modern, highly customizable Android karaoke lyrics library built with Jetpack Compose**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg)](https://android-arsenal.com/api?level=24)
+[![API](https://img.shields.io/badge/API-31%2B-brightgreen.svg)](https://android-arsenal.com/api?level=31)
 [![Kotlin](https://img.shields.io/badge/kotlin-2.1.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![Compose](https://img.shields.io/badge/Compose-2025.01.00-blue.svg)](https://developer.android.com/compose)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
@@ -49,7 +49,7 @@
 - **Gradient Support** - Rainbow, sunset, ocean, fire, and neon preset gradients
 - **Typography Control** - Font family, size, weight, and spacing customization
 - **Color Themes** - Dark/light mode with custom color schemes
-- **Visual Effects** - Glow, shadow, and blur effects
+- **Visual Effects** - Shadow and blur effects (blur disabled by default, opt-in feature)
 
 ### 🏗️ Developer Experience
 - **Clean Architecture** - Domain-driven design with clear separation of concerns
@@ -142,21 +142,37 @@ fun KaraokeScreen() {
 ### Advanced Configuration
 
 ```kotlin
+// Use a built-in preset
+val presetConfig = LibraryPresets.Neon
+
+// Or create a fully custom config
 val customConfig = KaraokeLibraryConfig(
     visual = VisualConfig(
-        fontSize = 24.sp,
-        playingTextColor = Color.Gold,
+        fontSize = 36.sp,
+        playingTextColor = Color(0xFFFFD700),
         gradientEnabled = true,
-        gradientPreset = GradientPreset.RAINBOW
+        gradientType = GradientType.LINEAR,
+        colors = ColorConfig(
+            sung = Color.Magenta,
+            unsung = Color.Cyan,
+            active = Color.Yellow
+        )
     ),
     animation = AnimationConfig(
-        enablePulse = true,
-        enableShimmer = true,
-        lineScaleOnPlay = 1.2f
+        enableCharacterAnimations = true,
+        characterMaxScale = 1.2f,
+        enableLineAnimations = true,
+        lineScaleOnPlay = 1.1f
     ),
-    viewer = ViewerConfig(
-        type = ViewerType.CENTER_FOCUSED,
-        animationDuration = 800
+    layout = LayoutConfig(
+        viewerConfig = ViewerConfig(
+            type = ViewerType.CENTER_FOCUSED,
+            scrollPosition = 0.5f
+        )
+    ),
+    effects = EffectsConfig(
+        enableBlur = true,  // Opt-in blur effect
+        blurIntensity = 0.8f
     )
 )
 
@@ -212,20 +228,54 @@ Choose from 12 different viewing experiences:
 
 ```
 karaoke-ui-library/
+├── api/
+│   └── KaraokeLibrary.kt       # Main entry point
 ├── core/
-│   ├── config/          # Configuration models
-│   ├── models/          # Domain models
-│   └── state/           # State management
+│   ├── config/                 # Configuration system
+│   │   ├── KaraokeLibraryConfig.kt   # Main config
+│   │   ├── VisualConfig.kt           # Colors, fonts, gradients
+│   │   ├── AnimationConfig.kt        # Animation settings
+│   │   ├── LayoutConfig.kt           # Spacing, padding
+│   │   ├── EffectsConfig.kt          # Blur, shadows, opacity
+│   │   ├── BehaviorConfig.kt         # Scroll, interaction
+│   │   ├── ViewerType.kt             # 12 viewer types
+│   │   ├── LibraryPresets.kt         # 10 theme presets
+│   │   └── ColorConfig.kt            # Color schemes
+│   └── models/                 # Domain models
+│       ├── ISyncedLine.kt            # Line interface
+│       ├── KaraokeLine.kt            # Line implementation
+│       └── KaraokeSyllable.kt        # Syllable model
 ├── components/
-│   ├── viewers/         # 12 viewer implementations
-│   └── KaraokeSingleLine.kt
+│   ├── KaraokeLyricsViewer.kt  # Main viewer container
+│   ├── KaraokeSingleLine.kt    # Single line renderer
+│   └── viewers/                # 12 viewer implementations
+│       ├── CenterFocusedViewer.kt
+│       ├── SmoothScrollViewer.kt
+│       ├── StackedViewer.kt
+│       ├── HorizontalPagedViewer.kt
+│       ├── WaveFlowViewer.kt
+│       ├── SpiralViewer.kt
+│       ├── Carousel3DViewer.kt
+│       ├── SplitDualViewer.kt
+│       ├── ElasticBounceViewer.kt
+│       ├── FadeThroughViewer.kt
+│       ├── RadialBurstViewer.kt
+│       └── FlipCardViewer.kt
 ├── rendering/
-│   ├── AnimationManager.kt    # Animation logic
-│   ├── EffectsManager.kt      # Visual effects
-│   ├── character/             # Character rendering
-│   ├── layout/               # Text layout
-│   └── syllable/             # Syllable rendering
-└── api/                # Public API interfaces
+│   ├── EffectsManager.kt       # Visual effects pipeline
+│   ├── GradientFactory.kt      # Gradient creation
+│   ├── RenderingCalculations.kt
+│   ├── character/              # Character rendering
+│   │   └── CharacterRenderer.kt
+│   ├── layout/                 # Text layout
+│   │   └── TextLayoutCalculator.kt
+│   └── syllable/               # Syllable rendering
+│       └── SyllableRenderer.kt
+└── state/                      # State management
+    ├── KaraokeStateHolder.kt   # State container
+    ├── KaraokeStateCalculator.kt # State computation
+    ├── KaraokeUiState.kt       # UI state model
+    └── LineUiState.kt          # Per-line state
 ```
 
 ### Key Components
@@ -327,30 +377,30 @@ Industry-standard format with rich metadata support:
 ```kotlin
 val visualConfig = VisualConfig(
     // Typography
-    fontSize = 24.sp,
+    fontSize = 34.sp,
     fontWeight = FontWeight.Bold,
     fontFamily = FontFamily.SansSerif,
-    letterSpacing = 0.5.sp,
+    letterSpacing = 0.sp,
     textAlign = TextAlign.Center,
 
-    // Colors
-    playingTextColor = Color(0xFFFFD700),    // Gold
-    playedTextColor = Color(0xFF808080),      // Gray
-    upcomingTextColor = Color(0xFFFFFFFF),    // White
-    accompanimentTextColor = Color(0xFFAAAAAA), // Light Gray
+    // Text Colors
+    playingTextColor = Color(0xFFFFD700),     // Gold - active singing
+    playedTextColor = Color(0xFF808080),       // Gray - already sung
+    upcomingTextColor = Color(0xFFFFFFFF),     // White - coming up
+    accompanimentTextColor = Color(0xFFFFE082), // Light yellow
 
-    // Effects
-    shadowEnabled = true,
-    shadowColor = Color.Black,
-    shadowOffset = Offset(2f, 2f),
-    glowEnabled = true,
-    glowColor = Color.White,
-
-    // Gradients
+    // Gradient Configuration (optional)
     gradientEnabled = true,
-    gradientType = GradientType.PRESET,
-    gradientPreset = GradientPreset.RAINBOW,
-    gradientAngle = 45f
+    gradientType = GradientType.LINEAR,
+    gradientAngle = 45f,
+    playingGradientColors = listOf(Color.Cyan, Color.Magenta),
+
+    // Color Config for gradient presets
+    colors = ColorConfig(
+        sung = Color.Magenta,
+        unsung = Color.Cyan,
+        active = Color.Yellow
+    )
 )
 ```
 
@@ -358,25 +408,52 @@ val visualConfig = VisualConfig(
 
 ```kotlin
 val animationConfig = AnimationConfig(
-    // Line animations
-    enablePulse = true,
-    pulseMinScale = 0.95f,
-    pulseMaxScale = 1.05f,
-    pulseDuration = 1000,
-
-    // Shimmer effects
-    enableShimmer = true,
-    shimmerDuration = 2000,
-
-    // Character animations
+    // Character animations (scale, float, rotation on active character)
     enableCharacterAnimations = true,
-    characterMaxScale = 1.2f,
+    characterAnimationDuration = 800f,
+    characterMaxScale = 1.15f,
     characterFloatOffset = 6f,
     characterRotationDegrees = 3f,
 
-    // Line scaling
-    lineScaleOnPlay = 1.1f,
-    lineAnimationDuration = 800L
+    // Line animations (scale active line)
+    enableLineAnimations = true,
+    lineScaleOnPlay = 1.05f,
+    lineAnimationDuration = 700f,
+
+    // Pulse animation (optional pulsing effect)
+    enablePulse = false,
+    pulseMinScale = 0.98f,
+    pulseMaxScale = 1.02f,
+    pulseDuration = 1500,
+
+    // Transition animations
+    fadeInDuration = 300f,
+    fadeOutDuration = 500f
+)
+```
+
+### Effects Configuration
+
+```kotlin
+val effectsConfig = EffectsConfig(
+    // Blur (disabled by default - opt-in feature, requires API 31+)
+    enableBlur = false,
+    blurIntensity = 1.0f,
+    playedLineBlur = 2.dp,
+    upcomingLineBlur = 3.dp,
+    distantLineBlur = 5.dp,
+
+    // Shadows
+    enableShadows = true,
+    textShadowColor = Color.Black.copy(alpha = 0.3f),
+    textShadowOffset = Offset(2f, 2f),
+    textShadowRadius = 4f,
+
+    // Opacity for different line states
+    playingLineOpacity = 1f,
+    playedLineOpacity = 0.25f,
+    upcomingLineOpacity = 0.6f,
+    distantLineOpacity = 0.3f
 )
 ```
 
@@ -384,13 +461,27 @@ val animationConfig = AnimationConfig(
 
 ```kotlin
 val viewerConfig = ViewerConfig(
-    type = ViewerType.WAVE_FLOW,
-    animationDuration = 1200,
-    showLineNumbers = false,
-    enableLineClick = true,
-    autoScroll = true,
-    padding = 16.dp
+    type = ViewerType.SMOOTH_SCROLL,  // Or any of 12 viewer types
+    scrollPosition = 0.33f            // Position active line at top third
 )
+```
+
+### Built-in Presets
+
+The library includes 10 ready-to-use theme presets in `LibraryPresets`:
+
+```kotlin
+// Available presets
+LibraryPresets.Classic   // Simple, clean karaoke style
+LibraryPresets.Neon      // Cyan/magenta with gradient effects
+LibraryPresets.Rainbow   // Multi-color rainbow gradient
+LibraryPresets.Fire      // Warm orange/red colors with flicker
+LibraryPresets.Ocean     // Cool blue/turquoise with wave motion
+LibraryPresets.Retro     // 80s style with pink/cyan
+LibraryPresets.Minimal   // Clean black/gray on white
+LibraryPresets.Elegant   // Gold/silver with subtle effects
+LibraryPresets.Party     // All effects maxed out
+LibraryPresets.Matrix    // Green monospace on black
 ```
 
 ## 🎯 Use Cases
@@ -466,25 +557,29 @@ fun LanguageLearningScreen() {
 
 ## 🎨 Theming Support
 
-### Built-in Themes
+### Using Library Presets
+
+The library includes 10 pre-configured theme presets:
 
 ```kotlin
-// Light theme
-val lightTheme = KaraokeTheme.Light
-
-// Dark theme
-val darkTheme = KaraokeTheme.Dark
-
-// High contrast
-val highContrastTheme = KaraokeTheme.HighContrast
-
-// Custom theme
-val customTheme = KaraokeTheme(
-    background = Color(0xFF1A1A1A),
-    onBackground = Color.White,
-    primary = Color(0xFFFFD700),
-    secondary = Color(0xFF808080)
+// Use a preset directly
+KaraokeLyricsViewer(
+    lines = lyrics,
+    currentTimeMs = time,
+    config = LibraryPresets.Neon
 )
+
+// Available presets:
+// - Classic: Yellow/green, clean style
+// - Neon: Cyan/magenta with gradients and blur
+// - Rainbow: Multi-color horizontal gradient
+// - Fire: Orange/red with flicker animation
+// - Ocean: Blue/turquoise with wave motion
+// - Retro: 80s pink/cyan style
+// - Minimal: Black/gray on white, no effects
+// - Elegant: Gold/silver with subtle animations
+// - Party: All effects maxed out
+// - Matrix: Green monospace on black
 ```
 
 ### Material 3 Integration
@@ -494,11 +589,12 @@ val customTheme = KaraokeTheme(
 fun ThemedKaraokeViewer() {
     val colorScheme = MaterialTheme.colorScheme
 
-    val config = KaraokeLibraryConfig.Default.copy(
+    val config = KaraokeLibraryConfig(
         visual = VisualConfig(
             playingTextColor = colorScheme.primary,
             playedTextColor = colorScheme.onSurface.copy(alpha = 0.6f),
-            upcomingTextColor = colorScheme.onSurface.copy(alpha = 0.8f)
+            upcomingTextColor = colorScheme.onSurface.copy(alpha = 0.8f),
+            backgroundColor = colorScheme.background
         )
     )
 
@@ -507,6 +603,30 @@ fun ThemedKaraokeViewer() {
         currentTimeMs = time,
         config = config
     )
+}
+```
+
+### App Settings Mapping
+
+Map your app's user settings to the library configuration:
+
+```kotlin
+class LibraryConfigMapper {
+    fun mapToLibraryConfig(userSettings: UserSettings): KaraokeLibraryConfig =
+        KaraokeLibraryConfig(
+            visual = VisualConfig(
+                fontSize = userSettings.fontSize.sp,
+                playingTextColor = Color(userSettings.lyricsColorArgb),
+                backgroundColor = Color(userSettings.backgroundColorArgb)
+            ),
+            animation = AnimationConfig(
+                enableCharacterAnimations = userSettings.enableCharacterAnimations,
+                enableLineAnimations = userSettings.enableAnimations
+            ),
+            effects = EffectsConfig(
+                enableBlur = userSettings.enableBlurEffect
+            )
+        )
 }
 ```
 
@@ -626,30 +746,10 @@ We maintain high code quality standards:
 
 - **Lines of Code:** ~15,000
 - **Test Coverage:** 85%
-- **Supported Android Versions:** API 24+ (Android 7.0+)
-- **Minimum SDK:** 24
+- **Supported Android Versions:** API 31+ (Android 12+)
+- **Minimum SDK:** 31
 - **Target SDK:** 35
 - **Languages:** Kotlin 100%
-
-## 🗺️ Roadmap
-
-### Version 1.1 (Q2 2025)
-- [ ] WebVTT format support
-- [ ] Right-to-left (RTL) text support
-- [ ] Audio visualization integration
-- [ ] Custom animation DSL
-
-### Version 1.2 (Q3 2025)
-- [ ] Multi-track karaoke support
-- [ ] Real-time pitch detection
-- [ ] Cloud lyrics synchronization
-- [ ] Advanced typography effects
-
-### Version 2.0 (Q4 2025)
-- [ ] Compose Multiplatform support
-- [ ] Desktop application
-- [ ] Web component export
-- [ ] Plugin architecture
 
 ## 📄 License
 

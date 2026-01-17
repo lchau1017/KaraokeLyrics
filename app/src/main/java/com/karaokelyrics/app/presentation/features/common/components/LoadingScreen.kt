@@ -37,10 +37,7 @@ fun LoadingScreen(
 }
 
 @Composable
-private fun AppLogo(
-    titleColor: Color,
-    subtitleColor: Color
-) {
+private fun AppLogo(titleColor: Color, subtitleColor: Color) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -64,9 +61,7 @@ private fun AppLogo(
 }
 
 @Composable
-private fun LoadingIndicator(
-    color: Color
-) {
+private fun LoadingIndicator(color: Color) {
     CircularProgressIndicator(
         color = color,
         modifier = Modifier.size(48.dp)

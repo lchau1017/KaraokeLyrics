@@ -7,8 +7,6 @@ import javax.inject.Inject
 /**
  * Use case to get the default media content to load on app start.
  */
-class GetDefaultMediaContentUseCase @Inject constructor(
-    private val lyricsRepository: LyricsRepository
-) {
+class GetDefaultMediaContentUseCase @Inject constructor(private val lyricsRepository: LyricsRepository) {
     operator fun invoke(): MediaContent = lyricsRepository.getDefaultContent()
 }

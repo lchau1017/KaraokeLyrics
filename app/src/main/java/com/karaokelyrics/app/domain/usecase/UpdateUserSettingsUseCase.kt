@@ -7,9 +7,7 @@ import javax.inject.Inject
 /**
  * Domain use case for updating user settings
  */
-class UpdateUserSettingsUseCase @Inject constructor(
-    private val settingsRepository: SettingsRepository
-) {
+class UpdateUserSettingsUseCase @Inject constructor(private val settingsRepository: SettingsRepository) {
 
     suspend fun updateLyricsColor(colorArgb: Int) {
         settingsRepository.updateLyricsColor(colorArgb)
