@@ -1,14 +1,17 @@
-package com.karaokelyrics.demo.data
+package com.karaokelyrics.demo.data.datasource
 
 import com.karaokelyrics.ui.core.models.KaraokeLine
 import com.karaokelyrics.ui.core.models.KaraokeSyllable
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Provides demo lyrics for testing and showcasing the library features.
  */
-object DemoLyricsProvider {
+@Singleton
+class DemoLyricsDataSource @Inject constructor() {
 
-    fun createDemoLyrics(): List<KaraokeLine> = listOf(
+    fun getDemoLyrics(): List<KaraokeLine> = listOf(
         // First verse
         KaraokeLine(
             syllables = listOf(
@@ -119,4 +122,8 @@ object DemoLyricsProvider {
             end = 20000
         )
     )
+
+    companion object {
+        const val TOTAL_DURATION_MS = 20000L
+    }
 }
