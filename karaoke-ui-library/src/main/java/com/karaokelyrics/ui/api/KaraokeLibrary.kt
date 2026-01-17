@@ -17,6 +17,7 @@ object KaraokeLibrary {
 
     /**
      * Display a single karaoke line with synchronized highlighting.
+     * Handles character-by-character progression and all visual effects.
      *
      * @param line The synchronized line to display
      * @param currentTimeMs Current playback time in milliseconds
@@ -25,14 +26,14 @@ object KaraokeLibrary {
      * @param onLineClick Optional callback when line is clicked
      */
     @Composable
-    fun KaraokeLineDisplay(
+    fun KaraokeSingleLine(
         line: ISyncedLine,
         currentTimeMs: Int,
         config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
         modifier: Modifier = Modifier,
         onLineClick: ((ISyncedLine) -> Unit)? = null
     ) {
-        com.karaokelyrics.ui.components.KaraokeLineDisplay(
+        com.karaokelyrics.ui.components.KaraokeSingleLine(
             line = line,
             currentTimeMs = currentTimeMs,
             config = config,
@@ -42,7 +43,12 @@ object KaraokeLibrary {
     }
 
     /**
-     * Display multiple karaoke lines with automatic scrolling and synchronization.
+     * Complete karaoke lyrics viewer with automatic scrolling and synchronization.
+     * This container manages the entire lyrics display experience, including:
+     * - Auto-scrolling to keep current line in view
+     * - Distance-based visual effects (blur, opacity)
+     * - Intelligent spacing between line groups
+     * - Smooth transitions and animations
      *
      * @param lines List of synchronized lines to display
      * @param currentTimeMs Current playback time in milliseconds
@@ -52,7 +58,7 @@ object KaraokeLibrary {
      * @param onLineLongPress Optional callback when a line is long-pressed
      */
     @Composable
-    fun KaraokeLyricsDisplay(
+    fun KaraokeLyricsViewer(
         lines: List<ISyncedLine>,
         currentTimeMs: Int,
         config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
@@ -60,7 +66,7 @@ object KaraokeLibrary {
         onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
         onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
     ) {
-        com.karaokelyrics.ui.components.KaraokeLyricsDisplay(
+        com.karaokelyrics.ui.components.KaraokeLyricsViewer(
             lines = lines,
             currentTimeMs = currentTimeMs,
             config = config,
@@ -68,32 +74,5 @@ object KaraokeLibrary {
             onLineClick = onLineClick,
             onLineLongPress = onLineLongPress
         )
-    }
-
-    /**
-     * Advanced: Display karaoke lines with a custom renderer.
-     * Provides full control over how each line is rendered.
-     *
-     * @param lines List of synchronized lines to display
-     * @param currentTimeMs Current playback time in milliseconds
-     * @param config Complete configuration for visual, animation, and behavior
-     * @param lineRenderer Custom composable for rendering each line
-     * @param modifier Modifier for the composable
-     */
-    @Composable
-    fun KaraokeCustomDisplay(
-        lines: List<ISyncedLine>,
-        currentTimeMs: Int,
-        config: KaraokeLibraryConfig,
-        lineRenderer: @Composable (ISyncedLine, Int, KaraokeLibraryConfig) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        Box(modifier = modifier.fillMaxSize()) {
-            LazyColumn {
-                itemsIndexed(lines) { index, line ->
-                    lineRenderer(line, currentTimeMs, config)
-                }
-            }
-        }
     }
 }

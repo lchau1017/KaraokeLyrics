@@ -82,54 +82,6 @@ class CharacterAnimationCalculator {
     }
 
     /**
-     * Calculate animation state for an entire word.
-     *
-     * @param wordStartTime Start time of the word
-     * @param wordEndTime End time of the word
-     * @param currentTime Current playback time
-     * @param characterIndex Index of the character within the word
-     * @param totalCharacters Total number of characters in the word
-     */
-    fun calculateWordAnimation(
-        wordStartTime: Long,
-        wordEndTime: Long,
-        currentTime: Long,
-        characterIndex: Int,
-        totalCharacters: Int,
-        animationDuration: Float = 800f
-    ): CharacterAnimationState {
-        if (currentTime < wordStartTime) {
-            return CharacterAnimationState(opacity = 0.8f)
-        }
-
-        if (currentTime > wordEndTime) {
-            return CharacterAnimationState(opacity = 0.6f, blur = 2f)
-        }
-
-        val wordDuration = wordEndTime - wordStartTime
-        val charDuration = wordDuration / totalCharacters.toFloat()
-        val charStartTime = wordStartTime + (characterIndex * charDuration).toLong()
-        val charEndTime = charStartTime + charDuration.toLong()
-
-        return calculateCharacterAnimation(
-            characterStartTime = charStartTime.toInt(),
-            characterEndTime = charEndTime.toInt(),
-            currentTime = currentTime.toInt(),
-            animationDuration = animationDuration
-        )
-    }
-
-    /**
-     * Calculate stagger delay for cascade animations.
-     *
-     * @param index Character or syllable index
-     * @param delayPerItem Delay between each item in milliseconds
-     */
-    fun calculateStaggerDelay(index: Int, delayPerItem: Float = 50f): Float {
-        return index * delayPerItem
-    }
-
-    /**
      * Easing function for smooth animation curves.
      */
     private fun easeInOutCubic(t: Float): Float {
@@ -147,22 +99,4 @@ class CharacterAnimationCalculator {
         return start + (end - start) * progress
     }
 
-    /**
-     * Calculate wave motion for group animations.
-     */
-    fun calculateWaveMotion(
-        index: Int,
-        totalItems: Int,
-        currentTime: Long,
-        waveSpeed: Float = 1000f,
-        waveAmplitude: Float = 10f
-    ): Offset {
-        val phase = (index.toFloat() / totalItems) * 2 * PI
-        val timePhase = (currentTime % waveSpeed) / waveSpeed * 2 * PI
-
-        val yOffset = waveAmplitude * sin(phase + timePhase).toFloat()
-        val xOffset = (waveAmplitude * 0.3f) * cos(phase + timePhase).toFloat()
-
-        return Offset(xOffset, yOffset)
-    }
 }

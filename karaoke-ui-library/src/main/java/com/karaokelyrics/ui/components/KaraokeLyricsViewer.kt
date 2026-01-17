@@ -1,5 +1,6 @@
 package com.karaokelyrics.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,14 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.ui.core.config.BehaviorConfig
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
-import com.karaokelyrics.ui.core.config.ScrollBehavior
 import com.karaokelyrics.ui.core.models.ISyncedLine
+import com.karaokelyrics.ui.utils.LineStateUtils
 import kotlinx.coroutines.launch
 
 /**
- * Composable for displaying multiple karaoke lines with automatic scrolling and synchronization.
+ * Complete karaoke lyrics viewer with automatic scrolling and synchronization.
+ * This container manages the entire lyrics display experience, including:
+ * - Auto-scrolling to keep current line in view
+ * - Distance-based visual effects (blur, opacity)
+ * - Intelligent spacing between line groups
+ * - Smooth transitions and animations
  *
  * @param lines List of synchronized lines to display
  * @param currentTimeMs Current playback time in milliseconds
@@ -27,8 +32,9 @@ import kotlinx.coroutines.launch
  * @param onLineClick Optional callback when a line is clicked
  * @param onLineLongPress Optional callback when a line is long-pressed
  */
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun KaraokeLyricsDisplay(
+fun KaraokeLyricsViewer(
     lines: List<ISyncedLine>,
     currentTimeMs: Int,
     config: KaraokeLibraryConfig = KaraokeLibraryConfig.Default,
@@ -41,16 +47,12 @@ fun KaraokeLyricsDisplay(
 
     // Find the current playing line index (for distance calculation)
     val currentLineIndex = remember(currentTimeMs, lines) {
-        lines.indexOfFirst { line ->
-            currentTimeMs in line.start..line.end
-        }.takeIf { it != -1 }
+        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
     }
 
     // Find the last played line index
     val lastPlayedLineIndex = remember(currentTimeMs, lines) {
-        lines.indexOfLast { line ->
-            currentTimeMs > line.end
-        }.takeIf { it != -1 }
+        LineStateUtils.getLastPlayedLineIndex(lines, currentTimeMs)
     }
 
     // Track the previous last played line index to detect changes
@@ -95,23 +97,13 @@ fun KaraokeLyricsDisplay(
                 items = lines,
                 key = { index, line -> "$index-${line.start}" }
             ) { index, line ->
-                // Check line states
-                val hasPlayed = currentTimeMs > line.end
-                val isPlaying = currentTimeMs in line.start..line.end
-                val isUpcoming = currentTimeMs < line.start
+                // Check line states using utility
+                val lineState = LineStateUtils.getLineState(line, currentTimeMs)
 
-                // Check if this is the last played line (has played but next line is playing or upcoming)
-                val isLastPlayed = hasPlayed && index < lines.size - 1 &&
-                    currentTimeMs <= lines[index + 1].end
-
-                // Check if this is the first upcoming line (is upcoming but previous line is played or playing)
-                val isFirstUpcoming = isUpcoming && index > 0 &&
-                    currentTimeMs >= lines[index - 1].start
-
-                // Check if this is the first active line in the active group
-                val isFirstActive = isPlaying && index > 0 && !lines[index - 1].let { prevLine ->
-                    currentTimeMs in prevLine.start..prevLine.end
-                }
+                // Check special positions
+                val isLastPlayed = LineStateUtils.isLastPlayedLine(index, lines, currentTimeMs)
+                val isFirstUpcoming = LineStateUtils.isFirstUpcomingLine(index, lines, currentTimeMs)
+                val isFirstActive = LineStateUtils.isFirstActiveLine(index, lines, currentTimeMs)
 
                 Column {
                     // Add spacing before line
@@ -127,10 +119,10 @@ fun KaraokeLyricsDisplay(
                         Spacer(modifier = Modifier.height(spaceBefore))
                     }
 
-                    KaraokeLineDisplayWithDistance(
+                    KaraokeSingleLineWithDistance(
                         line = line,
                         currentTimeMs = currentTimeMs,
-                        distance = currentLineIndex?.let { kotlin.math.abs(index - it) } ?: 999,
+                        distance = LineStateUtils.getDistanceFromCurrentLine(index, currentLineIndex),
                         config = config,
                         onLineClick = if (onLineClick != null) {
                             { onLineClick(line, index) }
@@ -151,10 +143,10 @@ fun KaraokeLyricsDisplay(
 }
 
 /**
- * Internal wrapper that includes distance-based effects.
+ * Internal wrapper that includes distance-based effects for a single line.
  */
 @Composable
-private fun KaraokeLineDisplayWithDistance(
+private fun KaraokeSingleLineWithDistance(
     line: ISyncedLine,
     currentTimeMs: Int,
     distance: Int,
@@ -171,12 +163,11 @@ private fun KaraokeLineDisplayWithDistance(
         else -> 0.6f             // Distant lines still readable
     }
 
-    // Determine if line is played, playing, or upcoming
-    val isPlaying = currentTimeMs in line.start..line.end
-    val hasPlayed = currentTimeMs > line.end
+    // Determine line state using utility
+    val lineState = LineStateUtils.getLineState(line, currentTimeMs)
 
     // Apply distance-based blur ONLY to upcoming/unplayed lines
-    val distanceBlurRadius = if (config.effects.enableBlur && !isPlaying && !hasPlayed) {
+    val distanceBlurRadius = if (config.effects.enableBlur && !lineState.isPlaying && !lineState.hasPlayed) {
         when (distance) {
             0 -> 0.dp  // Very next line - no blur for better readability
             1 -> config.effects.upcomingLineBlur * 0.5f  // Light blur for next line
@@ -200,7 +191,7 @@ private fun KaraokeLineDisplayWithDistance(
                 }
             )
     ) {
-        KaraokeLineDisplay(
+        KaraokeSingleLine(
             line = line,
             currentTimeMs = currentTimeMs,
             config = config,

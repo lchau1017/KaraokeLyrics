@@ -20,6 +20,25 @@ data class AnimationConfig(
     val lineScaleOnPlay: Float = 1.05f,
     val lineAnimationDuration: Float = 700f,
 
+    // Pulse Animation (for active lines)
+    val enablePulse: Boolean = false,
+    val pulseMinScale: Float = 0.98f,
+    val pulseMaxScale: Float = 1.02f,
+    val pulseDuration: Int = 1500,
+
+    // Shimmer Animation (for highlighting effects)
+    val enableShimmer: Boolean = false,
+    val shimmerDuration: Int = 2000,
+    val shimmerIntensity: Float = 0.3f,
+
+    // Color Transition Animation
+    val enableColorTransition: Boolean = true,
+    val colorTransitionDuration: Int = 300,
+
+    // Orchestrated Animations (for staggered effects)
+    val enableOrchestratedAnimations: Boolean = false,
+    val orchestrationDelayPerItem: Long = 50L,
+
     // Transition Animations
     val fadeInDuration: Float = 300f,
     val fadeOutDuration: Float = 500f,

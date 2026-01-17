@@ -26,7 +26,7 @@ fun KaraokeLyricsView(
             line.toLibraryLine()
         }
 
-        KaraokeLibrary.KaraokeLyricsDisplay(
+        KaraokeLibrary.KaraokeLyricsViewer(
             lines = libraryLines,
             currentTimeMs = currentTimeMs,
             config = libraryConfig,
