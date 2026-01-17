@@ -24,22 +24,22 @@ enum class ViewerType {
     SMOOTH_SCROLL,
 
     /**
-     * Minimal viewer showing only active line.
-     * - Only current line visible
-     * - No context lines shown
-     * - Maximum focus on current content
-     * - Ideal for: Single-line displays, widgets, minimal UI
+     * Stacked viewer with z-layer overlapping.
+     * - Active line appears on top (z-order)
+     * - Played lines stack underneath
+     * - Creates depth effect with overlapping
+     * - Ideal for: Artistic displays, modern UI
      */
-    SINGLE_LINE,
+    STACKED,
 
     /**
-     * Paged viewer that shows groups of lines.
-     * - Lines grouped by verse/section
-     * - Swipe or auto-advance between pages
-     * - All lines in group visible at once
-     * - Ideal for: Verse-by-verse display, presentation mode
+     * Horizontal paged viewer with swipe transitions.
+     * - Each line appears as a full page
+     * - Horizontal swipe between lines
+     * - Clean page-by-page presentation
+     * - Ideal for: Full-screen displays, presentations
      */
-    PAGED
+    HORIZONTAL_PAGED
 }
 
 /**

@@ -59,7 +59,7 @@ data class DemoSettings(
     val lineSpacing: Float = 80f,
 
     // Viewer type
-    val viewerTypeIndex: Int = 0 // 0=CENTER_FOCUSED, 1=SMOOTH_SCROLL, 2=SINGLE_LINE, 3=PAGED
+    val viewerTypeIndex: Int = 0 // 0=CENTER_FOCUSED, 1=SMOOTH_SCROLL, 2=STACKED, 3=HORIZONTAL_PAGED
 ) {
     companion object {
         val Default = DemoSettings()

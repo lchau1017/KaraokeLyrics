@@ -119,13 +119,10 @@ fun KaraokeLibraryDemo() {
                         smoothScrollDuration = 500
                     )
                     2 -> ViewerConfig(
-                        type = ViewerType.SINGLE_LINE,
-                        transitionAnimation = true
+                        type = ViewerType.STACKED
                     )
                     3 -> ViewerConfig(
-                        type = ViewerType.PAGED,
-                        autoAdvancePages = true,
-                        pageTransitionDelay = 300
+                        type = ViewerType.HORIZONTAL_PAGED
                     )
                     else -> ViewerConfig(
                         type = ViewerType.CENTER_FOCUSED,
@@ -253,12 +250,12 @@ fun KaraokeLibraryDemo() {
                         FilterChip(
                             selected = settings.viewerTypeIndex == 2,
                             onClick = { settings = settings.copy(viewerTypeIndex = 2) },
-                            label = { Text("Single", fontSize = 10.sp) }
+                            label = { Text("Stacked", fontSize = 10.sp) }
                         )
                         FilterChip(
                             selected = settings.viewerTypeIndex == 3,
                             onClick = { settings = settings.copy(viewerTypeIndex = 3) },
-                            label = { Text("Paged", fontSize = 10.sp) }
+                            label = { Text("H-Paged", fontSize = 10.sp) }
                         )
                     }
 
