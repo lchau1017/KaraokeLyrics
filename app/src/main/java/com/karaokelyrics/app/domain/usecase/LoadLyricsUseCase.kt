@@ -1,7 +1,7 @@
 package com.karaokelyrics.app.domain.usecase
 
-import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.model.SyncedLyrics
+import com.karaokelyrics.app.domain.repository.LyricsRepository
 import javax.inject.Inject
 
 /**
@@ -18,22 +18,20 @@ class LoadLyricsUseCase @Inject constructor(
      * @param fileName Name of the lyrics file in assets
      * @return Processed SyncedLyrics ready for display
      */
-    suspend operator fun invoke(fileName: String): Result<SyncedLyrics> {
-        return runCatching {
-            // Step 1: Load raw file content from repository
-            val fileContent = lyricsRepository.loadFileContent(fileName)
-                .getOrThrow()
+    suspend operator fun invoke(fileName: String): Result<SyncedLyrics> = runCatching {
+        // Step 1: Load raw file content from repository
+        val fileContent = lyricsRepository.loadFileContent(fileName)
+            .getOrThrow()
 
-            // Step 2: Parse TTML content using domain logic
-            val parsedLyrics = parseTtmlUseCase(fileContent)
+        // Step 2: Parse TTML content using domain logic
+        val parsedLyrics = parseTtmlUseCase(fileContent)
 
-            // Step 3: Apply business processing rules
-            val processedLyrics = processLyricsDataUseCase(parsedLyrics)
+        // Step 3: Apply business processing rules
+        val processedLyrics = processLyricsDataUseCase(parsedLyrics)
 
-            // Step 4: Store processed lyrics in repository
-            lyricsRepository.setCurrentLyrics(processedLyrics)
+        // Step 4: Store processed lyrics in repository
+        lyricsRepository.setCurrentLyrics(processedLyrics)
 
-            processedLyrics
-        }
+        processedLyrics
     }
 }

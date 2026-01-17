@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 
 /**
  * Reusable Button component with ViewData styling
@@ -91,12 +90,7 @@ fun AppTextButton(
  * Primary button variant
  */
 @Composable
-fun AppPrimaryButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
-) {
+fun AppPrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     AppButton(
         viewData = ButtonViewData.primary(text, enabled),
         onClick = onClick,

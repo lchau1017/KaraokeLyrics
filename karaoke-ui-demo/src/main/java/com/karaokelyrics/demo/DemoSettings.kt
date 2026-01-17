@@ -23,16 +23,10 @@ data class DemoSettings(
     val unsungColor: Color = Color(0xFF616161),
     val activeColor: Color = Color(0xFFFFEB3B),
     val backgroundColor: Color = Color(0xFF121212),
-    val shadowColor: Color = Color.Black,
-    val glowColor: Color = Color(0xFFFFEB3B),
 
     // Visual effects
     val gradientEnabled: Boolean = false,
     val gradientAngle: Float = 45f,
-    val shadowEnabled: Boolean = true,
-    val shadowOffsetX: Float = 2f,
-    val shadowOffsetY: Float = 2f,
-    val glowEnabled: Boolean = false,
     val blurEnabled: Boolean = false,
     val blurIntensity: Float = 1f,
 
@@ -50,10 +44,6 @@ data class DemoSettings(
     val pulseEnabled: Boolean = false,
     val pulseMinScale: Float = 0.95f,
     val pulseMaxScale: Float = 1.05f,
-
-    // Shimmer effect
-    val shimmerEnabled: Boolean = false,
-    val shimmerIntensity: Float = 0.5f,
 
     // Layout
     val lineSpacing: Float = 80f,

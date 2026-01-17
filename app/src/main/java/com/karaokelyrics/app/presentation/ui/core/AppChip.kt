@@ -12,11 +12,7 @@ import androidx.compose.ui.unit.dp
  * Reusable Chip component with ViewData styling
  */
 @Composable
-fun AppChip(
-    viewData: ChipViewData,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun AppChip(viewData: ChipViewData, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val backgroundColor = if (viewData.selected) {
         viewData.selectedBackgroundColor ?: MaterialTheme.colorScheme.primaryContainer
     } else {
@@ -63,13 +59,7 @@ fun AppChip(
  * Selection chip variant
  */
 @Composable
-fun AppSelectionChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
-) {
+fun AppSelectionChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     AppChip(
         viewData = ChipViewData.default(text, selected, enabled),
         onClick = onClick,
@@ -81,12 +71,7 @@ fun AppSelectionChip(
  * Filter chip variant
  */
 @Composable
-fun AppFilterChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun AppFilterChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     AppChip(
         viewData = ChipViewData.filter(text, selected),
         onClick = onClick,

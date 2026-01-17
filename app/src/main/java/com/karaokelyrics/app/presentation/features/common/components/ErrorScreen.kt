@@ -36,9 +36,7 @@ fun ErrorScreen(
 }
 
 @Composable
-private fun ErrorTitle(
-    color: Color
-) {
+private fun ErrorTitle(color: Color) {
     AppText(
         viewData = TextViewData(
             text = "Error loading lyrics",
@@ -51,10 +49,7 @@ private fun ErrorTitle(
 }
 
 @Composable
-private fun ErrorDescription(
-    message: String?,
-    color: Color
-) {
+private fun ErrorDescription(message: String?, color: Color) {
     AppText(
         viewData = TextViewData(
             text = message ?: "Unknown error occurred",
@@ -67,10 +62,7 @@ private fun ErrorDescription(
 }
 
 @Composable
-private fun RetryButton(
-    onRetry: () -> Unit,
-    buttonViewData: ButtonViewData
-) {
+private fun RetryButton(onRetry: () -> Unit, buttonViewData: ButtonViewData) {
     AppButton(
         viewData = buttonViewData,
         onClick = onRetry,

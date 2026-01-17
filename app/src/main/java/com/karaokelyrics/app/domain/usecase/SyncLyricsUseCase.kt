@@ -1,18 +1,14 @@
 package com.karaokelyrics.app.domain.usecase
 
+import com.karaokelyrics.app.domain.model.ISyncedLine
+import com.karaokelyrics.app.domain.model.KaraokeLine
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.karaokelyrics.app.domain.model.KaraokeLine
-import com.karaokelyrics.app.domain.model.ISyncedLine
 import javax.inject.Inject
 
 class SyncLyricsUseCase @Inject constructor() {
 
-    operator fun invoke(
-        lyrics: SyncedLyrics,
-        position: Long,
-        timingOffsetMs: Int = 200
-    ): LyricsSyncState {
+    operator fun invoke(lyrics: SyncedLyrics, position: Long, timingOffsetMs: Int = 200): LyricsSyncState {
         // Add configurable offset so lyrics appear before audio
         val positionMs = (position + timingOffsetMs).toInt()
 
@@ -50,10 +46,7 @@ class SyncLyricsUseCase @Inject constructor() {
         )
     }
 
-    private fun calculateKaraokeProgress(
-        line: KaraokeLine,
-        position: Int
-    ): Triple<Float, Int, Float> {
+    private fun calculateKaraokeProgress(line: KaraokeLine, position: Int): Triple<Float, Int, Float> {
         if (position < line.start) return Triple(0f, -1, 0f)
         if (position > line.end) return Triple(1f, line.syllables.size - 1, 1f)
 
@@ -72,7 +65,7 @@ class SyncLyricsUseCase @Inject constructor() {
 
         val activeSyllable = line.syllables[activeSyllableIndex]
         val syllableProgress = (position - activeSyllable.start).toFloat() /
-                (activeSyllable.end - activeSyllable.start)
+            (activeSyllable.end - activeSyllable.start)
 
         val overallProgress = (activeSyllableIndex + syllableProgress) / line.syllables.size
 
@@ -88,6 +81,6 @@ class SyncLyricsUseCase @Inject constructor() {
         if (position > syncedLine.end) return 1f
 
         return (position - syncedLine.start).toFloat() /
-               (syncedLine.end - syncedLine.start)
+            (syncedLine.end - syncedLine.start)
     }
 }

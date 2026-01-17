@@ -10,9 +10,7 @@ data class KaraokeLine(
     val metadata: Map<String, String> = emptyMap()
 ) : ISyncedLine {
 
-    override fun getContent(): String {
-        return syllables.joinToString("") { it.content }
-    }
+    override fun getContent(): String = syllables.joinToString("") { it.content }
 
     /**
      * Check if this is an accompaniment/background vocal line

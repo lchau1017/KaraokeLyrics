@@ -11,10 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.karaokelyrics.app.presentation.ui.core.*
+import com.karaokelyrics.app.presentation.features.player.viewdata.PlayButtonColorsViewData
 import com.karaokelyrics.app.presentation.features.player.viewdata.PlayerControlsViewData
 import com.karaokelyrics.app.presentation.features.player.viewdata.SliderColorsViewData
-import com.karaokelyrics.app.presentation.features.player.viewdata.PlayButtonColorsViewData
+import com.karaokelyrics.app.presentation.ui.core.*
 
 @Composable
 fun PlayerControls(
@@ -249,10 +249,7 @@ private fun AppIconButton(
 }
 
 @Composable
-private fun PauseIcon(
-    color: androidx.compose.ui.graphics.Color,
-    modifier: Modifier = Modifier
-) {
+private fun PauseIcon(color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Center,

@@ -1,6 +1,5 @@
 package com.karaokelyrics.app.presentation.ui.core
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -10,11 +9,7 @@ import androidx.compose.ui.Modifier
  * Reusable Surface component with ViewData styling
  */
 @Composable
-fun AppSurface(
-    viewData: SurfaceViewData,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
+fun AppSurface(viewData: SurfaceViewData, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Surface(
         modifier = modifier,
         color = viewData.backgroundColor ?: MaterialTheme.colorScheme.surface,
@@ -32,11 +27,7 @@ fun AppSurface(
  * Card surface variant
  */
 @Composable
-fun AppCard(
-    modifier: Modifier = Modifier,
-    viewData: SurfaceViewData = SurfaceViewData.card(),
-    content: @Composable () -> Unit
-) {
+fun AppCard(modifier: Modifier = Modifier, viewData: SurfaceViewData = SurfaceViewData.card(), content: @Composable () -> Unit) {
     AppSurface(
         viewData = viewData,
         modifier = modifier,

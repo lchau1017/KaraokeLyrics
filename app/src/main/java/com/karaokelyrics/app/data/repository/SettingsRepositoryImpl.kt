@@ -4,14 +4,12 @@ import com.karaokelyrics.app.data.source.local.PreferencesDataSource
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
 
 @Singleton
-class SettingsRepositoryImpl @Inject constructor(
-    private val preferencesDataSource: PreferencesDataSource
-) : SettingsRepository {
+class SettingsRepositoryImpl @Inject constructor(private val preferencesDataSource: PreferencesDataSource) : SettingsRepository {
 
     override fun getUserSettings(): Flow<UserSettings> = preferencesDataSource.userSettings
 

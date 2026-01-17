@@ -6,12 +6,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -20,21 +19,11 @@ import kotlin.math.sin
  * Rotates to bring active line to front.
  */
 @Composable
-internal fun Carousel3DViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
-) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
+internal fun Carousel3DViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
+    val currentLineIndex = uiState.currentLineIndex ?: 0
 
     // Animate rotation to current line
-    val targetRotation = currentLineIndex * (360f / maxOf(lines.size, 1))
+    val targetRotation = currentLineIndex * (360f / maxOf(uiState.lines.size, 1))
     val animatedRotation by animateFloatAsState(
         targetValue = -targetRotation,
         animationSpec = spring(
@@ -48,27 +37,23 @@ internal fun Carousel3DViewer(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        val visibleRange = 5 // Show 5 lines around current
-        val radius = 300f // Carousel radius
+        val radius = 300f
 
-        lines.forEachIndexed { index, line ->
+        uiState.lines.forEachIndexed { index, line ->
             val distance = index - currentLineIndex
+            val lineUiState = uiState.getLineState(index)
 
-            if (kotlin.math.abs(distance) <= visibleRange) {
-                val lineState = remember(line, currentTimeMs) {
-                    animationManager.getLineState(line, currentTimeMs)
-                }
-
+            if (kotlin.math.abs(distance) <= config.effects.visibleLineRange) {
                 // Calculate position in 3D space
-                val itemAngle = (index * 360f / lines.size) + animatedRotation
+                val itemAngle = (index * 360f / uiState.lines.size) + animatedRotation
                 val radians = Math.toRadians(itemAngle.toDouble())
                 val x = (sin(radians) * radius).toFloat()
                 val z = (cos(radians) * radius).toFloat()
 
-                // Calculate opacity based on z position (front = 1, back = 0)
+                // Calculate opacity based on z position
                 val normalizedZ = (z + radius) / (2 * radius)
                 val opacity = when {
-                    lineState.isPlaying -> 1f
+                    lineUiState.isPlaying -> 1f
                     normalizedZ > 0.7f -> normalizedZ * 0.8f
                     else -> normalizedZ * 0.3f
                 }
@@ -85,15 +70,15 @@ internal fun Carousel3DViewer(
                             scaleX = scale
                             scaleY = scale
                             alpha = opacity
-                            // Simulate depth with camera distance
                             cameraDistance = 12f * density
-                            rotationY = -itemAngle / 4 // Slight tilt for 3D effect
+                            rotationY = -itemAngle / 4
                         }
                         .zIndex(z)
                 ) {
                     KaraokeSingleLine(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, index) } }
                     )

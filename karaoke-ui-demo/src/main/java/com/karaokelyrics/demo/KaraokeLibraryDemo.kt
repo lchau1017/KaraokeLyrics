@@ -12,9 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -22,11 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.karaokelyrics.demo.data.DemoLyricsProvider
 import com.karaokelyrics.ui.api.KaraokeLibrary
 import com.karaokelyrics.ui.core.config.*
-import com.karaokelyrics.ui.core.models.KaraokeLine
-import com.karaokelyrics.ui.core.models.KaraokeSyllable
-import com.karaokelyrics.demo.data.DemoLyricsProvider
 import kotlinx.coroutines.delay
 
 /**
@@ -51,8 +46,6 @@ fun KaraokeLibraryDemo() {
                 unsungColor = Color.White,
                 activeColor = Color.Yellow,
                 backgroundColor = Color.Black,
-                shadowColor = Color.Black,
-                glowColor = Color.Yellow,
                 lineSpacing = 80f
             )
         )
@@ -70,71 +63,64 @@ fun KaraokeLibraryDemo() {
     val currentConfig by remember {
         derivedStateOf {
             KaraokeLibraryConfig(
-            visual = VisualConfig(
-                fontSize = settings.fontSize.sp,
-                fontWeight = settings.fontWeight,
-                fontFamily = settings.fontFamily,
-                textAlign = settings.textAlign,
-                playingTextColor = settings.activeColor,
-                playedTextColor = settings.sungColor,
-                upcomingTextColor = settings.unsungColor,
-                backgroundColor = settings.backgroundColor,
-                gradientEnabled = settings.gradientEnabled,
-                gradientAngle = settings.gradientAngle,
-                shadowEnabled = settings.shadowEnabled,
-                shadowColor = settings.shadowColor,
-                shadowOffset = Offset(settings.shadowOffsetX, settings.shadowOffsetY),
-                glowEnabled = settings.glowEnabled,
-                glowColor = settings.glowColor,
-                colors = ColorConfig(
-                    sung = settings.sungColor,
-                    unsung = settings.unsungColor,
-                    active = settings.activeColor
-                )
-            ),
-            animation = AnimationConfig(
-                enableCharacterAnimations = settings.charAnimEnabled,
-                characterMaxScale = settings.charMaxScale,
-                characterFloatOffset = settings.charFloatOffset,
-                characterRotationDegrees = settings.charRotationDegrees,
-                characterAnimationDuration = 800f,
-                enableLineAnimations = settings.lineAnimEnabled,
-                lineScaleOnPlay = settings.lineScaleOnPlay,
-                lineAnimationDuration = 700f,
-                enablePulse = settings.pulseEnabled,
-                pulseMinScale = settings.pulseMinScale,
-                pulseMaxScale = settings.pulseMaxScale,
-                enableShimmer = settings.shimmerEnabled,
-                shimmerIntensity = settings.shimmerIntensity
-            ),
-            effects = EffectsConfig(
-                enableBlur = settings.blurEnabled,
-                blurIntensity = settings.blurIntensity,
-                upcomingLineBlur = (3 * settings.blurIntensity).dp,
-                distantLineBlur = (6 * settings.blurIntensity).dp
-            ),
-            layout = LayoutConfig(
-                viewerConfig = ViewerConfig(
-                    type = when (settings.viewerTypeIndex) {
-                        0 -> ViewerType.CENTER_FOCUSED
-                        1 -> ViewerType.SMOOTH_SCROLL
-                        2 -> ViewerType.STACKED
-                        3 -> ViewerType.HORIZONTAL_PAGED
-                        4 -> ViewerType.WAVE_FLOW
-                        5 -> ViewerType.SPIRAL
-                        6 -> ViewerType.CAROUSEL_3D
-                        7 -> ViewerType.SPLIT_DUAL
-                        8 -> ViewerType.ELASTIC_BOUNCE
-                        9 -> ViewerType.FADE_THROUGH
-                        10 -> ViewerType.RADIAL_BURST
-                        11 -> ViewerType.FLIP_CARD
-                        else -> ViewerType.CENTER_FOCUSED
-                    }
+                visual = VisualConfig(
+                    fontSize = settings.fontSize.sp,
+                    fontWeight = settings.fontWeight,
+                    fontFamily = settings.fontFamily,
+                    textAlign = settings.textAlign,
+                    playingTextColor = settings.activeColor,
+                    playedTextColor = settings.sungColor,
+                    upcomingTextColor = settings.unsungColor,
+                    backgroundColor = settings.backgroundColor,
+                    gradientEnabled = settings.gradientEnabled,
+                    gradientAngle = settings.gradientAngle,
+                    colors = ColorConfig(
+                        sung = settings.sungColor,
+                        unsung = settings.unsungColor,
+                        active = settings.activeColor
+                    )
                 ),
-                lineSpacing = settings.lineSpacing.dp,
-                containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
+                animation = AnimationConfig(
+                    enableCharacterAnimations = settings.charAnimEnabled,
+                    characterMaxScale = settings.charMaxScale,
+                    characterFloatOffset = settings.charFloatOffset,
+                    characterRotationDegrees = settings.charRotationDegrees,
+                    characterAnimationDuration = 800f,
+                    enableLineAnimations = settings.lineAnimEnabled,
+                    lineScaleOnPlay = settings.lineScaleOnPlay,
+                    lineAnimationDuration = 700f,
+                    enablePulse = settings.pulseEnabled,
+                    pulseMinScale = settings.pulseMinScale,
+                    pulseMaxScale = settings.pulseMaxScale,
+                ),
+                effects = EffectsConfig(
+                    enableBlur = settings.blurEnabled,
+                    blurIntensity = settings.blurIntensity,
+                    upcomingLineBlur = (3 * settings.blurIntensity).dp,
+                    distantLineBlur = (6 * settings.blurIntensity).dp
+                ),
+                layout = LayoutConfig(
+                    viewerConfig = ViewerConfig(
+                        type = when (settings.viewerTypeIndex) {
+                            0 -> ViewerType.CENTER_FOCUSED
+                            1 -> ViewerType.SMOOTH_SCROLL
+                            2 -> ViewerType.STACKED
+                            3 -> ViewerType.HORIZONTAL_PAGED
+                            4 -> ViewerType.WAVE_FLOW
+                            5 -> ViewerType.SPIRAL
+                            6 -> ViewerType.CAROUSEL_3D
+                            7 -> ViewerType.SPLIT_DUAL
+                            8 -> ViewerType.ELASTIC_BOUNCE
+                            9 -> ViewerType.FADE_THROUGH
+                            10 -> ViewerType.RADIAL_BURST
+                            11 -> ViewerType.FLIP_CARD
+                            else -> ViewerType.CENTER_FOCUSED
+                        }
+                    ),
+                    lineSpacing = settings.lineSpacing.dp,
+                    containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
+                )
             )
-        )
         }
     }
 
@@ -217,7 +203,10 @@ fun KaraokeLibraryDemo() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(onClick = { currentTimeMs = 0; isPlaying = false }) {
+                        Button(onClick = {
+                            currentTimeMs = 0
+                            isPlaying = false
+                        }) {
                             Text("Reset")
                         }
                         Button(onClick = { isPlaying = !isPlaying }) {
@@ -341,7 +330,7 @@ fun KaraokeLibraryDemo() {
                     Slider(
                         value = settings.lineSpacing,
                         onValueChange = { settings = settings.copy(lineSpacing = it) },
-                        valueRange = 0f..150f  // Allow much larger spacing
+                        valueRange = 0f..150f // Allow much larger spacing
                     )
 
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
@@ -383,42 +372,6 @@ fun KaraokeLibraryDemo() {
                             onValueChange = { settings = settings.copy(gradientAngle = it) },
                             valueRange = 0f..360f
                         )
-                    }
-
-                    // Shadow
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = settings.shadowEnabled, onCheckedChange = { settings = settings.copy(shadowEnabled = it) })
-                        Text("Shadow", modifier = Modifier.padding(start = 8.dp))
-                    }
-                    if (settings.shadowEnabled) {
-                        ColorRow("Shadow Color", settings.shadowColor) {
-                            colorPickerTarget = "shadow"
-                            showColorPicker = true
-                        }
-                        Text("Offset X: ${settings.shadowOffsetX.toInt()}", fontSize = 12.sp)
-                        Slider(
-                            value = settings.shadowOffsetX,
-                            onValueChange = { settings = settings.copy(shadowOffsetX = it) },
-                            valueRange = -10f..10f
-                        )
-                        Text("Offset Y: ${settings.shadowOffsetY.toInt()}", fontSize = 12.sp)
-                        Slider(
-                            value = settings.shadowOffsetY,
-                            onValueChange = { settings = settings.copy(shadowOffsetY = it) },
-                            valueRange = -10f..10f
-                        )
-                    }
-
-                    // Glow
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = settings.glowEnabled, onCheckedChange = { settings = settings.copy(glowEnabled = it) })
-                        Text("Glow", modifier = Modifier.padding(start = 8.dp))
-                    }
-                    if (settings.glowEnabled) {
-                        ColorRow("Glow Color", settings.glowColor) {
-                            colorPickerTarget = "glow"
-                            showColorPicker = true
-                        }
                     }
 
                     // Blur
@@ -486,7 +439,13 @@ fun KaraokeLibraryDemo() {
                         Text("Pulse Effect", modifier = Modifier.padding(start = 8.dp))
                     }
                     if (settings.pulseEnabled) {
-                        Text("Pulse Range: ${String.format("%.2f", settings.pulseMinScale)} - ${String.format("%.2f", settings.pulseMaxScale)}", fontSize = 12.sp)
+                        Text(
+                            "Pulse Range: ${String.format(
+                                "%.2f",
+                                settings.pulseMinScale
+                            )} - ${String.format("%.2f", settings.pulseMaxScale)}",
+                            fontSize = 12.sp
+                        )
                         Slider(
                             value = settings.pulseMinScale,
                             onValueChange = { settings = settings.copy(pulseMinScale = it) },
@@ -496,20 +455,6 @@ fun KaraokeLibraryDemo() {
                             value = settings.pulseMaxScale,
                             onValueChange = { settings = settings.copy(pulseMaxScale = it) },
                             valueRange = 1f..1.1f
-                        )
-                    }
-
-                    // Shimmer animation
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(checked = settings.shimmerEnabled, onCheckedChange = { settings = settings.copy(shimmerEnabled = it) })
-                        Text("Shimmer Effect", modifier = Modifier.padding(start = 8.dp))
-                    }
-                    if (settings.shimmerEnabled) {
-                        Text("Intensity: ${String.format("%.2f", settings.shimmerIntensity)}", fontSize = 12.sp)
-                        Slider(
-                            value = settings.shimmerIntensity,
-                            onValueChange = { settings = settings.copy(shimmerIntensity = it) },
-                            valueRange = 0.1f..1f
                         )
                     }
 
@@ -533,11 +478,7 @@ fun KaraokeLibraryDemo() {
                                         pulseEnabled = preset.animation.enablePulse,
                                         pulseMinScale = preset.animation.pulseMinScale,
                                         pulseMaxScale = preset.animation.pulseMaxScale,
-                                        shimmerEnabled = preset.animation.enableShimmer,
-                                        shimmerIntensity = preset.animation.shimmerIntensity,
                                         gradientEnabled = false,
-                                        shadowEnabled = true,
-                                        glowEnabled = false,
                                         blurEnabled = false
                                     )
                                 },
@@ -555,13 +496,9 @@ fun KaraokeLibraryDemo() {
                                         unsungColor = preset.visual.upcomingTextColor,
                                         activeColor = preset.visual.playingTextColor,
                                         gradientEnabled = preset.visual.gradientEnabled,
-                                        shadowEnabled = preset.visual.shadowEnabled,
-                                        glowEnabled = preset.visual.glowEnabled,
                                         charAnimEnabled = preset.animation.enableCharacterAnimations,
                                         lineAnimEnabled = preset.animation.enableLineAnimations,
                                         pulseEnabled = preset.animation.enablePulse,
-                                        shimmerEnabled = preset.animation.enableShimmer,
-                                        shimmerIntensity = preset.animation.shimmerIntensity,
                                         blurEnabled = preset.effects.enableBlur,
                                         blurIntensity = preset.effects.blurIntensity
                                     )
@@ -580,8 +517,6 @@ fun KaraokeLibraryDemo() {
                                         activeColor = Color.Black,
                                         backgroundColor = Color.White,
                                         gradientEnabled = false,
-                                        shadowEnabled = false,
-                                        glowEnabled = false,
                                         blurEnabled = false,
                                         charAnimEnabled = false,
                                         lineAnimEnabled = false
@@ -606,8 +541,6 @@ fun KaraokeLibraryDemo() {
                 "unsung" -> settings.unsungColor
                 "active" -> settings.activeColor
                 "background" -> settings.backgroundColor
-                "shadow" -> settings.shadowColor
-                "glow" -> settings.glowColor
                 else -> Color.White
             },
             onColorSelected = { color ->
@@ -616,8 +549,6 @@ fun KaraokeLibraryDemo() {
                     "unsung" -> settings.copy(unsungColor = color)
                     "active" -> settings.copy(activeColor = color)
                     "background" -> settings.copy(backgroundColor = color)
-                    "shadow" -> settings.copy(shadowColor = color)
-                    "glow" -> settings.copy(glowColor = color)
                     else -> settings
                 }
                 showColorPicker = false
@@ -647,11 +578,7 @@ private fun ColorRow(label: String, color: Color, onClick: () -> Unit) {
 }
 
 @Composable
-private fun ColorPickerDialog(
-    currentColor: Color,
-    onColorSelected: (Color) -> Unit,
-    onDismiss: () -> Unit
-) {
+private fun ColorPickerDialog(currentColor: Color, onColorSelected: (Color) -> Unit, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card {
             Column(
@@ -669,7 +596,7 @@ private fun ColorPickerDialog(
                     Color(0xFFC0C0C0), // Silver
                     Color(0xFFFF6347), // Tomato
                     Color(0xFF00CED1), // Dark Turquoise
-                    Color(0xFFFF1493)  // Deep Pink
+                    Color(0xFFFF1493) // Deep Pink
                 )
 
                 colors.chunked(4).forEach { row ->

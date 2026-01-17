@@ -1,14 +1,5 @@
 package com.karaokelyrics.ui.core.config
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
 /**
  * Complete configuration for the Karaoke UI Library.
  * This is completely independent from any app user settings.
@@ -33,8 +24,7 @@ data class KaraokeLibraryConfig(
         val Minimal = KaraokeLibraryConfig(
             effects = EffectsConfig(
                 enableBlur = false,
-                enableShadows = false,
-                enableGlow = false
+                enableShadows = false
             ),
             animation = AnimationConfig(
                 enableCharacterAnimations = false,
@@ -52,9 +42,8 @@ data class KaraokeLibraryConfig(
                 characterRotationDegrees = 5f
             ),
             effects = EffectsConfig(
-                blurIntensity = 1.5f,
-                enableGlow = true,
-                glowRadius = 12f
+                enableBlur = true,
+                blurIntensity = 1.5f
             )
         )
     }

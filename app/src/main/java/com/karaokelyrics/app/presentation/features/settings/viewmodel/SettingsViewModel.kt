@@ -11,10 +11,10 @@ import com.karaokelyrics.app.presentation.features.settings.effect.SettingsEffec
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.toColorArgb
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * MVI ViewModel for Settings following Clean Architecture.
@@ -26,10 +26,7 @@ class SettingsViewModel @Inject constructor(
     private val updateUserSettingsUseCase: UpdateUserSettingsUseCase
 ) : ViewModel() {
 
-    data class SettingsState(
-        val settings: UserSettings = UserSettings(),
-        val isLoading: Boolean = false
-    )
+    data class SettingsState(val settings: UserSettings = UserSettings(), val isLoading: Boolean = false)
 
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()

@@ -10,28 +10,17 @@ import androidx.compose.ui.unit.dp
 import com.karaokelyrics.ui.components.KaraokeSingleLine
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.models.ISyncedLine
-import com.karaokelyrics.ui.rendering.AnimationManager
+import com.karaokelyrics.ui.state.KaraokeUiState
 
 /**
  * Split dual viewer showing current and next line simultaneously.
  * Perfect for duets or learning apps.
  */
 @Composable
-internal fun SplitDualViewer(
-    lines: List<ISyncedLine>,
-    currentTimeMs: Int,
-    config: KaraokeLibraryConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null,
-    onLineLongPress: ((ISyncedLine, Int) -> Unit)? = null
-) {
-    val animationManager = remember { AnimationManager() }
-
-    val currentLineIndex = remember(currentTimeMs, lines) {
-        animationManager.getCurrentLineIndex(lines, currentTimeMs)
-    } ?: 0
-
-    val currentLine = lines.getOrNull(currentLineIndex)
-    val nextLine = lines.getOrNull(currentLineIndex + 1)
+internal fun SplitDualViewer(uiState: KaraokeUiState, config: KaraokeLibraryConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
+    val currentLineIndex = uiState.currentLineIndex ?: 0
+    val currentLine = uiState.lines.getOrNull(currentLineIndex)
+    val nextLine = uiState.lines.getOrNull(currentLineIndex + 1)
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -45,6 +34,7 @@ internal fun SplitDualViewer(
             contentAlignment = Alignment.Center
         ) {
             currentLine?.let { line ->
+                val lineUiState = uiState.getLineState(currentLineIndex)
                 val alpha by animateFloatAsState(
                     targetValue = 1f,
                     animationSpec = tween(300),
@@ -53,7 +43,8 @@ internal fun SplitDualViewer(
                 Box(modifier = Modifier.alpha(alpha)) {
                     KaraokeSingleLine(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
                         onLineClick = onLineClick?.let { { it(line, currentLineIndex) } }
                     )
@@ -77,6 +68,8 @@ internal fun SplitDualViewer(
             contentAlignment = Alignment.Center
         ) {
             nextLine?.let { line ->
+                val nextLineIndex = currentLineIndex + 1
+                val lineUiState = uiState.getLineState(nextLineIndex)
                 val alpha by animateFloatAsState(
                     targetValue = 0.5f,
                     animationSpec = tween(300),
@@ -85,9 +78,10 @@ internal fun SplitDualViewer(
                 Box(modifier = Modifier.alpha(alpha)) {
                     KaraokeSingleLine(
                         line = line,
-                        currentTimeMs = currentTimeMs,
+                        lineUiState = lineUiState,
+                        currentTimeMs = uiState.currentTimeMs,
                         config = config,
-                        onLineClick = onLineClick?.let { { it(line, currentLineIndex + 1) } }
+                        onLineClick = onLineClick?.let { { it(line, nextLineIndex) } }
                     )
                 }
             }

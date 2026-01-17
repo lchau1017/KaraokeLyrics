@@ -15,12 +15,7 @@ object TextLayoutCalculator {
     /**
      * Calculate complete layout information for a karaoke line
      */
-    fun calculateLayout(
-        line: KaraokeLine,
-        textMeasurer: TextMeasurer,
-        textStyle: TextStyle,
-        maxWidth: Float
-    ): LayoutInfo {
+    fun calculateLayout(line: KaraokeLine, textMeasurer: TextMeasurer, textStyle: TextStyle, maxWidth: Float): LayoutInfo {
         val lines = mutableListOf<LineLayoutData>()
         var currentLineContent = mutableListOf<SyllableLayoutData>()
         var currentLineWidth = 0f
@@ -73,11 +68,7 @@ object TextLayoutCalculator {
         )
     }
 
-    private fun applyTextAlignment(
-        lines: MutableList<LineLayoutData>,
-        maxWidth: Float,
-        textAlign: TextAlign
-    ) {
+    private fun applyTextAlignment(lines: MutableList<LineLayoutData>, maxWidth: Float, textAlign: TextAlign) {
         lines.forEach { line ->
             val totalLineWidth = line.getTotalWidth()
             val alignmentOffset = when (textAlign) {
@@ -98,31 +89,19 @@ object TextLayoutCalculator {
     /**
      * Contains layout information for the entire text
      */
-    data class LayoutInfo(
-        val lines: List<LineLayoutData>,
-        val lineHeight: Float,
-        val totalHeight: Float
-    )
+    data class LayoutInfo(val lines: List<LineLayoutData>, val lineHeight: Float, val totalHeight: Float)
 
     /**
      * Layout data for a single line of text
      */
-    data class LineLayoutData(
-        val syllables: List<SyllableLayoutData>
-    ) {
-        fun getTotalWidth(): Float {
-            return syllables.lastOrNull()?.let {
-                it.xOffset + it.width
-            } ?: 0f
-        }
+    data class LineLayoutData(val syllables: List<SyllableLayoutData>) {
+        fun getTotalWidth(): Float = syllables.lastOrNull()?.let {
+            it.xOffset + it.width
+        } ?: 0f
     }
 
     /**
      * Layout data for a single syllable
      */
-    data class SyllableLayoutData(
-        val syllable: KaraokeSyllable,
-        var xOffset: Float,
-        val width: Float
-    )
+    data class SyllableLayoutData(val syllable: KaraokeSyllable, var xOffset: Float, val width: Float)
 }

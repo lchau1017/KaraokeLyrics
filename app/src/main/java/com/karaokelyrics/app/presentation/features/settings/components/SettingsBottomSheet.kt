@@ -14,15 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.graphics.toArgb
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
-import com.karaokelyrics.app.presentation.ui.core.*
+import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
 import com.karaokelyrics.app.presentation.features.settings.viewdata.SettingsBottomSheetViewData
 import com.karaokelyrics.app.presentation.features.settings.viewdata.SwitchColorsViewData
-import kotlinx.coroutines.launch
+import com.karaokelyrics.app.presentation.ui.core.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -345,7 +343,7 @@ private fun ColorPicker(
         Color(0xFFF39C12), // orange
         Color(0xFFE91E63), // pink
         Color(0xFF00BCD4), // cyan
-        Color(0xFFFFEB3B)  // yellow
+        Color(0xFFFFEB3B) // yellow
     )
 
     val lightLyricColors = listOf(
@@ -357,11 +355,11 @@ private fun ColorPicker(
         Color(0xFFE67E22), // orange
         Color(0xFFD81B60), // pink
         Color(0xFF00ACC1), // cyan
-        Color(0xFFF9A825)  // yellow
+        Color(0xFFF9A825) // yellow
     )
 
     val darkBackgroundColors = listOf(
-        spotifyBlack,     // Original Spotify black
+        spotifyBlack, // Original Spotify black
         Color(0xFF1A0E2E), // Deep purple black
         Color(0xFF0F2027), // Dark blue gradient base
         Color(0xFF1C1432), // Midnight purple
@@ -369,11 +367,11 @@ private fun ColorPicker(
         Color(0xFF1B1B2F), // Space blue
         Color(0xFF162447), // Dark royal blue
         Color(0xFF1F3A3D), // Dark teal
-        Color(0xFF2D1B69)  // Deep violet
+        Color(0xFF2D1B69) // Deep violet
     )
 
     val lightBackgroundColors = listOf(
-        white,             // Pure white
+        white, // Pure white
         Color(0xFFF3E5F5), // Light purple tint
         Color(0xFFE8F5E9), // Light green tint
         Color(0xFFFFF3E0), // Light amber tint
@@ -381,7 +379,7 @@ private fun ColorPicker(
         Color(0xFFFCE4EC), // Light pink tint
         Color(0xFFE0F2F1), // Light teal tint
         Color(0xFFFFF9C4), // Light yellow tint
-        Color(0xFFF3E0FF)  // Light lavender tint
+        Color(0xFFF3E0FF) // Light lavender tint
     )
 
     val colors = when {
