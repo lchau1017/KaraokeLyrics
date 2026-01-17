@@ -30,11 +30,13 @@ class LibraryConfigMapper @Inject constructor() {
     }
 
     private fun mapVisualConfig(userSettings: UserSettings): VisualConfig {
+        val primaryColor = Color(userSettings.lyricsColorArgb)
+
         return VisualConfig(
-            // Map colors - use defaults since UserSettings only has base colors
-            playingTextColor = Color(userSettings.lyricsColorArgb),
-            playedTextColor = Color(userSettings.lyricsColorArgb).copy(alpha = 0.9f),
-            upcomingTextColor = Color.White.copy(alpha = 0.3f),
+            // Map colors properly from user settings
+            playingTextColor = primaryColor,  // Active singing color
+            playedTextColor = primaryColor.copy(alpha = 0.7f),  // Slightly faded for sung text
+            upcomingTextColor = primaryColor.copy(alpha = 0.4f),  // More faded for upcoming text
             accompanimentTextColor = Color(0xFFFFE082),
 
             // Map font settings
@@ -49,17 +51,17 @@ class LibraryConfigMapper @Inject constructor() {
             // Map background
             backgroundColor = Color(userSettings.backgroundColorArgb),
 
-            // Map gradient settings - enable for testing
-            gradientEnabled = true,
-            shadowEnabled = true,
+            // Disable effects by default - let user enable them if needed
+            gradientEnabled = false,
+            shadowEnabled = true,  // Keep subtle shadow for readability
             shadowColor = Color.Black.copy(alpha = 0.5f),
             shadowOffset = androidx.compose.ui.geometry.Offset(2f, 2f),
-            glowEnabled = true,
-            glowColor = Color.Yellow.copy(alpha = 0.6f),
+            glowEnabled = false,  // Disable glow by default
+            glowColor = primaryColor.copy(alpha = 0.3f),
             colors = ColorConfig(
-                sung = Color.Green,
-                unsung = Color.White,
-                active = Color.Yellow
+                sung = primaryColor.copy(alpha = 0.7f),
+                unsung = primaryColor.copy(alpha = 0.4f),
+                active = primaryColor
             ),
             gradientAngle = 45f
         )
@@ -118,7 +120,7 @@ class LibraryConfigMapper @Inject constructor() {
             upcomingLineBlur = 3.dp,  // Light blur for upcoming lines
             distantLineBlur = 6.dp,  // Medium blur for distant lines
 
-            // Shadow effects - use defaults
+            // Shadow effects - subtle shadow for readability
             enableShadows = true,
             textShadowColor = Color.Black.copy(alpha = 0.3f),
             textShadowOffset = androidx.compose.ui.geometry.Offset(2f, 2f),
@@ -126,14 +128,14 @@ class LibraryConfigMapper @Inject constructor() {
 
             // Glow effects - disabled by default
             enableGlow = false,
-            glowColor = Color.White,
+            glowColor = Color(userSettings.lyricsColorArgb).copy(alpha = 0.3f),
             glowRadius = 8f,
 
             // Opacity - clear for playing/played, slightly reduced for upcoming
             playingLineOpacity = 1f,      // Full opacity for current line
-            playedLineOpacity = 0.8f,      // Good visibility for played lines
-            upcomingLineOpacity = 0.7f,    // Good visibility with light blur for upcoming
-            distantLineOpacity = 0.5f     // Moderate transparency for distant lines
+            playedLineOpacity = 0.9f,      // Good visibility for played lines
+            upcomingLineOpacity = 0.5f,    // Reduced visibility for upcoming
+            distantLineOpacity = 0.3f     // More transparency for distant lines
         )
     }
 
