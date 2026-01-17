@@ -47,22 +47,20 @@ fun KaraokeLyricsViewer(
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
 
-    // Use derivedStateOf for efficient index calculation
-    // This will only recompute when the actual index changes, not on every time update
-    val currentLineIndex by remember {
-        derivedStateOf {
-            LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
-        }
+    // Calculate current line index with proper memoization
+    // IMPORTANT: Use remember with keys (currentTimeMs, lines) for immediate updates
+    // This ensures the index updates when time changes but caches the result
+    // DO NOT use remember { derivedStateOf } here as it would cache the derived state instance
+    val currentLineIndex = remember(currentTimeMs, lines) {
+        LineStateUtils.getCurrentLineIndex(lines, currentTimeMs)
     }
 
     // Find the next upcoming line when no active line
-    val nextUpcomingIndex by remember {
-        derivedStateOf {
-            if (currentLineIndex == null) {
-                // Find first line that hasn't started yet
-                lines.indexOfFirst { line -> currentTimeMs < line.start }.takeIf { it >= 0 }
-            } else null
-        }
+    val nextUpcomingIndex = remember(currentTimeMs, lines, currentLineIndex) {
+        if (currentLineIndex == null) {
+            // Find first line that hasn't started yet
+            lines.indexOfFirst { line -> currentTimeMs < line.start }.takeIf { it >= 0 }
+        } else null
     }
 
     // Track previous indices to detect changes
@@ -143,22 +141,32 @@ fun KaraokeLyricsViewer(
                     LineStateUtils.getLineState(line, currentTimeMs)
                 }
 
-                // Check special positions - only recalculate when necessary
-                val isLastPlayed = remember(index, lines.size, currentTimeMs) {
-                    LineStateUtils.isLastPlayedLine(index, lines, currentTimeMs)
+                // Check special positions - use derivedStateOf for less frequent updates
+                // OPTIMIZATION: remember { derivedStateOf } creates the state once and tracks dependencies
+                // This reduces recalculations compared to remember(currentTimeMs) which recalcs every time
+                val isLastPlayed by remember(index, lines.size) {
+                    derivedStateOf {
+                        LineStateUtils.isLastPlayedLine(index, lines, currentTimeMs)
+                    }
                 }
-                val isFirstUpcoming = remember(index, currentTimeMs) {
-                    LineStateUtils.isFirstUpcomingLine(index, lines, currentTimeMs)
+                val isFirstUpcoming by remember(index) {
+                    derivedStateOf {
+                        LineStateUtils.isFirstUpcomingLine(index, lines, currentTimeMs)
+                    }
                 }
-                val isFirstActive = remember(index, currentTimeMs) {
-                    LineStateUtils.isFirstActiveLine(index, lines, currentTimeMs)
+                val isFirstActive by remember(index) {
+                    derivedStateOf {
+                        LineStateUtils.isFirstActiveLine(index, lines, currentTimeMs)
+                    }
                 }
 
                 Column {
                     // Add spacing before line
                     if (index > 0) {
-                        val hasActiveLine = remember(currentTimeMs) {
-                            LineStateUtils.hasActiveLine(lines, currentTimeMs)
+                        val hasActiveLine by remember {
+                            derivedStateOf {
+                                LineStateUtils.hasActiveLine(lines, currentTimeMs)
+                            }
                         }
 
                         val spaceBefore = when {
