@@ -112,12 +112,28 @@ fun KaraokeLibraryDemo() {
                 distantLineBlur = (6 * settings.blurIntensity).dp
             ),
             layout = LayoutConfig(
-                viewerConfig = ViewerConfig(
-                    type = ViewerType.CENTER_FOCUSED,
-                    centerOffset = 0.5f, // Center in the viewport
-                    visibleLinesBefore = 0, // Don't show played lines
-                    visibleLinesAfter = 0 // Don't show upcoming lines
-                ),
+                viewerConfig = when (settings.viewerTypeIndex) {
+                    1 -> ViewerConfig(
+                        type = ViewerType.SMOOTH_SCROLL,
+                        scrollPosition = 0.33f,
+                        smoothScrollDuration = 500
+                    )
+                    2 -> ViewerConfig(
+                        type = ViewerType.SINGLE_LINE,
+                        transitionAnimation = true
+                    )
+                    3 -> ViewerConfig(
+                        type = ViewerType.PAGED,
+                        autoAdvancePages = true,
+                        pageTransitionDelay = 300
+                    )
+                    else -> ViewerConfig(
+                        type = ViewerType.CENTER_FOCUSED,
+                        centerOffset = 0.5f,
+                        visibleLinesBefore = 0,
+                        visibleLinesAfter = 0
+                    )
+                },
                 lineSpacing = settings.lineSpacing.dp,
                 containerPadding = androidx.compose.foundation.layout.PaddingValues(8.dp)
             )
@@ -218,6 +234,33 @@ fun KaraokeLibraryDemo() {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Text("Time: ${currentTimeMs / 1000}s")
+
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    // Viewer Type
+                    Text("Viewer Type", style = MaterialTheme.typography.titleMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        FilterChip(
+                            selected = settings.viewerTypeIndex == 0,
+                            onClick = { settings = settings.copy(viewerTypeIndex = 0) },
+                            label = { Text("Center", fontSize = 10.sp) }
+                        )
+                        FilterChip(
+                            selected = settings.viewerTypeIndex == 1,
+                            onClick = { settings = settings.copy(viewerTypeIndex = 1) },
+                            label = { Text("Smooth", fontSize = 10.sp) }
+                        )
+                        FilterChip(
+                            selected = settings.viewerTypeIndex == 2,
+                            onClick = { settings = settings.copy(viewerTypeIndex = 2) },
+                            label = { Text("Single", fontSize = 10.sp) }
+                        )
+                        FilterChip(
+                            selected = settings.viewerTypeIndex == 3,
+                            onClick = { settings = settings.copy(viewerTypeIndex = 3) },
+                            label = { Text("Paged", fontSize = 10.sp) }
+                        )
+                    }
 
                     Divider(modifier = Modifier.padding(vertical = 8.dp))
 

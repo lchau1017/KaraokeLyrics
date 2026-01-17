@@ -56,7 +56,10 @@ data class DemoSettings(
     val shimmerIntensity: Float = 0.5f,
 
     // Layout
-    val lineSpacing: Float = 80f
+    val lineSpacing: Float = 80f,
+
+    // Viewer type
+    val viewerTypeIndex: Int = 0 // 0=CENTER_FOCUSED, 1=SMOOTH_SCROLL, 2=SINGLE_LINE, 3=PAGED
 ) {
     companion object {
         val Default = DemoSettings()

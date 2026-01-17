@@ -89,6 +89,13 @@ class LibraryConfigMapper @Inject constructor() {
 
     private fun mapLayoutConfig(userSettings: UserSettings): LayoutConfig {
         return LayoutConfig(
+            // Viewer configuration - use smooth scroll for app
+            viewerConfig = ViewerConfig(
+                type = ViewerType.SMOOTH_SCROLL,
+                scrollPosition = 0.33f, // Position active line at top third
+                smoothScrollDuration = 500
+            ),
+
             // Spacing - use defaults
             linePadding = androidx.compose.foundation.layout.PaddingValues(
                 horizontal = 24.dp,
@@ -105,15 +112,6 @@ class LibraryConfigMapper @Inject constructor() {
             // Container - optimized for full-screen app
             containerPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
             maxLineWidth = null,
-
-            // Scrollable content padding - full screen optimized
-            contentTopPadding = 16.dp, // Minimal top padding for app
-            scrollTopOffset = 120.dp, // Larger offset to keep active line more centered
-            contentBottomPaddingRatio = 1.0f, // Full height bottom padding for smooth scrolling
-
-            // Active line group spacing - optimized for full screen viewing
-            activeGroupSpacing = 100.dp, // Large separation between played and active
-            upcomingGroupSpacing = 200.dp, // Very large gap to ensure upcoming lines are off-screen
 
             // Text direction - auto detect
             forceTextDirection = null

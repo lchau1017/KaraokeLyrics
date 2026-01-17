@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.karaokelyrics.ui.components.viewers.CenterFocusedViewer
+import com.karaokelyrics.ui.components.viewers.PagedViewer
+import com.karaokelyrics.ui.components.viewers.SingleLineViewer
 import com.karaokelyrics.ui.components.viewers.SmoothScrollViewer
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 import com.karaokelyrics.ui.core.config.ViewerType
@@ -61,25 +63,16 @@ fun KaraokeLyricsViewer(
                 )
             }
             ViewerType.SINGLE_LINE -> {
-                // TODO: Implement single line viewer
-                CenterFocusedViewer(
+                SingleLineViewer(
                     lines = lines,
                     currentTimeMs = currentTimeMs,
-                    config = config.copy(
-                        layout = config.layout.copy(
-                            viewerConfig = config.layout.viewerConfig.copy(
-                                visibleLinesBefore = 0,
-                                visibleLinesAfter = 0
-                            )
-                        )
-                    ),
+                    config = config,
                     onLineClick = onLineClick,
                     onLineLongPress = onLineLongPress
                 )
             }
             ViewerType.PAGED -> {
-                // TODO: Implement paged viewer
-                SmoothScrollViewer(
+                PagedViewer(
                     lines = lines,
                     currentTimeMs = currentTimeMs,
                     config = config,
