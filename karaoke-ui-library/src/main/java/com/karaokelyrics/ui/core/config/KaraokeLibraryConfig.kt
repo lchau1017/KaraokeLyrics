@@ -24,8 +24,7 @@ data class KaraokeLibraryConfig(
         val Minimal = KaraokeLibraryConfig(
             effects = EffectsConfig(
                 enableBlur = false,
-                enableShadows = false,
-                enableGlow = false
+                enableShadows = false
             ),
             animation = AnimationConfig(
                 enableCharacterAnimations = false,
@@ -43,9 +42,8 @@ data class KaraokeLibraryConfig(
                 characterRotationDegrees = 5f
             ),
             effects = EffectsConfig(
-                blurIntensity = 1.5f,
-                enableGlow = true,
-                glowRadius = 12f
+                enableBlur = true,
+                blurIntensity = 1.5f
             )
         )
     }

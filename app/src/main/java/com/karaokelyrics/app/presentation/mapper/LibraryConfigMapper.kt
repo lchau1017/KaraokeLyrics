@@ -108,10 +108,10 @@ class LibraryConfigMapper @Inject constructor() {
     private fun mapEffectsConfig(userSettings: UserSettings): EffectsConfig = EffectsConfig(
         // Blur effects - only apply to upcoming/unplayed lines
         enableBlur = userSettings.enableBlurEffect,
-        blurIntensity = 1.0f, // Moderate intensity for readability
-        playedLineBlur = 0.dp, // No blur for played lines
-        upcomingLineBlur = 3.dp, // Light blur for upcoming lines
-        distantLineBlur = 6.dp, // Medium blur for distant lines
+        blurIntensity = 1.0f,
+        playedLineBlur = 0.dp,
+        upcomingLineBlur = 3.dp,
+        distantLineBlur = 6.dp,
 
         // Shadow effects - subtle shadow for readability
         enableShadows = true,
@@ -119,16 +119,11 @@ class LibraryConfigMapper @Inject constructor() {
         textShadowOffset = androidx.compose.ui.geometry.Offset(2f, 2f),
         textShadowRadius = 4f,
 
-        // Glow effects - disabled by default
-        enableGlow = false,
-        glowColor = Color(userSettings.lyricsColorArgb).copy(alpha = 0.3f),
-        glowRadius = 8f,
-
         // Opacity - clear for playing/played, slightly reduced for upcoming
-        playingLineOpacity = 1f, // Full opacity for current line
-        playedLineOpacity = 0.9f, // Good visibility for played lines
-        upcomingLineOpacity = 0.5f, // Reduced visibility for upcoming
-        distantLineOpacity = 0.3f // More transparency for distant lines
+        playingLineOpacity = 1f,
+        playedLineOpacity = 0.9f,
+        upcomingLineOpacity = 0.5f,
+        distantLineOpacity = 0.3f
     )
 
     private fun mapBehaviorConfig(userSettings: UserSettings): BehaviorConfig = BehaviorConfig(
