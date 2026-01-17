@@ -1,4 +1,4 @@
-package com.karaokelyrics.demo
+package com.karaokelyrics.demo.domain.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
@@ -13,16 +13,16 @@ import androidx.compose.ui.text.style.TextAlign
 @Immutable
 data class DemoSettings(
     // Text settings
-    val fontSize: Float = 22f,
+    val fontSize: Float = 32f,
     val fontWeight: FontWeight = FontWeight.Bold,
     val fontFamily: FontFamily = FontFamily.Default,
     val textAlign: TextAlign = TextAlign.Center,
 
     // Colors
-    val sungColor: Color = Color(0xFF9E9E9E),
-    val unsungColor: Color = Color(0xFF616161),
-    val activeColor: Color = Color(0xFFFFEB3B),
-    val backgroundColor: Color = Color(0xFF121212),
+    val sungColor: Color = Color.Green,
+    val unsungColor: Color = Color.White,
+    val activeColor: Color = Color.Yellow,
+    val backgroundColor: Color = Color.Black,
 
     // Visual effects
     val gradientEnabled: Boolean = false,
