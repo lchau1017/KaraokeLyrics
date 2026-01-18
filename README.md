@@ -93,7 +93,7 @@ A complete karaoke player with real-time music playback and synchronized lyrics.
 - MVI architecture with Clean Architecture
 - Dagger Hilt dependency injection
 
-### 2. 🎨 UI Library Demo (`karaoke-ui-demo/`)
+### 2. 🎨 UI Library Demo (`kyrics-demo/`)
 An interactive showcase and testing ground for the karaoke UI library, built with **MVI (Model-View-Intent) architecture** and **Clean Architecture** principles.
 
 **Key Features:**
@@ -294,7 +294,7 @@ kyrics/
 ### Demo Module Structure (MVI Architecture)
 
 ```
-karaoke-ui-demo/
+kyrics-demo/
 ├── di/
 │   └── DemoModule.kt                    # Hilt dependency injection
 ├── data/
@@ -373,7 +373,7 @@ The project includes a comprehensive test suite covering all architectural layer
 | Module | Coverage | Test Types |
 |--------|----------|------------|
 | `kyrics` | 90%+ | Unit, Screenshot, Integration |
-| `karaoke-ui-demo` | 85%+ | Unit, ViewModel, Repository |
+| `kyrics-demo` | 85%+ | Unit, ViewModel, Repository |
 | `app` | 80%+ | Unit, ViewModel, Integration |
 
 ### Library Tests (`kyrics`)
@@ -403,10 +403,10 @@ kyrics/src/test/
 - **Configuration** - KyricsPresets validation and defaults
 - **Visual Regression** - Screenshot tests for all presets and components
 
-### Demo Module Tests (`karaoke-ui-demo`)
+### Demo Module Tests (`kyrics-demo`)
 
 ```
-karaoke-ui-demo/src/test/
+kyrics-demo/src/test/
 ├── data/
 │   ├── datasource/
 │   │   └── DemoLyricsDataSourceTest.kt        # Data source tests
@@ -433,7 +433,7 @@ karaoke-ui-demo/src/test/
 
 # Run specific module tests
 ./gradlew :kyrics:test
-./gradlew :karaoke-ui-demo:test
+./gradlew :kyrics-demo:test
 ./gradlew :app:test
 
 # Run with coverage report
@@ -879,7 +879,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
    ./gradlew :app:installDebug
 
    # UI library demo
-   ./gradlew :karaoke-ui-demo:installDebug
+   ./gradlew :kyrics-demo:installDebug
    ```
 
 ### Code Quality
