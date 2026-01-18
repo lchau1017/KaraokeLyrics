@@ -186,9 +186,9 @@ class PlayerViewModelTest {
     fun `setDuration updates state duration`() = runTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.setDuration(120000L)
+        viewModel.setDuration(120_000L)
 
-        assertThat(viewModel.state.value.duration).isEqualTo(120000L)
+        assertThat(viewModel.state.value.duration).isEqualTo(120_000L)
     }
 
     @Test
@@ -197,11 +197,11 @@ class PlayerViewModelTest {
         positionFlow.value = 5000L
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.setDuration(120000L)
+        viewModel.setDuration(120_000L)
 
         assertThat(viewModel.state.value.isPlaying).isTrue()
         assertThat(viewModel.state.value.currentPosition).isEqualTo(5000L)
-        assertThat(viewModel.state.value.duration).isEqualTo(120000L)
+        assertThat(viewModel.state.value.duration).isEqualTo(120_000L)
     }
 
     // ==================== Edge Cases ====================

@@ -1,8 +1,8 @@
 package com.karaokelyrics.app.data.parser
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.KaraokeLine
-import com.karaokelyrics.app.domain.model.KaraokeSyllable
+import com.karaokelyrics.app.domain.model.KyricsLine
+import com.karaokelyrics.app.domain.model.KyricsSyllable
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.parser.TtmlParser
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         }
 
         // Sort by start time
-        return SyncedLyrics(lyricsLines.sortedBy { (it as? KaraokeLine)?.start ?: 0 })
+        return SyncedLyrics(lyricsLines.sortedBy { (it as? KyricsLine)?.start ?: 0 })
     }
 
     private fun parseBody(parser: XmlPullParser, lyricsLines: MutableList<ISyncedLine>) {
@@ -78,8 +78,8 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
             return
         }
 
-        val mainSyllables = mutableListOf<KaraokeSyllable>()
-        val bgSyllables = mutableListOf<KaraokeSyllable>()
+        val mainSyllables = mutableListOf<KyricsSyllable>()
+        val bgSyllables = mutableListOf<KyricsSyllable>()
         var bgStart: Int? = null
         var bgEnd: Int? = null
 
@@ -101,7 +101,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
                     // Regular syllable span
                     val text = getElementText(parser, "span")
                     if (text.isNotEmpty()) {
-                        val syllable = KaraokeSyllable(
+                        val syllable = KyricsSyllable(
                             content = text,
                             start = parseTime(spanBegin),
                             end = parseTime(spanEnd)
@@ -137,7 +137,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
             )
 
             lyricsLines.add(
-                KaraokeLine(
+                KyricsLine(
                     syllables = mainSyllables,
                     start = parseTime(pBegin),
                     end = parseTime(pEnd),
@@ -156,7 +156,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
             )
 
             lyricsLines.add(
-                KaraokeLine(
+                KyricsLine(
                     syllables = bgSyllables,
                     start = bgStart ?: bgSyllables.first().start,
                     end = bgEnd ?: bgSyllables.last().end,

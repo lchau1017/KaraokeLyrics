@@ -6,7 +6,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.ui.core.config.*
+import com.kyrics.config.*
 import javax.inject.Inject
 
 /**
@@ -18,7 +18,7 @@ class LibraryConfigMapper @Inject constructor() {
     /**
      * Convert user settings to library configuration.
      */
-    fun mapToLibraryConfig(userSettings: UserSettings): KaraokeLibraryConfig = KaraokeLibraryConfig(
+    fun mapToLibraryConfig(userSettings: UserSettings): KyricsConfig = KyricsConfig(
         visual = mapVisualConfig(userSettings),
         animation = mapAnimationConfig(userSettings),
         layout = mapLayoutConfig(userSettings),
@@ -139,9 +139,9 @@ class LibraryConfigMapper @Inject constructor() {
     /**
      * Create a preset configuration based on user preference.
      */
-    fun getPresetConfig(presetName: String): KaraokeLibraryConfig = when (presetName.lowercase()) {
-        "minimal" -> KaraokeLibraryConfig.Minimal
-        "dramatic" -> KaraokeLibraryConfig.Dramatic
-        else -> KaraokeLibraryConfig.Default
+    fun getPresetConfig(presetName: String): KyricsConfig = when (presetName.lowercase()) {
+        "minimal" -> KyricsConfig.Minimal
+        "dramatic" -> KyricsConfig.Dramatic
+        else -> KyricsConfig.Default
     }
 }

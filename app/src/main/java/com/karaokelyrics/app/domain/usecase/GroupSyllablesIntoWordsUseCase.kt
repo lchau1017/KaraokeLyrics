@@ -1,6 +1,6 @@
 package com.karaokelyrics.app.domain.usecase
 
-import com.karaokelyrics.app.domain.model.KaraokeSyllable
+import com.karaokelyrics.app.domain.model.KyricsSyllable
 import javax.inject.Inject
 
 /**
@@ -13,11 +13,11 @@ class GroupSyllablesIntoWordsUseCase @Inject constructor() {
      * Groups syllables into words based on trailing whitespace.
      * A word ends when a syllable contains trailing whitespace.
      */
-    operator fun invoke(syllables: List<KaraokeSyllable>): List<List<KaraokeSyllable>> {
+    operator fun invoke(syllables: List<KyricsSyllable>): List<List<KyricsSyllable>> {
         if (syllables.isEmpty()) return emptyList()
 
-        val words = mutableListOf<List<KaraokeSyllable>>()
-        var currentWord = mutableListOf<KaraokeSyllable>()
+        val words = mutableListOf<List<KyricsSyllable>>()
+        var currentWord = mutableListOf<KyricsSyllable>()
 
         syllables.forEach { syllable ->
             currentWord.add(syllable)
