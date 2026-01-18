@@ -1,7 +1,7 @@
 package com.karaokelyrics.app.domain.model
 
-data class KaraokeLine(
-    val syllables: List<KaraokeSyllable>,
+data class KyricsLine(
+    val syllables: List<KyricsSyllable>,
     override val start: Int,
     override val end: Int,
     val metadata: Map<String, String> = emptyMap(), // Generic metadata instead of UI-specific fields

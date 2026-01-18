@@ -55,8 +55,8 @@ android {
 }
 
 dependencies {
-    // Karaoke UI Library
-    implementation(project(":karaoke-ui-library"))
+    // Kyrics Library
+    implementation(project(":kyrics"))
 
     // Core Android
     implementation("androidx.core:core-ktx:1.15.0")

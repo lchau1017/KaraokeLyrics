@@ -121,30 +121,30 @@ An interactive showcase and testing ground for the karaoke UI library, built wit
 
 ### Installation
 
-This is a multi-module project. To use the karaoke UI library in your app module, add the library module as a dependency:
+This is a multi-module project. To use the Kyrics library in your app module, add the library module as a dependency:
 
 ```kotlin
 // In your app/build.gradle.kts
 dependencies {
-    implementation(project(":karaoke-ui-library"))
+    implementation(project(":kyrics"))
 }
 ```
 
 ### Basic Usage
 
 ```kotlin
-import com.karaokelyrics.ui.api.KaraokeLyricsViewer
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+import com.kyrics.KyricsViewer
+import com.kyrics.config.KyricsConfig
 
 @Composable
 fun KaraokeScreen() {
     val lines = remember { loadLyricLines() }
     val currentTime by musicPlayer.currentTime.collectAsState()
 
-    KaraokeLyricsViewer(
+    KyricsViewer(
         lines = lines,
         currentTimeMs = currentTime,
-        config = KaraokeLibraryConfig.Default,
+        config = KyricsConfig.Default,
         modifier = Modifier.fillMaxSize()
     )
 }
@@ -153,15 +153,15 @@ fun KaraokeScreen() {
 ### Advanced Configuration
 
 ```kotlin
-import com.karaokelyrics.ui.api.KaraokeLyricsViewer
-import com.karaokelyrics.ui.api.KaraokePresets
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+import com.kyrics.KyricsViewer
+import com.kyrics.KyricsPresets
+import com.kyrics.config.KyricsConfig
 
 // Use a built-in preset
-val presetConfig = KaraokePresets.Neon
+val presetConfig = KyricsPresets.Neon
 
 // Or create a fully custom config
-val customConfig = KaraokeLibraryConfig(
+val customConfig = KyricsConfig(
     visual = VisualConfig(
         fontSize = 36.sp,
         playingTextColor = Color(0xFFFFD700),
@@ -191,7 +191,7 @@ val customConfig = KaraokeLibraryConfig(
     )
 )
 
-KaraokeLyricsViewer(
+KyricsViewer(
     lines = lines,
     currentTimeMs = currentTime,
     config = customConfig
@@ -242,27 +242,25 @@ Choose from 12 different viewing experiences:
 ### Library Structure
 
 ```
-karaoke-ui-library/
-├── api/
-│   └── KaraokeLibrary.kt       # KaraokeLyricsViewer & KaraokePresets
-├── core/
-│   ├── config/                 # Configuration system
-│   │   ├── KaraokeLibraryConfig.kt   # Main config
-│   │   ├── VisualConfig.kt           # Colors, fonts, gradients
-│   │   ├── AnimationConfig.kt        # Animation settings
-│   │   ├── LayoutConfig.kt           # Spacing, padding
-│   │   ├── EffectsConfig.kt          # Blur, shadows, opacity
-│   │   ├── BehaviorConfig.kt         # Scroll, interaction
-│   │   ├── ViewerType.kt             # 12 viewer types
-│   │   ├── LibraryPresets.kt         # 10 theme presets
-│   │   └── ColorConfig.kt            # Color schemes
-│   └── models/                 # Domain models
-│       ├── ISyncedLine.kt            # Line interface
-│       ├── KaraokeLine.kt            # Line implementation
-│       └── KaraokeSyllable.kt        # Syllable model
+kyrics/
+├── Kyrics.kt                   # Main API (KyricsViewer & KyricsPresets)
+├── config/                     # Configuration system
+│   ├── KyricsConfig.kt         # Main config
+│   ├── VisualConfig.kt         # Colors, fonts, gradients
+│   ├── AnimationConfig.kt      # Animation settings
+│   ├── LayoutConfig.kt         # Spacing, padding
+│   ├── EffectsConfig.kt        # Blur, shadows, opacity
+│   ├── BehaviorConfig.kt       # Scroll, interaction
+│   ├── ViewerType.kt           # 12 viewer types
+│   ├── KyricsPresets.kt        # 10 theme presets
+│   └── ColorConfig.kt          # Color schemes
+├── models/                     # Domain models
+│   ├── ISyncedLine.kt          # Line interface
+│   ├── KyricsLine.kt           # Line implementation
+│   └── KyricsSyllable.kt       # Syllable model
 ├── components/
-│   ├── KaraokeLyricsViewer.kt  # Main viewer container
-│   ├── KaraokeSingleLine.kt    # Single line renderer
+│   ├── KyricsViewer.kt         # Main viewer container
+│   ├── KyricsSingleLine.kt     # Single line renderer
 │   └── viewers/                # 12 viewer implementations
 │       ├── CenterFocusedViewer.kt
 │       ├── SmoothScrollViewer.kt
@@ -287,9 +285,9 @@ karaoke-ui-library/
 │   └── syllable/               # Syllable rendering
 │       └── SyllableRenderer.kt
 └── state/                      # State management
-    ├── KaraokeStateHolder.kt   # State container
-    ├── KaraokeStateCalculator.kt # State computation
-    ├── KaraokeUiState.kt       # UI state model
+    ├── KyricsStateHolder.kt    # State container
+    ├── KyricsStateCalculator.kt # State computation
+    ├── KyricsUiState.kt        # UI state model
     └── LineUiState.kt          # Per-line state
 ```
 
@@ -374,36 +372,35 @@ The project includes a comprehensive test suite covering all architectural layer
 
 | Module | Coverage | Test Types |
 |--------|----------|------------|
-| `karaoke-ui-library` | 90%+ | Unit, Screenshot, Integration |
+| `kyrics` | 90%+ | Unit, Screenshot, Integration |
 | `karaoke-ui-demo` | 85%+ | Unit, ViewModel, Repository |
 | `app` | 80%+ | Unit, ViewModel, Integration |
 
-### Library Tests (`karaoke-ui-library`)
+### Library Tests (`kyrics`)
 
 ```
-karaoke-ui-library/src/test/
-├── ui/
-│   ├── components/
-│   │   ├── KaraokeLyricsViewerTest.kt    # Viewer component tests
-│   │   └── KaraokeSingleLineTest.kt      # Single line rendering tests
-│   ├── core/config/
-│   │   └── LibraryPresetsTest.kt         # Preset configuration validation
-│   ├── rendering/
-│   │   ├── GradientFactoryTest.kt        # Gradient creation tests
-│   │   └── RenderingCalculationsTest.kt  # Rendering math tests
-│   ├── screenshot/
-│   │   ├── KaraokeSingleLineScreenshotTest.kt   # Visual regression tests
-│   │   └── LibraryPresetsScreenshotTest.kt      # Preset screenshot tests
-│   └── state/
-│       ├── KaraokeStateCalculatorTest.kt # State calculation logic
-│       ├── KaraokeStateHolderTest.kt     # State management tests
-│       └── KaraokeStateHolderComposeTest.kt # Compose integration
+kyrics/src/test/
+├── components/
+│   ├── KyricsViewerTest.kt           # Viewer component tests
+│   └── KyricsSingleLineTest.kt       # Single line rendering tests
+├── config/
+│   └── KyricsPresetsTest.kt          # Preset configuration validation
+├── rendering/
+│   ├── GradientFactoryTest.kt        # Gradient creation tests
+│   └── RenderingCalculationsTest.kt  # Rendering math tests
+├── screenshot/
+│   ├── KyricsSingleLineScreenshotTest.kt   # Visual regression tests
+│   └── KyricsPresetsScreenshotTest.kt      # Preset screenshot tests
+└── state/
+    ├── KyricsStateCalculatorTest.kt  # State calculation logic
+    ├── KyricsStateHolderTest.kt      # State management tests
+    └── KyricsStateHolderComposeTest.kt # Compose integration
 ```
 
 **Key Test Areas:**
-- **State Management** - KaraokeStateHolder and KaraokeStateCalculator
+- **State Management** - KyricsStateHolder and KyricsStateCalculator
 - **Rendering Logic** - GradientFactory, RenderingCalculations
-- **Configuration** - LibraryPresets validation and defaults
+- **Configuration** - KyricsPresets validation and defaults
 - **Visual Regression** - Screenshot tests for all presets and components
 
 ### Demo Module Tests (`karaoke-ui-demo`)
@@ -435,7 +432,7 @@ karaoke-ui-demo/src/test/
 ./gradlew test
 
 # Run specific module tests
-./gradlew :karaoke-ui-library:test
+./gradlew :kyrics:test
 ./gradlew :karaoke-ui-demo:test
 ./gradlew :app:test
 
@@ -443,7 +440,7 @@ karaoke-ui-demo/src/test/
 ./gradlew testDebugUnitTestCoverage
 
 # Run screenshot tests
-./gradlew :karaoke-ui-library:validateDebugScreenshotTest
+./gradlew :kyrics:validateDebugScreenshotTest
 
 # Run connected tests (requires device/emulator)
 ./gradlew connectedAndroidTest
@@ -507,16 +504,16 @@ Extended format supporting word-level synchronization:
 Rich programmatic format with full feature support:
 
 ```kotlin
-KaraokeLine(
+KyricsLine(
     start = 12340,
     end = 15670,
     content = "Every moment feels so right",
     syllables = listOf(
-        KaraokeSyllable("Every", 12340, 12800),
-        KaraokeSyllable("moment", 12800, 13400),
-        KaraokeSyllable("feels", 13400, 14000),
-        KaraokeSyllable("so", 14000, 14400),
-        KaraokeSyllable("right", 14400, 15670)
+        KyricsSyllable("Every", 12340, 12800),
+        KyricsSyllable("moment", 12800, 13400),
+        KyricsSyllable("feels", 13400, 14000),
+        KyricsSyllable("so", 14000, 14400),
+        KyricsSyllable("right", 14400, 15670)
     )
 )
 ```
@@ -634,22 +631,22 @@ val viewerConfig = ViewerConfig(
 
 ### Built-in Presets
 
-The library includes 10 ready-to-use theme presets via `KaraokePresets`:
+The library includes 10 ready-to-use theme presets via `KyricsPresets`:
 
 ```kotlin
-import com.karaokelyrics.ui.api.KaraokePresets
+import com.kyrics.KyricsPresets
 
 // Available presets
-KaraokePresets.Classic   // Simple, clean karaoke style
-KaraokePresets.Neon      // Cyan/magenta with gradient effects
-KaraokePresets.Rainbow   // Multi-color rainbow gradient
-KaraokePresets.Fire      // Warm orange/red colors with flicker
-KaraokePresets.Ocean     // Cool blue/turquoise with wave motion
-KaraokePresets.Retro     // 80s style with pink/cyan
-KaraokePresets.Minimal   // Clean black/gray on white
-KaraokePresets.Elegant   // Gold/silver with subtle effects
-KaraokePresets.Party     // All effects maxed out
-KaraokePresets.Matrix    // Green monospace on black
+KyricsPresets.Classic   // Simple, clean karaoke style
+KyricsPresets.Neon      // Cyan/magenta with gradient effects
+KyricsPresets.Rainbow   // Multi-color rainbow gradient
+KyricsPresets.Fire      // Warm orange/red colors with flicker
+KyricsPresets.Ocean     // Cool blue/turquoise with wave motion
+KyricsPresets.Retro     // 80s style with pink/cyan
+KyricsPresets.Minimal   // Clean black/gray on white
+KyricsPresets.Elegant   // Gold/silver with subtle effects
+KyricsPresets.Party     // All effects maxed out
+KyricsPresets.Matrix    // Green monospace on black
 ```
 
 ## 🎯 Use Cases
@@ -663,7 +660,7 @@ fun KaraokeApp() {
     val viewModel: KaraokeViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    KaraokeLyricsViewer(
+    KyricsViewer(
         lines = state.lyrics,
         currentTimeMs = state.currentPosition,
         config = state.config.copy(
@@ -686,10 +683,10 @@ fun MusicPlayerWithLyrics() {
     Column {
         AlbumArtwork(modifier = Modifier.height(200.dp))
 
-        KaraokeLyricsViewer(
+        KyricsViewer(
             lines = currentTrack.lyrics,
             currentTimeMs = playbackPosition,
-            config = KaraokeLibraryConfig.Default.copy(
+            config = KyricsConfig.Default.copy(
                 viewer = ViewerConfig(type = ViewerType.SMOOTH_SCROLL)
             ),
             modifier = Modifier.weight(1f)
@@ -706,10 +703,10 @@ Use for language learning with pronunciation guidance.
 ```kotlin
 @Composable
 fun LanguageLearningScreen() {
-    KaraokeLyricsViewer(
+    KyricsViewer(
         lines = lesson.sentences,
         currentTimeMs = audioPosition,
-        config = KaraokeLibraryConfig.Default.copy(
+        config = KyricsConfig.Default.copy(
             visual = VisualConfig(
                 fontSize = 20.sp,
                 playingTextColor = Color.Blue
@@ -730,14 +727,14 @@ fun LanguageLearningScreen() {
 The library includes 10 pre-configured theme presets:
 
 ```kotlin
-import com.karaokelyrics.ui.api.KaraokeLyricsViewer
-import com.karaokelyrics.ui.api.KaraokePresets
+import com.kyrics.KyricsViewer
+import com.kyrics.KyricsPresets
 
 // Use a preset directly
-KaraokeLyricsViewer(
+KyricsViewer(
     lines = lyrics,
     currentTimeMs = time,
-    config = KaraokePresets.Neon
+    config = KyricsPresets.Neon
 )
 
 // Available presets:
@@ -760,7 +757,7 @@ KaraokeLyricsViewer(
 fun ThemedKaraokeViewer() {
     val colorScheme = MaterialTheme.colorScheme
 
-    val config = KaraokeLibraryConfig(
+    val config = KyricsConfig(
         visual = VisualConfig(
             playingTextColor = colorScheme.primary,
             playedTextColor = colorScheme.onSurface.copy(alpha = 0.6f),
@@ -769,7 +766,7 @@ fun ThemedKaraokeViewer() {
         )
     )
 
-    KaraokeLyricsViewer(
+    KyricsViewer(
         lines = lyrics,
         currentTimeMs = time,
         config = config
@@ -783,8 +780,8 @@ Map your app's user settings to the library configuration:
 
 ```kotlin
 class LibraryConfigMapper {
-    fun mapToLibraryConfig(userSettings: UserSettings): KaraokeLibraryConfig =
-        KaraokeLibraryConfig(
+    fun mapToLibraryConfig(userSettings: UserSettings): KyricsConfig =
+        KyricsConfig(
             visual = VisualConfig(
                 fontSize = userSettings.fontSize.sp,
                 playingTextColor = Color(userSettings.lyricsColorArgb),
@@ -904,7 +901,7 @@ We maintain high code quality standards with automated tooling:
 ./gradlew testDebugUnitTestCoverage
 
 # Run screenshot tests
-./gradlew :karaoke-ui-library:validateDebugScreenshotTest
+./gradlew :kyrics:validateDebugScreenshotTest
 
 # Run connected/instrumented tests
 ./gradlew connectedAndroidTest

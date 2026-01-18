@@ -22,8 +22,8 @@ import com.karaokelyrics.demo.presentation.screen.components.SettingsPanel
 import com.karaokelyrics.demo.presentation.viewmodel.ColorPickerTarget
 import com.karaokelyrics.demo.presentation.viewmodel.DemoIntent
 import com.karaokelyrics.demo.presentation.viewmodel.DemoState
-import com.karaokelyrics.ui.api.KaraokeLyricsViewer
-import com.karaokelyrics.ui.core.models.ISyncedLine
+import com.kyrics.KyricsViewer
+import com.kyrics.models.ISyncedLine
 
 /**
  * Main demo screen composable - stateless.
@@ -59,7 +59,7 @@ fun DemoScreen(
                     .weight(0.33f)
                     .background(state.settings.backgroundColor)
             ) {
-                KaraokeLyricsViewer(
+                KyricsViewer(
                     lines = state.demoLines,
                     currentTimeMs = state.currentTimeMs.toInt(),
                     config = state.libraryConfig,

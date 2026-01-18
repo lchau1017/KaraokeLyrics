@@ -2,8 +2,8 @@ package com.karaokelyrics.demo.presentation.viewmodel
 
 import androidx.compose.runtime.Immutable
 import com.karaokelyrics.demo.domain.model.DemoSettings
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
-import com.karaokelyrics.ui.core.models.KaraokeLine
+import com.kyrics.config.KyricsConfig
+import com.kyrics.models.KyricsLine
 
 /**
  * Immutable UI state for the Demo screen.
@@ -15,8 +15,8 @@ data class DemoState(
     val currentTimeMs: Long = 0L,
     val selectedLineIndex: Int = 0,
     val showColorPicker: ColorPickerTarget? = null,
-    val demoLines: List<KaraokeLine> = emptyList(),
-    val libraryConfig: KaraokeLibraryConfig = KaraokeLibraryConfig.Default
+    val demoLines: List<KyricsLine> = emptyList(),
+    val libraryConfig: KyricsConfig = KyricsConfig.Default
 ) {
     companion object {
         val Initial = DemoState()

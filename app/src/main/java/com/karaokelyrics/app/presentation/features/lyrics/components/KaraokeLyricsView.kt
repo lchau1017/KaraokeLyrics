@@ -5,18 +5,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.karaokelyrics.ui.api.KaraokeLyricsViewer
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+import com.kyrics.KyricsViewer
+import com.kyrics.config.KyricsConfig
+import com.kyrics.models.ISyncedLine as LibraryISyncedLine
+import com.kyrics.models.KyricsLine
+import com.kyrics.models.KyricsSyllable
 
 /**
- * Simplified KaraokeLyricsView that uses the karaoke-ui-library.
+ * Simplified KaraokeLyricsView that uses the Kyrics library.
  * Acts as a thin wrapper to integrate the library with the app.
  */
 @Composable
 fun KaraokeLyricsView(
     lyrics: SyncedLyrics?,
     currentTimeMs: Int,
-    libraryConfig: KaraokeLibraryConfig,
+    libraryConfig: KyricsConfig,
     onLineClicked: (ISyncedLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -26,12 +29,12 @@ fun KaraokeLyricsView(
             line.toLibraryLine()
         }
 
-        KaraokeLyricsViewer(
+        KyricsViewer(
             lines = libraryLines,
             currentTimeMs = currentTimeMs,
             config = libraryConfig,
             modifier = modifier.fillMaxSize(),
-            onLineClick = { line, index ->
+            onLineClick = { _: LibraryISyncedLine, index: Int ->
                 // Find the original line and trigger callback
                 it.lines.getOrNull(index)?.let { originalLine ->
                     onLineClicked(originalLine)
@@ -45,14 +48,14 @@ fun KaraokeLyricsView(
  * Extension function to convert app's ISyncedLine to library's ISyncedLine.
  * Since they have the same structure, we can use a simple adapter.
  */
-private fun ISyncedLine.toLibraryLine(): com.karaokelyrics.ui.core.models.ISyncedLine {
+private fun ISyncedLine.toLibraryLine(): LibraryISyncedLine {
     val appLine = this
 
-    // If it's a KaraokeLine, convert it properly
-    if (appLine is com.karaokelyrics.app.domain.model.KaraokeLine) {
-        return com.karaokelyrics.ui.core.models.KaraokeLine(
+    // If it's a KyricsLine (app's version), convert it properly
+    if (appLine is com.karaokelyrics.app.domain.model.KyricsLine) {
+        return KyricsLine(
             syllables = appLine.syllables.map { syllable ->
-                com.karaokelyrics.ui.core.models.KaraokeSyllable(
+                KyricsSyllable(
                     content = syllable.content,
                     start = syllable.start,
                     end = syllable.end
@@ -65,7 +68,7 @@ private fun ISyncedLine.toLibraryLine(): com.karaokelyrics.ui.core.models.ISynce
     }
 
     // For simple lines, create a wrapper
-    return object : com.karaokelyrics.ui.core.models.ISyncedLine {
+    return object : LibraryISyncedLine {
         override val start: Int = appLine.start
         override val end: Int = appLine.end
         override fun getContent(): String = appLine.content

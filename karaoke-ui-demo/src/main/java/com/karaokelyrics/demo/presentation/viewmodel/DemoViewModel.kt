@@ -11,15 +11,15 @@ import com.karaokelyrics.demo.data.datasource.DemoLyricsDataSource
 import com.karaokelyrics.demo.domain.model.DemoSettings
 import com.karaokelyrics.demo.domain.usecase.GetDemoSettingsUseCase
 import com.karaokelyrics.demo.domain.usecase.UpdateDemoSettingsUseCase
-import com.karaokelyrics.ui.core.config.AnimationConfig
-import com.karaokelyrics.ui.core.config.ColorConfig
-import com.karaokelyrics.ui.core.config.EffectsConfig
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
-import com.karaokelyrics.ui.core.config.LayoutConfig
-import com.karaokelyrics.ui.core.config.LibraryPresets
-import com.karaokelyrics.ui.core.config.ViewerConfig
-import com.karaokelyrics.ui.core.config.ViewerType
-import com.karaokelyrics.ui.core.config.VisualConfig
+import com.kyrics.config.AnimationConfig
+import com.kyrics.config.ColorConfig
+import com.kyrics.config.EffectsConfig
+import com.kyrics.config.KyricsConfig
+import com.kyrics.config.LayoutConfig
+import com.kyrics.config.KyricsPresets
+import com.kyrics.config.ViewerConfig
+import com.kyrics.config.ViewerType
+import com.kyrics.config.VisualConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -317,16 +317,16 @@ class DemoViewModel @Inject constructor(
     private fun loadPreset(presetName: String) {
         viewModelScope.launch {
             val preset = when (presetName) {
-                "Classic" -> LibraryPresets.Classic
-                "Neon" -> LibraryPresets.Neon
-                "Minimal" -> LibraryPresets.Minimal
-                "Rainbow" -> LibraryPresets.Rainbow
-                "Fire" -> LibraryPresets.Fire
-                "Ocean" -> LibraryPresets.Ocean
-                "Retro" -> LibraryPresets.Retro
-                "Elegant" -> LibraryPresets.Elegant
-                "Party" -> LibraryPresets.Party
-                "Matrix" -> LibraryPresets.Matrix
+                "Classic" -> KyricsPresets.Classic
+                "Neon" -> KyricsPresets.Neon
+                "Minimal" -> KyricsPresets.Minimal
+                "Rainbow" -> KyricsPresets.Rainbow
+                "Fire" -> KyricsPresets.Fire
+                "Ocean" -> KyricsPresets.Ocean
+                "Retro" -> KyricsPresets.Retro
+                "Elegant" -> KyricsPresets.Elegant
+                "Party" -> KyricsPresets.Party
+                "Matrix" -> KyricsPresets.Matrix
                 else -> null
             }
 
@@ -353,8 +353,8 @@ class DemoViewModel @Inject constructor(
         }
     }
 
-    private fun buildLibraryConfig(settings: DemoSettings): KaraokeLibraryConfig {
-        return KaraokeLibraryConfig(
+    private fun buildLibraryConfig(settings: DemoSettings): KyricsConfig {
+        return KyricsConfig(
             visual = VisualConfig(
                 fontSize = settings.fontSize.sp,
                 fontWeight = settings.fontWeight,

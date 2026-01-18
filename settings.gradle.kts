@@ -16,5 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "KaraokeLyrics"
 include(":app")
-include(":karaoke-ui-library")
+include(":kyrics")
 include(":karaoke-ui-demo")

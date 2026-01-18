@@ -45,8 +45,8 @@ android {
 }
 
 dependencies {
-    // Include the karaoke UI library
-    implementation(project(":karaoke-ui-library"))
+    // Include the Kyrics library
+    implementation(project(":kyrics"))
 
     // Compose dependencies
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))

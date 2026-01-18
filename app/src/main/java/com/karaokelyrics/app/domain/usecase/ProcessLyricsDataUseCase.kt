@@ -1,7 +1,7 @@
 package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.KaraokeLine
+import com.karaokelyrics.app.domain.model.KyricsLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         // Sort lines by start time
         val sortedLines = lyrics.lines.sortedBy { line ->
             when (line) {
-                is KaraokeLine -> line.start
+                is KyricsLine -> line.start
                 else -> 0
             }
         }
@@ -31,7 +31,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         // Validate timing data
         val validatedLines = sortedLines.filter { line ->
             when (line) {
-                is KaraokeLine -> validateKaraokeLine(line)
+                is KyricsLine -> validateKyricsLine(line)
                 else -> true
             }
         }
@@ -39,7 +39,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         // Apply any other business transformations
         val processedLines = validatedLines.map { line ->
             when (line) {
-                is KaraokeLine -> processKaraokeLine(line)
+                is KyricsLine -> processKyricsLine(line)
                 else -> line
             }
         }
@@ -47,7 +47,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         return SyncedLyrics(processedLines)
     }
 
-    private fun validateKaraokeLine(line: KaraokeLine): Boolean {
+    private fun validateKyricsLine(line: KyricsLine): Boolean {
         // Validate that line has valid timing
         if (line.start < 0 || line.end <= line.start) {
             return false
@@ -59,7 +59,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         }
     }
 
-    private fun processKaraokeLine(line: KaraokeLine): KaraokeLine {
+    private fun processKyricsLine(line: KyricsLine): KyricsLine {
         // Trim trailing spaces from last syllable
         val processedSyllables = line.syllables.toMutableList()
         if (processedSyllables.isNotEmpty()) {
@@ -80,11 +80,11 @@ class ProcessLyricsDataUseCase @Inject constructor() {
      */
     fun mergeOverlappingLines(lyrics: SyncedLyrics): SyncedLyrics {
         val mergedLines = mutableListOf<ISyncedLine>()
-        var previousLine: KaraokeLine? = null
+        var previousLine: KyricsLine? = null
 
         for (line in lyrics.lines) {
             when (line) {
-                is KaraokeLine -> {
+                is KyricsLine -> {
                     if (previousLine != null && shouldMergeLines(previousLine, line)) {
                         // Merge lines
                         previousLine = mergeTwoLines(previousLine, line)
@@ -104,14 +104,14 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         return SyncedLyrics(mergedLines)
     }
 
-    private fun shouldMergeLines(line1: KaraokeLine, line2: KaraokeLine): Boolean {
+    private fun shouldMergeLines(line1: KyricsLine, line2: KyricsLine): Boolean {
         // Business rule: Merge if lines overlap and have same metadata
         return line1.end > line2.start &&
             line1.metadata == line2.metadata &&
             line1.isAccompaniment == line2.isAccompaniment
     }
 
-    private fun mergeTwoLines(line1: KaraokeLine, line2: KaraokeLine): KaraokeLine = KaraokeLine(
+    private fun mergeTwoLines(line1: KyricsLine, line2: KyricsLine): KyricsLine = KyricsLine(
         syllables = line1.syllables + line2.syllables,
         start = line1.start,
         end = maxOf(line1.end, line2.end),

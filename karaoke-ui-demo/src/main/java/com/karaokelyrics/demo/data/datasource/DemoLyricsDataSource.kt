@@ -1,7 +1,7 @@
 package com.karaokelyrics.demo.data.datasource
 
-import com.karaokelyrics.ui.core.models.KaraokeLine
-import com.karaokelyrics.ui.core.models.KaraokeSyllable
+import com.kyrics.models.KyricsLine
+import com.kyrics.models.KyricsSyllable
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,112 +11,112 @@ import javax.inject.Singleton
 @Singleton
 class DemoLyricsDataSource @Inject constructor() {
 
-    fun getDemoLyrics(): List<KaraokeLine> = listOf(
+    fun getDemoLyrics(): List<KyricsLine> = listOf(
         // First verse
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("When ", 0, 200),
-                KaraokeSyllable("the ", 200, 400),
-                KaraokeSyllable("sun ", 400, 800),
-                KaraokeSyllable("goes ", 800, 1200),
-                KaraokeSyllable("down", 1200, 2000)
+                KyricsSyllable("When ", 0, 200),
+                KyricsSyllable("the ", 200, 400),
+                KyricsSyllable("sun ", 400, 800),
+                KyricsSyllable("goes ", 800, 1200),
+                KyricsSyllable("down", 1200, 2000)
             ),
             start = 0,
             end = 2000
         ),
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("And ", 2000, 2200),
-                KaraokeSyllable("the ", 2200, 2400),
-                KaraokeSyllable("stars ", 2400, 2800),
-                KaraokeSyllable("come ", 2800, 3200),
-                KaraokeSyllable("out", 3200, 4000)
+                KyricsSyllable("And ", 2000, 2200),
+                KyricsSyllable("the ", 2200, 2400),
+                KyricsSyllable("stars ", 2400, 2800),
+                KyricsSyllable("come ", 2800, 3200),
+                KyricsSyllable("out", 3200, 4000)
             ),
             start = 2000,
             end = 4000
         ),
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("I'll ", 4000, 4200),
-                KaraokeSyllable("be ", 4200, 4400),
-                KaraokeSyllable("dream", 4400, 4800),
-                KaraokeSyllable("ing ", 4800, 5200),
-                KaraokeSyllable("of ", 5200, 5400),
-                KaraokeSyllable("you", 5400, 6000)
+                KyricsSyllable("I'll ", 4000, 4200),
+                KyricsSyllable("be ", 4200, 4400),
+                KyricsSyllable("dream", 4400, 4800),
+                KyricsSyllable("ing ", 4800, 5200),
+                KyricsSyllable("of ", 5200, 5400),
+                KyricsSyllable("you", 5400, 6000)
             ),
             start = 4000,
             end = 6000
         ),
 
         // Chorus
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("Dance ", 6500, 6900),
-                KaraokeSyllable("with ", 6900, 7100),
-                KaraokeSyllable("me ", 7100, 7500),
-                KaraokeSyllable("to", 7500, 7700),
-                KaraokeSyllable("night", 7700, 8500)
+                KyricsSyllable("Dance ", 6500, 6900),
+                KyricsSyllable("with ", 6900, 7100),
+                KyricsSyllable("me ", 7100, 7500),
+                KyricsSyllable("to", 7500, 7700),
+                KyricsSyllable("night", 7700, 8500)
             ),
             start = 6500,
             end = 8500
         ),
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("Un", 8500, 8700),
-                KaraokeSyllable("der ", 8700, 8900),
-                KaraokeSyllable("the ", 8900, 9100),
-                KaraokeSyllable("moon", 9100, 9500),
-                KaraokeSyllable("light", 9500, 10500)
+                KyricsSyllable("Un", 8500, 8700),
+                KyricsSyllable("der ", 8700, 8900),
+                KyricsSyllable("the ", 8900, 9100),
+                KyricsSyllable("moon", 9100, 9500),
+                KyricsSyllable("light", 9500, 10500)
             ),
             start = 8500,
             end = 10500
         ),
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("Hold ", 10500, 10900),
-                KaraokeSyllable("me ", 10900, 11300),
-                KaraokeSyllable("close", 11300, 11700),
-                KaraokeSyllable("ly", 11700, 12500)
+                KyricsSyllable("Hold ", 10500, 10900),
+                KyricsSyllable("me ", 10900, 11300),
+                KyricsSyllable("close", 11300, 11700),
+                KyricsSyllable("ly", 11700, 12500)
             ),
             start = 10500,
             end = 12500
         ),
 
         // Bridge
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("Eve", 13000, 13200),
-                KaraokeSyllable("ry ", 13200, 13400),
-                KaraokeSyllable("mo", 13400, 13600),
-                KaraokeSyllable("ment ", 13600, 14000),
-                KaraokeSyllable("feels ", 14000, 14400),
-                KaraokeSyllable("so ", 14400, 14600),
-                KaraokeSyllable("right", 14600, 15500)
+                KyricsSyllable("Eve", 13000, 13200),
+                KyricsSyllable("ry ", 13200, 13400),
+                KyricsSyllable("mo", 13400, 13600),
+                KyricsSyllable("ment ", 13600, 14000),
+                KyricsSyllable("feels ", 14000, 14400),
+                KyricsSyllable("so ", 14400, 14600),
+                KyricsSyllable("right", 14600, 15500)
             ),
             start = 13000,
             end = 15500
         ),
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("With ", 15500, 15700),
-                KaraokeSyllable("you ", 15700, 16100),
-                KaraokeSyllable("by ", 16100, 16300),
-                KaraokeSyllable("my ", 16300, 16500),
-                KaraokeSyllable("side", 16500, 17500)
+                KyricsSyllable("With ", 15500, 15700),
+                KyricsSyllable("you ", 15700, 16100),
+                KyricsSyllable("by ", 16100, 16300),
+                KyricsSyllable("my ", 16300, 16500),
+                KyricsSyllable("side", 16500, 17500)
             ),
             start = 15500,
             end = 17500
         ),
 
         // Outro
-        KaraokeLine(
+        KyricsLine(
             syllables = listOf(
-                KaraokeSyllable("For", 18000, 18200),
-                KaraokeSyllable("ev", 18200, 18400),
-                KaraokeSyllable("er ", 18400, 18800),
-                KaraokeSyllable("and ", 18800, 19000),
-                KaraokeSyllable("al", 19000, 19200),
-                KaraokeSyllable("ways", 19200, 20000)
+                KyricsSyllable("For", 18000, 18200),
+                KyricsSyllable("ev", 18200, 18400),
+                KyricsSyllable("er ", 18400, 18800),
+                KyricsSyllable("and ", 18800, 19000),
+                KyricsSyllable("al", 19000, 19200),
+                KyricsSyllable("ways", 19200, 20000)
             ),
             start = 18000,
             end = 20000
