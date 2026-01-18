@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.karaokelyrics.app.domain.model.ISyncedLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.karaokelyrics.ui.api.KaraokeLibrary
+import com.karaokelyrics.ui.api.KaraokeLyricsViewer
 import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
 
 /**
@@ -26,7 +26,7 @@ fun KaraokeLyricsView(
             line.toLibraryLine()
         }
 
-        KaraokeLibrary.KaraokeLyricsViewer(
+        KaraokeLyricsViewer(
             lines = libraryLines,
             currentTimeMs = currentTimeMs,
             config = libraryConfig,

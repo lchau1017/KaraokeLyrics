@@ -121,17 +121,21 @@ An interactive showcase and testing ground for the karaoke UI library, built wit
 
 ### Installation
 
-Add to your `build.gradle.kts` (Module: app):
+This is a multi-module project. To use the karaoke UI library in your app module, add the library module as a dependency:
 
 ```kotlin
+// In your app/build.gradle.kts
 dependencies {
-    implementation 'com.karaokelyrics:karaoke-ui-library:1.0.0'
+    implementation(project(":karaoke-ui-library"))
 }
 ```
 
 ### Basic Usage
 
 ```kotlin
+import com.karaokelyrics.ui.api.KaraokeLyricsViewer
+import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+
 @Composable
 fun KaraokeScreen() {
     val lines = remember { loadLyricLines() }
@@ -149,8 +153,12 @@ fun KaraokeScreen() {
 ### Advanced Configuration
 
 ```kotlin
+import com.karaokelyrics.ui.api.KaraokeLyricsViewer
+import com.karaokelyrics.ui.api.KaraokePresets
+import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+
 // Use a built-in preset
-val presetConfig = LibraryPresets.Neon
+val presetConfig = KaraokePresets.Neon
 
 // Or create a fully custom config
 val customConfig = KaraokeLibraryConfig(
@@ -236,7 +244,7 @@ Choose from 12 different viewing experiences:
 ```
 karaoke-ui-library/
 ├── api/
-│   └── KaraokeLibrary.kt       # Main entry point
+│   └── KaraokeLibrary.kt       # KaraokeLyricsViewer & KaraokePresets
 ├── core/
 │   ├── config/                 # Configuration system
 │   │   ├── KaraokeLibraryConfig.kt   # Main config
@@ -626,20 +634,22 @@ val viewerConfig = ViewerConfig(
 
 ### Built-in Presets
 
-The library includes 10 ready-to-use theme presets in `LibraryPresets`:
+The library includes 10 ready-to-use theme presets via `KaraokePresets`:
 
 ```kotlin
+import com.karaokelyrics.ui.api.KaraokePresets
+
 // Available presets
-LibraryPresets.Classic   // Simple, clean karaoke style
-LibraryPresets.Neon      // Cyan/magenta with gradient effects
-LibraryPresets.Rainbow   // Multi-color rainbow gradient
-LibraryPresets.Fire      // Warm orange/red colors with flicker
-LibraryPresets.Ocean     // Cool blue/turquoise with wave motion
-LibraryPresets.Retro     // 80s style with pink/cyan
-LibraryPresets.Minimal   // Clean black/gray on white
-LibraryPresets.Elegant   // Gold/silver with subtle effects
-LibraryPresets.Party     // All effects maxed out
-LibraryPresets.Matrix    // Green monospace on black
+KaraokePresets.Classic   // Simple, clean karaoke style
+KaraokePresets.Neon      // Cyan/magenta with gradient effects
+KaraokePresets.Rainbow   // Multi-color rainbow gradient
+KaraokePresets.Fire      // Warm orange/red colors with flicker
+KaraokePresets.Ocean     // Cool blue/turquoise with wave motion
+KaraokePresets.Retro     // 80s style with pink/cyan
+KaraokePresets.Minimal   // Clean black/gray on white
+KaraokePresets.Elegant   // Gold/silver with subtle effects
+KaraokePresets.Party     // All effects maxed out
+KaraokePresets.Matrix    // Green monospace on black
 ```
 
 ## 🎯 Use Cases
@@ -720,11 +730,14 @@ fun LanguageLearningScreen() {
 The library includes 10 pre-configured theme presets:
 
 ```kotlin
+import com.karaokelyrics.ui.api.KaraokeLyricsViewer
+import com.karaokelyrics.ui.api.KaraokePresets
+
 // Use a preset directly
 KaraokeLyricsViewer(
     lines = lyrics,
     currentTimeMs = time,
-    config = LibraryPresets.Neon
+    config = KaraokePresets.Neon
 )
 
 // Available presets:
