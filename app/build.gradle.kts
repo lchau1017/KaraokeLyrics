@@ -56,7 +56,7 @@ android {
 
 dependencies {
     // Kyrics Library
-    implementation(project(":kyrics"))
+    implementation(libs.kyrics)
 
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
