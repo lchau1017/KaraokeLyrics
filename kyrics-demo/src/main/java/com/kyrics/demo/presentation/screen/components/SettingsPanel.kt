@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -30,16 +30,13 @@ import androidx.compose.ui.unit.sp
 import com.kyrics.demo.presentation.viewmodel.ColorPickerTarget
 import com.kyrics.demo.presentation.viewmodel.DemoIntent
 import com.kyrics.demo.presentation.viewmodel.DemoState
+import java.util.Locale
 
 /**
  * Stateless settings panel composable containing all demo controls.
  */
 @Composable
-fun SettingsPanel(
-    state: DemoState,
-    onIntent: (DemoIntent) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun SettingsPanel(state: DemoState, onIntent: (DemoIntent) -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -231,11 +228,7 @@ private fun ColorsSection(
 }
 
 @Composable
-private fun ColorRow(
-    label: String,
-    color: Color,
-    onClick: () -> Unit
-) {
+private fun ColorRow(label: String, color: Color, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -289,7 +282,7 @@ private fun VisualEffectsSection(
         Text("Blur (for non-active lines)", modifier = Modifier.padding(start = 8.dp))
     }
     if (blurEnabled) {
-        Text("Intensity: ${String.format("%.1f", blurIntensity)}", fontSize = 12.sp)
+        Text("Intensity: ${String.format(Locale.US, "%.1f", blurIntensity)}", fontSize = 12.sp)
         Slider(
             value = blurIntensity,
             onValueChange = { onIntent(DemoIntent.UpdateBlurIntensity(it)) },
@@ -322,7 +315,7 @@ private fun AnimationsSection(
         Text("Character Animation", modifier = Modifier.padding(start = 8.dp))
     }
     if (charAnimEnabled) {
-        Text("Max Scale: ${String.format("%.2f", charMaxScale)}", fontSize = 12.sp)
+        Text("Max Scale: ${String.format(Locale.US, "%.2f", charMaxScale)}", fontSize = 12.sp)
         Slider(
             value = charMaxScale,
             onValueChange = { onIntent(DemoIntent.UpdateCharMaxScale(it)) },
@@ -351,7 +344,7 @@ private fun AnimationsSection(
         Text("Line Animation", modifier = Modifier.padding(start = 8.dp))
     }
     if (lineAnimEnabled) {
-        Text("Scale on Play: ${String.format("%.2f", lineScaleOnPlay)}", fontSize = 12.sp)
+        Text("Scale on Play: ${String.format(Locale.US, "%.2f", lineScaleOnPlay)}", fontSize = 12.sp)
         Slider(
             value = lineScaleOnPlay,
             onValueChange = { onIntent(DemoIntent.UpdateLineScaleOnPlay(it)) },
@@ -369,7 +362,7 @@ private fun AnimationsSection(
     }
     if (pulseEnabled) {
         Text(
-            "Pulse Range: ${String.format("%.2f", pulseMinScale)} - ${String.format("%.2f", pulseMaxScale)}",
+            "Pulse Range: ${String.format(Locale.US, "%.2f", pulseMinScale)} - ${String.format(Locale.US, "%.2f", pulseMaxScale)}",
             fontSize = 12.sp
         )
         Slider(

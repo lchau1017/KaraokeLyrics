@@ -11,6 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class DemoLyricsDataSource @Inject constructor() {
 
+    @Suppress("LongMethod")
     fun getDemoLyrics(): List<KyricsLine> = listOf(
         // First verse
         KyricsLine(
@@ -62,68 +63,68 @@ class DemoLyricsDataSource @Inject constructor() {
         ),
         KyricsLine(
             syllables = listOf(
-                KyricsSyllable("Un", 8500, 8700),
-                KyricsSyllable("der ", 8700, 8900),
-                KyricsSyllable("the ", 8900, 9100),
-                KyricsSyllable("moon", 9100, 9500),
-                KyricsSyllable("light", 9500, 10500)
+                KyricsSyllable("Un", 8_500, 8_700),
+                KyricsSyllable("der ", 8_700, 8_900),
+                KyricsSyllable("the ", 8_900, 9_100),
+                KyricsSyllable("moon", 9_100, 9_500),
+                KyricsSyllable("light", 9_500, 10_500)
             ),
-            start = 8500,
-            end = 10500
+            start = 8_500,
+            end = 10_500
         ),
         KyricsLine(
             syllables = listOf(
-                KyricsSyllable("Hold ", 10500, 10900),
-                KyricsSyllable("me ", 10900, 11300),
-                KyricsSyllable("close", 11300, 11700),
-                KyricsSyllable("ly", 11700, 12500)
+                KyricsSyllable("Hold ", 10_500, 10_900),
+                KyricsSyllable("me ", 10_900, 11_300),
+                KyricsSyllable("close", 11_300, 11_700),
+                KyricsSyllable("ly", 11_700, 12_500)
             ),
-            start = 10500,
-            end = 12500
+            start = 10_500,
+            end = 12_500
         ),
 
         // Bridge
         KyricsLine(
             syllables = listOf(
-                KyricsSyllable("Eve", 13000, 13200),
-                KyricsSyllable("ry ", 13200, 13400),
-                KyricsSyllable("mo", 13400, 13600),
-                KyricsSyllable("ment ", 13600, 14000),
-                KyricsSyllable("feels ", 14000, 14400),
-                KyricsSyllable("so ", 14400, 14600),
-                KyricsSyllable("right", 14600, 15500)
+                KyricsSyllable("Eve", 13_000, 13_200),
+                KyricsSyllable("ry ", 13_200, 13_400),
+                KyricsSyllable("mo", 13_400, 13_600),
+                KyricsSyllable("ment ", 13_600, 14_000),
+                KyricsSyllable("feels ", 14_000, 14_400),
+                KyricsSyllable("so ", 14_400, 14_600),
+                KyricsSyllable("right", 14_600, 15_500)
             ),
-            start = 13000,
-            end = 15500
+            start = 13_000,
+            end = 15_500
         ),
         KyricsLine(
             syllables = listOf(
-                KyricsSyllable("With ", 15500, 15700),
-                KyricsSyllable("you ", 15700, 16100),
-                KyricsSyllable("by ", 16100, 16300),
-                KyricsSyllable("my ", 16300, 16500),
-                KyricsSyllable("side", 16500, 17500)
+                KyricsSyllable("With ", 15_500, 15_700),
+                KyricsSyllable("you ", 15_700, 16_100),
+                KyricsSyllable("by ", 16_100, 16_300),
+                KyricsSyllable("my ", 16_300, 16_500),
+                KyricsSyllable("side", 16_500, 17_500)
             ),
-            start = 15500,
-            end = 17500
+            start = 15_500,
+            end = 17_500
         ),
 
         // Outro
         KyricsLine(
             syllables = listOf(
-                KyricsSyllable("For", 18000, 18200),
-                KyricsSyllable("ev", 18200, 18400),
-                KyricsSyllable("er ", 18400, 18800),
-                KyricsSyllable("and ", 18800, 19000),
-                KyricsSyllable("al", 19000, 19200),
-                KyricsSyllable("ways", 19200, 20000)
+                KyricsSyllable("For", 18_000, 18_200),
+                KyricsSyllable("ev", 18_200, 18_400),
+                KyricsSyllable("er ", 18_400, 18_800),
+                KyricsSyllable("and ", 18_800, 19_000),
+                KyricsSyllable("al", 19_000, 19_200),
+                KyricsSyllable("ways", 19_200, 20_000)
             ),
-            start = 18000,
-            end = 20000
+            start = 18_000,
+            end = 20_000
         )
     )
 
     companion object {
-        const val TOTAL_DURATION_MS = 20000L
+        const val TOTAL_DURATION_MS = 20_000L
     }
 }

@@ -7,20 +7,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kyrics.demo.data.datasource.DemoLyricsDataSource
-import com.kyrics.demo.domain.model.DemoSettings
-import com.kyrics.demo.domain.usecase.GetDemoSettingsUseCase
-import com.kyrics.demo.domain.usecase.UpdateDemoSettingsUseCase
 import com.kyrics.config.AnimationConfig
 import com.kyrics.config.ColorConfig
 import com.kyrics.config.EffectsConfig
 import com.kyrics.config.KyricsConfig
-import com.kyrics.config.LayoutConfig
 import com.kyrics.config.KyricsPresets
+import com.kyrics.config.LayoutConfig
 import com.kyrics.config.ViewerConfig
 import com.kyrics.config.ViewerType
 import com.kyrics.config.VisualConfig
+import com.kyrics.demo.data.datasource.DemoLyricsDataSource
+import com.kyrics.demo.domain.model.DemoSettings
+import com.kyrics.demo.domain.usecase.GetDemoSettingsUseCase
+import com.kyrics.demo.domain.usecase.UpdateDemoSettingsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -30,7 +31,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class DemoViewModel @Inject constructor(
@@ -353,69 +353,65 @@ class DemoViewModel @Inject constructor(
         }
     }
 
-    private fun buildLibraryConfig(settings: DemoSettings): KyricsConfig {
-        return KyricsConfig(
-            visual = VisualConfig(
-                fontSize = settings.fontSize.sp,
-                fontWeight = settings.fontWeight,
-                fontFamily = settings.fontFamily,
-                textAlign = settings.textAlign,
-                playingTextColor = settings.activeColor,
-                playedTextColor = settings.sungColor,
-                upcomingTextColor = settings.unsungColor,
-                backgroundColor = settings.backgroundColor,
-                gradientEnabled = settings.gradientEnabled,
-                gradientAngle = settings.gradientAngle,
-                colors = ColorConfig(
-                    sung = settings.sungColor,
-                    unsung = settings.unsungColor,
-                    active = settings.activeColor
-                )
-            ),
-            animation = AnimationConfig(
-                enableCharacterAnimations = settings.charAnimEnabled,
-                characterMaxScale = settings.charMaxScale,
-                characterFloatOffset = settings.charFloatOffset,
-                characterRotationDegrees = settings.charRotationDegrees,
-                characterAnimationDuration = 800f,
-                enableLineAnimations = settings.lineAnimEnabled,
-                lineScaleOnPlay = settings.lineScaleOnPlay,
-                lineAnimationDuration = 700f,
-                enablePulse = settings.pulseEnabled,
-                pulseMinScale = settings.pulseMinScale,
-                pulseMaxScale = settings.pulseMaxScale
-            ),
-            effects = EffectsConfig(
-                enableBlur = settings.blurEnabled,
-                blurIntensity = settings.blurIntensity,
-                upcomingLineBlur = (3 * settings.blurIntensity).dp,
-                distantLineBlur = (6 * settings.blurIntensity).dp
-            ),
-            layout = LayoutConfig(
-                viewerConfig = ViewerConfig(
-                    type = getViewerType(settings.viewerTypeIndex)
-                ),
-                lineSpacing = settings.lineSpacing.dp,
-                containerPadding = PaddingValues(8.dp)
+    private fun buildLibraryConfig(settings: DemoSettings): KyricsConfig = KyricsConfig(
+        visual = VisualConfig(
+            fontSize = settings.fontSize.sp,
+            fontWeight = settings.fontWeight,
+            fontFamily = settings.fontFamily,
+            textAlign = settings.textAlign,
+            playingTextColor = settings.activeColor,
+            playedTextColor = settings.sungColor,
+            upcomingTextColor = settings.unsungColor,
+            backgroundColor = settings.backgroundColor,
+            gradientEnabled = settings.gradientEnabled,
+            gradientAngle = settings.gradientAngle,
+            colors = ColorConfig(
+                sung = settings.sungColor,
+                unsung = settings.unsungColor,
+                active = settings.activeColor
             )
+        ),
+        animation = AnimationConfig(
+            enableCharacterAnimations = settings.charAnimEnabled,
+            characterMaxScale = settings.charMaxScale,
+            characterFloatOffset = settings.charFloatOffset,
+            characterRotationDegrees = settings.charRotationDegrees,
+            characterAnimationDuration = 800f,
+            enableLineAnimations = settings.lineAnimEnabled,
+            lineScaleOnPlay = settings.lineScaleOnPlay,
+            lineAnimationDuration = 700f,
+            enablePulse = settings.pulseEnabled,
+            pulseMinScale = settings.pulseMinScale,
+            pulseMaxScale = settings.pulseMaxScale
+        ),
+        effects = EffectsConfig(
+            enableBlur = settings.blurEnabled,
+            blurIntensity = settings.blurIntensity,
+            upcomingLineBlur = (3 * settings.blurIntensity).dp,
+            distantLineBlur = (6 * settings.blurIntensity).dp
+        ),
+        layout = LayoutConfig(
+            viewerConfig = ViewerConfig(
+                type = getViewerType(settings.viewerTypeIndex)
+            ),
+            lineSpacing = settings.lineSpacing.dp,
+            containerPadding = PaddingValues(8.dp)
         )
-    }
+    )
 
-    private fun getViewerType(index: Int): ViewerType {
-        return when (index) {
-            0 -> ViewerType.CENTER_FOCUSED
-            1 -> ViewerType.SMOOTH_SCROLL
-            2 -> ViewerType.STACKED
-            3 -> ViewerType.HORIZONTAL_PAGED
-            4 -> ViewerType.WAVE_FLOW
-            5 -> ViewerType.SPIRAL
-            6 -> ViewerType.CAROUSEL_3D
-            7 -> ViewerType.SPLIT_DUAL
-            8 -> ViewerType.ELASTIC_BOUNCE
-            9 -> ViewerType.FADE_THROUGH
-            10 -> ViewerType.RADIAL_BURST
-            11 -> ViewerType.FLIP_CARD
-            else -> ViewerType.CENTER_FOCUSED
-        }
+    private fun getViewerType(index: Int): ViewerType = when (index) {
+        0 -> ViewerType.CENTER_FOCUSED
+        1 -> ViewerType.SMOOTH_SCROLL
+        2 -> ViewerType.STACKED
+        3 -> ViewerType.HORIZONTAL_PAGED
+        4 -> ViewerType.WAVE_FLOW
+        5 -> ViewerType.SPIRAL
+        6 -> ViewerType.CAROUSEL_3D
+        7 -> ViewerType.SPLIT_DUAL
+        8 -> ViewerType.ELASTIC_BOUNCE
+        9 -> ViewerType.FADE_THROUGH
+        10 -> ViewerType.RADIAL_BURST
+        11 -> ViewerType.FLIP_CARD
+        else -> ViewerType.CENTER_FOCUSED
     }
 }

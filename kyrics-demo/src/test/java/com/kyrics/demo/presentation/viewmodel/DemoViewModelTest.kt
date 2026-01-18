@@ -51,13 +51,11 @@ class DemoViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(): DemoViewModel {
-        return DemoViewModel(
-            getDemoSettingsUseCase,
-            updateDemoSettingsUseCase,
-            demoLyricsDataSource
-        )
-    }
+    private fun createViewModel(): DemoViewModel = DemoViewModel(
+        getDemoSettingsUseCase,
+        updateDemoSettingsUseCase,
+        demoLyricsDataSource
+    )
 
     // ==================== Initial State Tests ====================
 
@@ -140,9 +138,9 @@ class DemoViewModelTest {
         viewModel = createViewModel()
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.onIntent(DemoIntent.Seek(10000))
+        viewModel.onIntent(DemoIntent.Seek(10_000))
 
-        assertThat(viewModel.state.value.currentTimeMs).isEqualTo(10000)
+        assertThat(viewModel.state.value.currentTimeMs).isEqualTo(10_000)
     }
 
     @Test

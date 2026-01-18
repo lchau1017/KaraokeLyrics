@@ -2,11 +2,11 @@ package com.kyrics.demo.data.repository
 
 import com.kyrics.demo.domain.model.DemoSettings
 import com.kyrics.demo.domain.repository.DemoSettingsRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Implementation of DemoSettingsRepository.

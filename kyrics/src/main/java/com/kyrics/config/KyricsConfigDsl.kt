@@ -50,9 +50,7 @@ annotation class KyricsConfigDsl
  * }
  * ```
  */
-fun kyricsConfig(block: KyricsConfigBuilder.() -> Unit): KyricsConfig {
-    return KyricsConfigBuilder().apply(block).build()
-}
+fun kyricsConfig(block: KyricsConfigBuilder.() -> Unit): KyricsConfig = KyricsConfigBuilder().apply(block).build()
 
 /**
  * Main builder for [KyricsConfig].

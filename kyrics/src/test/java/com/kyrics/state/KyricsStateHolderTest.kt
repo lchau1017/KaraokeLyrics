@@ -235,7 +235,7 @@ class KyricsStateHolderTest {
     @Test
     fun `handles time after all lines`() {
         stateHolder.setLines(TestData.createSimpleLines())
-        stateHolder.updateTime(20000) // After all lines
+        stateHolder.updateTime(20_000) // After all lines
 
         assertThat(stateHolder.currentLineIndex).isNull()
         // All lines should be played

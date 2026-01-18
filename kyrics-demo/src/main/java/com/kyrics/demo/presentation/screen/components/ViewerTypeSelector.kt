@@ -15,11 +15,7 @@ import androidx.compose.ui.unit.sp
  * Stateless viewer type selector composable.
  */
 @Composable
-fun ViewerTypeSelector(
-    selectedIndex: Int,
-    onSelectViewerType: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ViewerTypeSelector(selectedIndex: Int, onSelectViewerType: (Int) -> Unit, modifier: Modifier = Modifier) {
     val viewerTypes = listOf(
         "Center", "Smooth", "Stacked", "H-Paged",
         "Wave", "Spiral", "3D-Carousel", "Split",

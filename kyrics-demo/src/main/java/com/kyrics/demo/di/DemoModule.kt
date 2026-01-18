@@ -15,11 +15,9 @@ object DemoModule {
 
     @Provides
     @Singleton
-    fun provideDemoSettingsRepository(): DemoSettingsRepository =
-        DemoSettingsRepositoryImpl()
+    fun provideDemoSettingsRepository(): DemoSettingsRepository = DemoSettingsRepositoryImpl()
 
     @Provides
     @Singleton
-    fun provideDemoLyricsDataSource(): DemoLyricsDataSource =
-        DemoLyricsDataSource()
+    fun provideDemoLyricsDataSource(): DemoLyricsDataSource = DemoLyricsDataSource()
 }

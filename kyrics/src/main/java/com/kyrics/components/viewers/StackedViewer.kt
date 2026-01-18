@@ -16,6 +16,7 @@ import com.kyrics.state.KyricsUiState
  * Stacked viewer with z-layer overlapping effect.
  * Active line appears on top with played lines stacking underneath.
  */
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun StackedViewer(uiState: KyricsUiState, config: KyricsConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex

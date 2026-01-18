@@ -16,11 +16,7 @@ import com.kyrics.state.KyricsUiState
  * Each line appears as a full page with consistent left-to-right flow.
  */
 @Composable
-internal fun HorizontalPagedViewer(
-    uiState: KyricsUiState,
-    config: KyricsConfig,
-    onLineClick: ((ISyncedLine, Int) -> Unit)? = null
-) {
+internal fun HorizontalPagedViewer(uiState: KyricsUiState, config: KyricsConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0
 
     // Track if we've shown this line before to maintain consistent direction

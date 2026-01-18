@@ -15,6 +15,7 @@ import com.kyrics.state.KyricsUiState
  * Radial burst viewer with lines emerging from center.
  * Creates ripple/explosion effect with pulsing active line.
  */
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun RadialBurstViewer(uiState: KyricsUiState, config: KyricsConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0

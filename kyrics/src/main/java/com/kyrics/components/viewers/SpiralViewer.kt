@@ -18,6 +18,7 @@ import kotlin.math.sin
  * Spiral viewer with lines arranged in a spiral pattern.
  * Active line at center with played lines spiraling outward.
  */
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun SpiralViewer(uiState: KyricsUiState, config: KyricsConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0

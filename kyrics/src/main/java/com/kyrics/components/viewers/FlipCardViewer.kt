@@ -15,6 +15,7 @@ import com.kyrics.state.KyricsUiState
  * Flip card viewer with 3D card flip transitions.
  * Creates a page-turning effect with front/back metaphor.
  */
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun FlipCardViewer(uiState: KyricsUiState, config: KyricsConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0

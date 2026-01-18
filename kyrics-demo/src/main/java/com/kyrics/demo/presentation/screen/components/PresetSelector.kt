@@ -14,10 +14,7 @@ import androidx.compose.ui.unit.sp
  * Stateless preset selector composable.
  */
 @Composable
-fun PresetSelector(
-    onSelectPreset: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun PresetSelector(onSelectPreset: (String) -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -91,11 +88,7 @@ fun PresetSelector(
 }
 
 @Composable
-private fun PresetButton(
-    name: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun PresetButton(name: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = onClick,
         modifier = modifier

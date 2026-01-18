@@ -2,8 +2,8 @@ package com.kyrics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.kyrics.config.KyricsConfigBuilder
 import com.kyrics.config.KyricsConfig
+import com.kyrics.config.KyricsConfigBuilder
 import com.kyrics.config.KyricsPresets as ConfigPresets
 import com.kyrics.config.kyricsConfig
 import com.kyrics.models.ISyncedLine

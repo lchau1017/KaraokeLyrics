@@ -17,6 +17,7 @@ import com.kyrics.rendering.RenderingCalculations
  */
 object CharacterRenderer {
 
+    @Suppress("LongParameterList")
     fun renderSyllableCharacters(
         drawScope: DrawScope,
         syllable: KyricsSyllable,

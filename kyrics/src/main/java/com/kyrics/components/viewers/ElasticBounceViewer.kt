@@ -15,6 +15,7 @@ import com.kyrics.state.KyricsUiState
  * Elastic bounce viewer with physics-based spring animations.
  * Creates playful, energetic transitions.
  */
+@Suppress("CognitiveComplexMethod")
 @Composable
 internal fun ElasticBounceViewer(uiState: KyricsUiState, config: KyricsConfig, onLineClick: ((ISyncedLine, Int) -> Unit)? = null) {
     val currentLineIndex = uiState.currentLineIndex ?: 0

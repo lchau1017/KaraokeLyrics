@@ -24,12 +24,7 @@ import androidx.compose.ui.window.Dialog
  * Stateless color picker dialog composable.
  */
 @Composable
-fun ColorPickerDialog(
-    currentColor: Color,
-    onColorSelected: (Color) -> Unit,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ColorPickerDialog(currentColor: Color, onColorSelected: (Color) -> Unit, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
     Dialog(onDismissRequest = onDismiss) {
         Card(modifier = modifier) {
             Column(
@@ -76,12 +71,7 @@ fun ColorPickerDialog(
 }
 
 @Composable
-private fun ColorBox(
-    color: Color,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun ColorBox(color: Color, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .size(40.dp)

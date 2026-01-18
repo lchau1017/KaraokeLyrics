@@ -17,12 +17,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kyrics.KyricsViewer
 import com.kyrics.demo.presentation.screen.components.ColorPickerDialog
 import com.kyrics.demo.presentation.screen.components.SettingsPanel
 import com.kyrics.demo.presentation.viewmodel.ColorPickerTarget
 import com.kyrics.demo.presentation.viewmodel.DemoIntent
 import com.kyrics.demo.presentation.viewmodel.DemoState
-import com.kyrics.KyricsViewer
 import com.kyrics.models.ISyncedLine
 
 /**
@@ -31,11 +31,7 @@ import com.kyrics.models.ISyncedLine
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DemoScreen(
-    state: DemoState,
-    onIntent: (DemoIntent) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun DemoScreen(state: DemoState, onIntent: (DemoIntent) -> Unit, modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier,
         topBar = {

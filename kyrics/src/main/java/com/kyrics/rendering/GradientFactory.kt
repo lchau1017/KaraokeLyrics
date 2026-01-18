@@ -19,50 +19,45 @@ object GradientFactory {
     /**
      * Create a gradient brush for a character based on configuration.
      */
-    fun createCharacterGradient(
-        charWidth: Float,
-        charHeight: Float,
-        charProgress: Float,
-        config: KyricsConfig,
-        baseColor: Color
-    ): Brush = when (config.visual.gradientType) {
-        GradientType.PROGRESS -> {
-            createProgressGradient(
-                progress = charProgress,
-                baseColor = baseColor,
-                highlightColor = config.visual.colors.active,
-                width = charWidth
-            )
+    fun createCharacterGradient(charWidth: Float, charHeight: Float, charProgress: Float, config: KyricsConfig, baseColor: Color): Brush =
+        when (config.visual.gradientType) {
+            GradientType.PROGRESS -> {
+                createProgressGradient(
+                    progress = charProgress,
+                    baseColor = baseColor,
+                    highlightColor = config.visual.colors.active,
+                    width = charWidth
+                )
+            }
+            GradientType.MULTI_COLOR -> {
+                val colors = config.visual.playingGradientColors.takeIf { it.size > 1 }
+                    ?: listOf(config.visual.colors.active, config.visual.colors.sung)
+                createMultiColorGradient(
+                    colors = colors,
+                    angle = config.visual.gradientAngle,
+                    width = charWidth,
+                    height = charHeight
+                )
+            }
+            GradientType.PRESET -> {
+                val presetColors = getPresetColors(config.visual.gradientPreset)
+                    ?: listOf(config.visual.colors.active, config.visual.colors.sung)
+                createMultiColorGradient(
+                    colors = presetColors,
+                    angle = config.visual.gradientAngle,
+                    width = charWidth,
+                    height = charHeight
+                )
+            }
+            else -> {
+                createLinearGradient(
+                    colors = listOf(config.visual.colors.active, config.visual.colors.sung),
+                    angle = config.visual.gradientAngle,
+                    width = charWidth,
+                    height = charHeight
+                )
+            }
         }
-        GradientType.MULTI_COLOR -> {
-            val colors = config.visual.playingGradientColors.takeIf { it.size > 1 }
-                ?: listOf(config.visual.colors.active, config.visual.colors.sung)
-            createMultiColorGradient(
-                colors = colors,
-                angle = config.visual.gradientAngle,
-                width = charWidth,
-                height = charHeight
-            )
-        }
-        GradientType.PRESET -> {
-            val presetColors = getPresetColors(config.visual.gradientPreset)
-                ?: listOf(config.visual.colors.active, config.visual.colors.sung)
-            createMultiColorGradient(
-                colors = presetColors,
-                angle = config.visual.gradientAngle,
-                width = charWidth,
-                height = charHeight
-            )
-        }
-        else -> {
-            createLinearGradient(
-                colors = listOf(config.visual.colors.active, config.visual.colors.sung),
-                angle = config.visual.gradientAngle,
-                width = charWidth,
-                height = charHeight
-            )
-        }
-    }
 
     /**
      * Create a linear gradient brush based on angle.

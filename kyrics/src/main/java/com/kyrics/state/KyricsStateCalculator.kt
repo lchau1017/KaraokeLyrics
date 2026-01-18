@@ -127,8 +127,12 @@ class KyricsStateCalculator {
     fun calculateOpacity(isPlaying: Boolean, hasPlayed: Boolean, distance: Int, config: KyricsConfig): Float {
         val effects = config.effects
         return when {
-            isPlaying -> effects.playingLineOpacity
-            hasPlayed -> effects.playedLineOpacity
+            isPlaying -> {
+                effects.playingLineOpacity
+            }
+            hasPlayed -> {
+                effects.playedLineOpacity
+            }
             else -> {
                 // Upcoming line - reduce opacity based on distance
                 val distanceReduction = (distance * effects.opacityFalloff).coerceAtMost(effects.maxOpacityReduction)

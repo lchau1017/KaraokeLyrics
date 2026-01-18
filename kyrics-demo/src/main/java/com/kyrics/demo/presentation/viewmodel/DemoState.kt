@@ -1,8 +1,8 @@
 package com.kyrics.demo.presentation.viewmodel
 
 import androidx.compose.runtime.Immutable
-import com.kyrics.demo.domain.model.DemoSettings
 import com.kyrics.config.KyricsConfig
+import com.kyrics.demo.domain.model.DemoSettings
 import com.kyrics.models.KyricsLine
 
 /**
