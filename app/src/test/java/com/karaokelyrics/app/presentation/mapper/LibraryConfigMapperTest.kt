@@ -5,13 +5,13 @@ import androidx.compose.ui.graphics.toArgb
 import com.google.common.truth.Truth.assertThat
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+import com.kyrics.config.KyricsConfig
 import org.junit.Before
 import org.junit.Test
 
 /**
  * Unit tests for LibraryConfigMapper.
- * Verifies correct mapping from app UserSettings to library KaraokeLibraryConfig.
+ * Verifies correct mapping from app UserSettings to library KyricsConfig.
  */
 class LibraryConfigMapperTest {
 
@@ -147,21 +147,21 @@ class LibraryConfigMapperTest {
     fun `getPresetConfig returns Default for unknown preset`() {
         val result = mapper.getPresetConfig("unknown_preset")
 
-        assertThat(result).isEqualTo(KaraokeLibraryConfig.Default)
+        assertThat(result).isEqualTo(KyricsConfig.Default)
     }
 
     @Test
     fun `getPresetConfig returns Minimal for minimal preset`() {
         val result = mapper.getPresetConfig("minimal")
 
-        assertThat(result).isEqualTo(KaraokeLibraryConfig.Minimal)
+        assertThat(result).isEqualTo(KyricsConfig.Minimal)
     }
 
     @Test
     fun `getPresetConfig returns Dramatic for dramatic preset`() {
         val result = mapper.getPresetConfig("dramatic")
 
-        assertThat(result).isEqualTo(KaraokeLibraryConfig.Dramatic)
+        assertThat(result).isEqualTo(KyricsConfig.Dramatic)
     }
 
     @Test
@@ -170,9 +170,9 @@ class LibraryConfigMapperTest {
         val upperResult = mapper.getPresetConfig("MINIMAL")
         val mixedResult = mapper.getPresetConfig("Minimal")
 
-        assertThat(lowerResult).isEqualTo(KaraokeLibraryConfig.Minimal)
-        assertThat(upperResult).isEqualTo(KaraokeLibraryConfig.Minimal)
-        assertThat(mixedResult).isEqualTo(KaraokeLibraryConfig.Minimal)
+        assertThat(lowerResult).isEqualTo(KyricsConfig.Minimal)
+        assertThat(upperResult).isEqualTo(KyricsConfig.Minimal)
+        assertThat(mixedResult).isEqualTo(KyricsConfig.Minimal)
     }
 
     // ==================== Combined Settings Tests ====================

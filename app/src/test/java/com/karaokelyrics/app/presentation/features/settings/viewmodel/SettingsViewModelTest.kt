@@ -9,7 +9,6 @@ import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
 import com.karaokelyrics.app.presentation.features.settings.effect.SettingsEffect
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
-import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk

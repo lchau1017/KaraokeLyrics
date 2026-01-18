@@ -1,19 +1,19 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.karaokelyrics.app"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.karaokelyrics.app"
-        minSdk = 31
-        targetSdk = 35
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
 
@@ -55,65 +55,51 @@ android {
 }
 
 dependencies {
-    // Karaoke UI Library
-    implementation(project(":karaoke-ui-library"))
+    // Kyrics Library
+    implementation(project(":kyrics"))
 
-    // Core Android
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    // AndroidX Core
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.bundles.lifecycle)
+    implementation(libs.androidx.activity.compose)
 
     // Compose
-    val composeBom = platform("androidx.compose:compose-bom:2024.12.01")
-    implementation(composeBom)
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.bundles.compose)
 
     // Hilt
-    implementation("com.google.dagger:hilt-android:2.54")
-    ksp("com.google.dagger:hilt-compiler:2.54")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.1")
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.guava)
 
-    // DataStore for settings
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
 
     // Media3
-    implementation("androidx.media3:media3-exoplayer:1.5.0")
-    implementation("androidx.media3:media3-session:1.5.0")
-
-    // Lyrics - We implement our own
+    implementation(libs.bundles.media3)
 
     // Utils
-    implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation(libs.timber)
 
     // Testing - Unit Tests
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
-    testImplementation("app.cash.turbine:turbine:1.0.0")
-    testImplementation("com.google.truth:truth:1.1.5")
-    testImplementation("io.mockk:mockk:1.13.8")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation(libs.bundles.testing.unit)
+    testImplementation(libs.androidx.arch.core.testing)
 
     // Testing - Hilt
-    testImplementation("com.google.dagger:hilt-android-testing:2.54")
-    kspTest("com.google.dagger:hilt-compiler:2.54")
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.compiler)
 
     // Testing - Android/Instrumented Tests
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(composeBom)
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    androidTestImplementation("com.google.truth:truth:1.1.5")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.54")
-    kspAndroidTest("com.google.dagger:hilt-compiler:2.54")
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.bundles.testing.android)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
+
+    // Debug
+    debugImplementation(libs.bundles.compose.debug)
 }

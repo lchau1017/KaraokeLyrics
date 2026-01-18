@@ -12,7 +12,7 @@ import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.mapper.LibraryConfigMapper
 import com.karaokelyrics.app.presentation.player.PlayerController
-import com.karaokelyrics.ui.core.config.KaraokeLibraryConfig
+import com.kyrics.config.KyricsConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
@@ -42,7 +42,7 @@ class LyricsViewModel @Inject constructor(
         val error: String? = null,
         val userSettings: UserSettings = UserSettings(),
         val currentTimeMs: Int = 0,
-        val libraryConfig: KaraokeLibraryConfig = KaraokeLibraryConfig.Default
+        val libraryConfig: KyricsConfig = KyricsConfig.Default
     )
 
     private val _state = MutableStateFlow(LyricsState())
