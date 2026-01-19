@@ -25,11 +25,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // Dispatcher Provider
+    @Provides
+    @Singleton
+    fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
+
     // Data Sources
     @Provides
     @Singleton
-    fun provideAssetDataSource(@ApplicationContext context: Context): com.karaokelyrics.app.data.source.local.AssetDataSource =
-        com.karaokelyrics.app.data.source.local.AssetDataSource(context)
+    fun provideAssetDataSource(
+        @ApplicationContext context: Context,
+        dispatcherProvider: DispatcherProvider
+    ): com.karaokelyrics.app.data.source.local.AssetDataSource =
+        com.karaokelyrics.app.data.source.local.AssetDataSource(context, dispatcherProvider)
 
     @Provides
     @Singleton
@@ -57,7 +65,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePlayerController(@ApplicationContext context: Context): PlayerController = MediaPlayerController(context)
+    fun providePlayerController(@ApplicationContext context: Context, dispatcherProvider: DispatcherProvider): PlayerController =
+        MediaPlayerController(context, dispatcherProvider)
 
     // Domain Use Cases
 
