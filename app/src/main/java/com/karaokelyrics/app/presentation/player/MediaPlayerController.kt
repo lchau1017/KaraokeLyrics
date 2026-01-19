@@ -7,12 +7,12 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
+import com.karaokelyrics.app.di.DispatcherProvider
 import com.karaokelyrics.app.infrastructure.service.PlaybackService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,10 @@ import kotlinx.coroutines.withContext
  * Handles Android MediaController and MediaSession interaction.
  */
 @Singleton
-class MediaPlayerController @Inject constructor(@ApplicationContext private val context: Context) : PlayerController {
+class MediaPlayerController @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val dispatcherProvider: DispatcherProvider
+) : PlayerController {
 
     private var mediaController: MediaController? = null
     private val controllerFuture: ListenableFuture<MediaController>
@@ -60,24 +63,24 @@ class MediaPlayerController @Inject constructor(@ApplicationContext private val 
             } ?: emit(0L)
             delay(100) // Update every 100ms for smooth animation
         }
-    }.flowOn(Dispatchers.Main)
+    }.flowOn(dispatcherProvider.main)
 
     override fun observeIsPlaying(): Flow<Boolean> = _isPlaying.asStateFlow()
 
     override suspend fun play() {
-        withContext(Dispatchers.Main) {
+        withContext(dispatcherProvider.main) {
             mediaController?.play()
         }
     }
 
     override suspend fun pause() {
-        withContext(Dispatchers.Main) {
+        withContext(dispatcherProvider.main) {
             mediaController?.pause()
         }
     }
 
     override suspend fun seekTo(position: Long) {
-        withContext(Dispatchers.Main) {
+        withContext(dispatcherProvider.main) {
             mediaController?.seekTo(position)
         }
     }

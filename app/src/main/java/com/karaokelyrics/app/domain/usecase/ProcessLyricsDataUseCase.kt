@@ -1,8 +1,7 @@
 package com.karaokelyrics.app.domain.usecase
 
-import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.KyricsLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
+import com.kyrics.models.KyricsLine
 import javax.inject.Inject
 
 /**
@@ -16,23 +15,16 @@ class ProcessLyricsDataUseCase @Inject constructor() {
      * Applies business rules like:
      * - Sorting lines by start time
      * - Validating timing data
-     * - Merging overlapping lines
-     * - Handling special cases (accompaniment tracks, etc.)
      */
     operator fun invoke(lyrics: SyncedLyrics): SyncedLyrics {
         // Sort lines by start time
-        val sortedLines = lyrics.lines.sortedBy { line ->
-            when (line) {
-                is KyricsLine -> line.start
-                else -> 0
-            }
-        }
+        val sortedLines = lyrics.lines.sortedBy { it.start }
 
         // Validate timing data
         val validatedLines = sortedLines.filter { line ->
             when (line) {
                 is KyricsLine -> validateKyricsLine(line)
-                else -> true
+                else -> line.start >= 0 && line.end > line.start
             }
         }
 
@@ -74,48 +66,4 @@ class ProcessLyricsDataUseCase @Inject constructor() {
 
         return line.copy(syllables = sortedSyllables)
     }
-
-    /**
-     * Merge overlapping or duplicate lines based on business rules.
-     */
-    fun mergeOverlappingLines(lyrics: SyncedLyrics): SyncedLyrics {
-        val mergedLines = mutableListOf<ISyncedLine>()
-        var previousLine: KyricsLine? = null
-
-        for (line in lyrics.lines) {
-            when (line) {
-                is KyricsLine -> {
-                    if (previousLine != null && shouldMergeLines(previousLine, line)) {
-                        // Merge lines
-                        previousLine = mergeTwoLines(previousLine, line)
-                    } else {
-                        // Add previous line if exists
-                        previousLine?.let { mergedLines.add(it) }
-                        previousLine = line
-                    }
-                }
-                else -> mergedLines.add(line)
-            }
-        }
-
-        // Add the last line
-        previousLine?.let { mergedLines.add(it) }
-
-        return SyncedLyrics(mergedLines)
-    }
-
-    private fun shouldMergeLines(line1: KyricsLine, line2: KyricsLine): Boolean {
-        // Business rule: Merge if lines overlap and have same metadata
-        return line1.end > line2.start &&
-            line1.metadata == line2.metadata &&
-            line1.isAccompaniment == line2.isAccompaniment
-    }
-
-    private fun mergeTwoLines(line1: KyricsLine, line2: KyricsLine): KyricsLine = KyricsLine(
-        syllables = line1.syllables + line2.syllables,
-        start = line1.start,
-        end = maxOf(line1.end, line2.end),
-        metadata = line1.metadata,
-        isAccompaniment = line1.isAccompaniment
-    )
 }
