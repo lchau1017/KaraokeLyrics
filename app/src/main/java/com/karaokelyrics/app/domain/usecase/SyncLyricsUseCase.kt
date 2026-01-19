@@ -1,9 +1,9 @@
 package com.karaokelyrics.app.domain.usecase
 
-import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.KyricsLine
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
+import com.kyrics.models.KyricsLine
+import com.kyrics.models.SyncedLine
 import javax.inject.Inject
 
 class SyncLyricsUseCase @Inject constructor() {
@@ -72,15 +72,12 @@ class SyncLyricsUseCase @Inject constructor() {
         return Triple(overallProgress, activeSyllableIndex, syllableProgress)
     }
 
-    private fun calculateSimpleProgress(line: Any?, position: Int): Float {
+    private fun calculateSimpleProgress(line: SyncedLine?, position: Int): Float {
         if (line == null) return 0f
-        val syncedLine = line as? ISyncedLine
-            ?: return 0f
 
-        if (position < syncedLine.start) return 0f
-        if (position > syncedLine.end) return 1f
+        if (position < line.start) return 0f
+        if (position > line.end) return 1f
 
-        return (position - syncedLine.start).toFloat() /
-            (syncedLine.end - syncedLine.start)
+        return (position - line.start).toFloat() / (line.end - line.start)
     }
 }

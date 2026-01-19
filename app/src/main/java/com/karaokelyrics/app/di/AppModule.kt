@@ -5,7 +5,6 @@ import com.karaokelyrics.app.data.repository.LyricsRepositoryImpl
 import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
@@ -26,11 +25,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // Dispatcher Provider
+    @Provides
+    @Singleton
+    fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
+
     // Data Sources
     @Provides
     @Singleton
-    fun provideAssetDataSource(@ApplicationContext context: Context): com.karaokelyrics.app.data.source.local.AssetDataSource =
-        com.karaokelyrics.app.data.source.local.AssetDataSource(context)
+    fun provideAssetDataSource(
+        @ApplicationContext context: Context,
+        dispatcherProvider: DispatcherProvider
+    ): com.karaokelyrics.app.data.source.local.AssetDataSource =
+        com.karaokelyrics.app.data.source.local.AssetDataSource(context, dispatcherProvider)
 
     @Provides
     @Singleton
@@ -58,13 +65,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePlayerController(@ApplicationContext context: Context): PlayerController = MediaPlayerController(context)
+    fun providePlayerController(@ApplicationContext context: Context, dispatcherProvider: DispatcherProvider): PlayerController =
+        MediaPlayerController(context, dispatcherProvider)
 
     // Domain Use Cases
-    @Provides
-    fun provideGroupSyllablesIntoWordsUseCase(): GroupSyllablesIntoWordsUseCase = GroupSyllablesIntoWordsUseCase()
-
-    // Legacy presentation helpers removed - using library instead
 
     @Provides
     fun provideSyncLyricsUseCase(): SyncLyricsUseCase = SyncLyricsUseCase()

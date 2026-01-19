@@ -71,7 +71,7 @@ In your `app/build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.lchau1017:Kyrics:v1.0.0")
+    implementation("com.github.lchau1017:Kyrics:v1.1.1")
 }
 ```
 
@@ -79,7 +79,7 @@ Or using Version Catalog (`gradle/libs.versions.toml`):
 
 ```toml
 [versions]
-kyrics = "v1.0.0"
+kyrics = "v1.1.1"
 
 [libraries]
 kyrics = { group = "com.github.lchau1017", name = "Kyrics", version.ref = "kyrics" }
@@ -113,52 +113,83 @@ fun KaraokeScreen() {
 }
 ```
 
-## Advanced Configuration
+## Advanced Configuration with DSL
+
+The Kyrics library provides a powerful DSL for configuration:
 
 ```kotlin
-import com.kyrics.KyricsViewer
-import com.kyrics.KyricsPresets
-import com.kyrics.config.KyricsConfig
+import com.kyrics.config.kyricsConfig
+import com.kyrics.config.ViewerType
 
-// Use a built-in preset
-val presetConfig = KyricsPresets.Neon
+val customConfig = kyricsConfig {
+    colors {
+        playing = Color.Yellow
+        played = Color.Yellow.copy(alpha = 0.7f)
+        upcoming = Color.Yellow.copy(alpha = 0.4f)
+        accompaniment = Color.Yellow.copy(alpha = 0.5f)
+        background = Color.Black
+    }
 
-// Or create a fully custom config
-val customConfig = KyricsConfig(
-    visual = VisualConfig(
-        fontSize = 36.sp,
-        playingTextColor = Color(0xFFFFD700),
-        gradientEnabled = true,
-        gradientType = GradientType.LINEAR,
-        colors = ColorConfig(
-            sung = Color.Magenta,
-            unsung = Color.Cyan,
-            active = Color.Yellow
-        )
-    ),
-    animation = AnimationConfig(
-        enableCharacterAnimations = true,
-        characterMaxScale = 1.2f,
-        enableLineAnimations = true,
-        lineScaleOnPlay = 1.1f
-    ),
-    layout = LayoutConfig(
-        viewerConfig = ViewerConfig(
-            type = ViewerType.WAVE_FLOW,
-            scrollPosition = 0.5f
-        )
-    ),
-    effects = EffectsConfig(
-        enableBlur = true,
-        blurIntensity = 0.8f
-    )
-)
+    typography {
+        fontSize = 36.sp
+        fontWeight = FontWeight.Bold
+        textAlign = TextAlign.Center
+    }
+
+    animations {
+        characterAnimations = true
+        characterDuration = 800f
+        characterScale = 1.15f
+        lineAnimations = true
+        lineScale = 1.05f
+    }
+
+    effects {
+        blur = true
+        blurIntensity = 1.0f
+    }
+
+    gradient {
+        enabled = true
+        angle = 45f
+    }
+
+    viewer {
+        type = ViewerType.SMOOTH_SCROLL
+    }
+
+    layout {
+        lineSpacing = 12.dp
+    }
+}
 
 KyricsViewer(
     lines = lines,
     currentTimeMs = currentTime,
     config = customConfig
 )
+```
+
+## Creating Lyrics with DSL
+
+Use the `kyricsLine()` DSL to create synchronized lyrics:
+
+```kotlin
+import com.kyrics.kyricsLine
+
+val line = kyricsLine(start = 0, end = 5000) {
+    alignment("center")
+    syllable("Hel", start = 0, end = 500)
+    syllable("lo ", start = 500, end = 1000)
+    syllable("World", start = 1000, end = 2000)
+}
+
+// For accompaniment/background vocals
+val bgLine = kyricsLine(start = 2000, end = 4000) {
+    alignment("center")
+    accompaniment()
+    syllable("(ooh)", start = 2000, end = 3000)
+}
 ```
 
 ## Viewer Types
@@ -199,40 +230,137 @@ KyricsPresets.Party     // All effects maxed out
 KyricsPresets.Matrix    // Green monospace on black
 ```
 
-## Sample Applications
+## Project Architecture
 
-This project includes demo applications showcasing the Kyrics library:
-
-### Main Karaoke Player (`app/`)
-
-A complete karaoke player with real-time music playback and synchronized lyrics.
-
-**Features:**
-- Audio playback with Media3/ExoPlayer
-- Real-time lyric synchronization
-- Character-by-character highlighting
-- Multiple viewer modes
-- Customizable settings
-
-**Tech Stack:**
-- Jetpack Compose UI
-- Media3/ExoPlayer for audio
-- Dagger Hilt dependency injection
-- MVI architecture
-
-## Project Structure
+This sample application follows **Clean Architecture** with **MVI (Model-View-Intent)** pattern:
 
 ```
-KaraokeLyrics/
-├── app/                    # Sample application
-│   ├── presentation/       # UI layer with Compose
-│   ├── domain/             # Business logic
-│   └── data/               # Data layer
-├── gradle/
-│   └── libs.versions.toml  # Version catalog
-└── docs/                   # Documentation and media
-    ├── images/             # Screenshots
-    └── videos/             # Demo videos
+app/
+├── di/                              # Dependency Injection
+│   ├── AppModule.kt                 # Hilt module for DI
+│   ├── DispatcherProvider.kt        # Interface for coroutine dispatchers
+│   └── DefaultDispatcherProvider.kt # Default dispatcher implementation
+│
+├── infrastructure/                  # Android Framework
+│   └── service/
+│       └── PlaybackService.kt       # Media3 playback service
+│
+├── data/                            # Data Layer
+│   ├── parser/
+│   │   ├── TtmlParser.kt            # TTML lyrics parser (uses Kyrics DSL)
+│   │   ├── TimeParser.kt            # Time format parsing utilities
+│   │   └── XmlPullParserExtensions.kt # XML navigation helpers
+│   ├── repository/
+│   │   ├── LyricsRepositoryImpl.kt  # Lyrics data repository
+│   │   └── SettingsRepositoryImpl.kt # User settings repository
+│   └── source/local/
+│       ├── AssetDataSource.kt       # Asset file access
+│       ├── MediaContentProvider.kt  # Media content provider
+│       └── PreferencesDataSource.kt # SharedPreferences access
+│
+├── domain/                          # Domain Layer
+│   ├── model/
+│   │   ├── SyncedLyrics.kt          # Wrapper for Kyrics SyncedLine
+│   │   ├── UserSettings.kt          # User preferences model
+│   │   ├── MediaContent.kt          # Media content model
+│   │   └── LyricsSyncState.kt       # Lyrics sync state
+│   ├── parser/
+│   │   └── TtmlParser.kt            # Parser interface
+│   ├── repository/
+│   │   ├── LyricsRepository.kt      # Lyrics repository interface
+│   │   └── SettingsRepository.kt    # Settings repository interface
+│   └── usecase/
+│       ├── LoadLyricsUseCase.kt     # Load and parse lyrics
+│       ├── ParseTtmlUseCase.kt      # TTML parsing
+│       ├── SyncLyricsUseCase.kt     # Lyrics synchronization
+│       ├── ProcessLyricsDataUseCase.kt # Process lyrics data
+│       └── ...                      # Other use cases
+│
+└── presentation/                    # Presentation Layer (MVI)
+    ├── mapper/
+    │   └── LibraryConfigMapper.kt   # Maps UserSettings to KyricsConfig
+    ├── player/
+    │   ├── PlayerController.kt      # Player interface
+    │   └── MediaPlayerController.kt # Media3 player implementation
+    ├── ui/
+    │   ├── core/                    # Reusable UI components
+    │   └── theme/                   # App theming
+    └── features/
+        ├── lyrics/
+        │   ├── viewmodel/           # LyricsViewModel
+        │   ├── screen/              # LyricsScreen composable
+        │   ├── components/          # KaraokeLyricsView
+        │   ├── coordinator/         # PlaybackSyncCoordinator
+        │   ├── intent/              # MVI intents
+        │   └── effect/              # MVI effects
+        ├── settings/
+        │   ├── viewmodel/           # SettingsViewModel
+        │   ├── components/          # Settings UI components
+        │   └── mapper/              # Settings UI mapper
+        ├── player/
+        │   ├── viewmodel/           # PlayerViewModel
+        │   ├── components/          # Player controls
+        │   └── intent/              # Player intents
+        └── common/
+            └── components/          # Shared components
+```
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      Presentation Layer                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
+│  │ LyricsScreen│  │   Settings  │  │    PlayerControls       │  │
+│  │  (Compose)  │  │ BottomSheet │  │      (Compose)          │  │
+│  └──────┬──────┘  └──────┬──────┘  └───────────┬─────────────┘  │
+│         │                │                      │                │
+│  ┌──────▼──────┐  ┌──────▼──────┐  ┌───────────▼─────────────┐  │
+│  │   Lyrics    │  │  Settings   │  │       Player            │  │
+│  │  ViewModel  │  │  ViewModel  │  │      ViewModel          │  │
+│  └──────┬──────┘  └──────┬──────┘  └───────────┬─────────────┘  │
+│         │                │                      │                │
+│  ┌──────▼────────────────▼──────────────────────▼─────────────┐ │
+│  │              LibraryConfigMapper (DSL)                      │ │
+│  │         UserSettings → KyricsConfig (kyricsConfig {})       │ │
+│  └──────────────────────────┬──────────────────────────────────┘ │
+└─────────────────────────────┼────────────────────────────────────┘
+                              │
+┌─────────────────────────────▼────────────────────────────────────┐
+│                        Domain Layer                               │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐  │
+│  │ LoadLyricsUse  │  │ SyncLyricsUse  │  │  ObserveSettings   │  │
+│  │     Case       │  │     Case       │  │     UseCase        │  │
+│  └───────┬────────┘  └───────┬────────┘  └─────────┬──────────┘  │
+│          │                   │                     │              │
+│  ┌───────▼───────────────────▼─────────────────────▼────────────┐│
+│  │                    Repository Interfaces                      ││
+│  │         LyricsRepository    SettingsRepository               ││
+│  └──────────────────────────────────────────────────────────────┘│
+└──────────────────────────────┬───────────────────────────────────┘
+                               │
+┌──────────────────────────────▼───────────────────────────────────┐
+│                         Data Layer                                │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │                    TtmlParserImpl                           │  │
+│  │           Uses kyricsLine() DSL for parsing                 │  │
+│  │    ┌──────────────┐    ┌─────────────────────────────────┐ │  │
+│  │    │  TimeParser  │    │  XmlPullParserExtensions        │ │  │
+│  │    └──────────────┘    └─────────────────────────────────┘ │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐   │
+│  │ AssetDataSource │  │PreferencesData  │  │MediaContent     │   │
+│  │ (Dispatcher DI) │  │    Source       │  │   Provider      │   │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+                               │
+┌──────────────────────────────▼───────────────────────────────────┐
+│                       Kyrics Library                              │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐  │
+│  │  KyricsViewer  │  │  KyricsConfig  │  │    SyncedLine      │  │
+│  │   (Compose)    │  │     (DSL)      │  │     (Model)        │  │
+│  └────────────────┘  └────────────────┘  └────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ## Running the Sample App
@@ -256,6 +384,9 @@ KaraokeLyrics/
 # Code formatting check
 ./gradlew ktlintCheck
 
+# Auto-fix formatting issues
+./gradlew ktlintFormat
+
 # Static analysis
 ./gradlew detekt
 
@@ -267,10 +398,11 @@ KaraokeLyrics/
 
 - **Jetpack Compose** - Modern Android UI toolkit
 - **Kotlin 2.1.0** - Primary development language
-- **Kyrics Library** - Karaoke lyrics display (via JitPack)
+- **Kyrics Library v1.1.1** - Karaoke lyrics display (via JitPack)
 - **Media3/ExoPlayer** - Audio playback
 - **Dagger Hilt** - Dependency injection
 - **Coroutines & Flow** - Asynchronous programming
+- **MVI Architecture** - Unidirectional data flow
 
 ## Requirements
 
