@@ -30,6 +30,7 @@ class LibraryConfigMapper @Inject constructor() {
                 played = primaryColor.copy(alpha = 0.7f)
                 upcoming = primaryColor.copy(alpha = 0.4f)
                 background = bgColor
+                accompaniment = primaryColor.copy(alpha = 0.5f)
             }
 
             typography {
