@@ -1,10 +1,10 @@
 package com.karaokelyrics.app.data.parser
 
-import com.karaokelyrics.app.domain.model.ISyncedLine
-import com.karaokelyrics.app.domain.model.KyricsLine
-import com.karaokelyrics.app.domain.model.KyricsSyllable
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.parser.TtmlParser
+import com.kyrics.models.SyncedLine
+import com.kyrics.models.KyricsLine
+import com.kyrics.models.KyricsSyllable
 import javax.inject.Inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
@@ -18,7 +18,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         val parser = factory.newPullParser()
         parser.setInput(content.reader())
 
-        val lyricsLines = mutableListOf<ISyncedLine>()
+        val lyricsLines = mutableListOf<SyncedLine>()
 
         try {
             var eventType = parser.eventType
@@ -36,10 +36,10 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         }
 
         // Sort by start time
-        return SyncedLyrics(lyricsLines.sortedBy { (it as? KyricsLine)?.start ?: 0 })
+        return SyncedLyrics(lyricsLines.sortedBy { it.start })
     }
 
-    private fun parseBody(parser: XmlPullParser, lyricsLines: MutableList<ISyncedLine>) {
+    private fun parseBody(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
         var eventType = parser.next()
 
         while (!(eventType == XmlPullParser.END_TAG && parser.name == "body")) {
@@ -53,7 +53,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         }
     }
 
-    private fun parseDiv(parser: XmlPullParser, lyricsLines: MutableList<ISyncedLine>) {
+    private fun parseDiv(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
         var eventType = parser.next()
 
         while (!(eventType == XmlPullParser.END_TAG && parser.name == "div")) {
@@ -67,10 +67,9 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         }
     }
 
-    private fun parseP(parser: XmlPullParser, lyricsLines: MutableList<ISyncedLine>) {
+    private fun parseP(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
         val pBegin = parser.getAttributeValue(null, "begin")
         val pEnd = parser.getAttributeValue(null, "end")
-        val agent = parser.getAttributeValue("http://www.w3.org/ns/ttml#metadata", "agent")
 
         if (pBegin == null || pEnd == null) {
             // Skip to end of this p element
@@ -141,8 +140,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
                     syllables = mainSyllables,
                     start = parseTime(pBegin),
                     end = parseTime(pEnd),
-                    metadata = mapOf("alignment" to "Center"),
-                    isAccompaniment = false
+                    metadata = mapOf("alignment" to "Center")
                 )
             )
         }
@@ -160,8 +158,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
                     syllables = bgSyllables,
                     start = bgStart ?: bgSyllables.first().start,
                     end = bgEnd ?: bgSyllables.last().end,
-                    metadata = mapOf("alignment" to "Center"),
-                    isAccompaniment = true
+                    metadata = mapOf("alignment" to "Center", "isAccompaniment" to "true")
                 )
             )
         }

@@ -47,7 +47,7 @@ paparazzi = "1.3.4"
 timber = "5.0.1"
 
 # Kyrics
-kyrics = "v1.0.0"
+kyrics = "v1.1.0"
 
 [libraries]
 # AndroidX Core

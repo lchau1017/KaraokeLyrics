@@ -5,7 +5,6 @@ import com.karaokelyrics.app.data.repository.LyricsRepositoryImpl
 import com.karaokelyrics.app.data.repository.SettingsRepositoryImpl
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
-import com.karaokelyrics.app.domain.usecase.GroupSyllablesIntoWordsUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
@@ -61,10 +60,6 @@ object AppModule {
     fun providePlayerController(@ApplicationContext context: Context): PlayerController = MediaPlayerController(context)
 
     // Domain Use Cases
-    @Provides
-    fun provideGroupSyllablesIntoWordsUseCase(): GroupSyllablesIntoWordsUseCase = GroupSyllablesIntoWordsUseCase()
-
-    // Legacy presentation helpers removed - using library instead
 
     @Provides
     fun provideSyncLyricsUseCase(): SyncLyricsUseCase = SyncLyricsUseCase()
