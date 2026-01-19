@@ -2,8 +2,8 @@ package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.kyrics.models.SyncedLine
 import com.kyrics.models.KyricsLine
+import com.kyrics.models.SyncedLine
 import javax.inject.Inject
 
 class SyncLyricsUseCase @Inject constructor() {

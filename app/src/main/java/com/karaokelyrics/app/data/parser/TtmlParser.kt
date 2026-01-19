@@ -8,261 +8,115 @@ import javax.inject.Inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 
+/**
+ * Parses TTML (Timed Text Markup Language) lyrics into [SyncedLyrics].
+ *
+ * Supports the following TTML features:
+ * - Syllable-level timing via `<span begin="..." end="...">` elements
+ * - Background/accompaniment vocals via `ttm:role="x-bg"` attribute
+ * - Multiple time formats: milliseconds (100ms), seconds (1.5s), and clock time (00:01:30.500)
+ *
+ * Example TTML structure:
+ * ```xml
+ * <tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
+ *   <body>
+ *     <div>
+ *       <p begin="0ms" end="5000ms">
+ *         <span begin="0ms" end="500ms">Hello </span>
+ *         <span begin="500ms" end="1000ms">World</span>
+ *         <span ttm:role="x-bg" begin="2000ms" end="3000ms">
+ *           <span begin="2000ms" end="2500ms">(ooh)</span>
+ *         </span>
+ *       </p>
+ *     </div>
+ *   </body>
+ * </tt>
+ * ```
+ */
 class TtmlParserImpl @Inject constructor() : TtmlParser {
 
     override fun parse(lines: List<String>): SyncedLyrics {
-        val content = lines.joinToString("\n")
-        val factory = XmlPullParserFactory.newInstance()
-        factory.isNamespaceAware = true
-        val parser = factory.newPullParser()
-        parser.setInput(content.reader())
-
+        val parser = createParser(lines.joinToString("\n"))
         val lyricsLines = mutableListOf<SyncedLine>()
 
         try {
-            var eventType = parser.eventType
-
-            // Navigate to body element
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG && parser.name == "body") {
-                    parseBody(parser, lyricsLines)
-                    break
-                }
-                eventType = parser.next()
-            }
-        } catch (e: Exception) {
-            // Error parsing TTML
+            parser.navigateTo("body")?.let { parseBody(it, lyricsLines) }
+        } catch (_: Exception) {
+            // Silently handle parsing errors
         }
 
-        // Sort by start time
         return SyncedLyrics(lyricsLines.sortedBy { it.start })
     }
 
-    private fun parseBody(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
-        var eventType = parser.next()
+    private fun createParser(content: String): XmlPullParser = XmlPullParserFactory.newInstance()
+        .apply { isNamespaceAware = true }
+        .newPullParser()
+        .apply { setInput(content.reader()) }
 
-        while (!(eventType == XmlPullParser.END_TAG && parser.name == "body")) {
-            if (eventType == XmlPullParser.START_TAG) {
-                when (parser.name) {
-                    "div" -> parseDiv(parser, lyricsLines)
-                }
-            }
-            eventType = parser.next()
-            if (eventType == XmlPullParser.END_DOCUMENT) break
-        }
+    private fun parseBody(parser: XmlPullParser, lines: MutableList<SyncedLine>) {
+        parser.forEachChild("body") { if (it == "div") parseDiv(parser, lines) }
     }
 
-    private fun parseDiv(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
-        var eventType = parser.next()
-
-        while (!(eventType == XmlPullParser.END_TAG && parser.name == "div")) {
-            if (eventType == XmlPullParser.START_TAG) {
-                when (parser.name) {
-                    "p" -> parseP(parser, lyricsLines)
-                }
-            }
-            eventType = parser.next()
-            if (eventType == XmlPullParser.END_DOCUMENT) break
-        }
+    private fun parseDiv(parser: XmlPullParser, lines: MutableList<SyncedLine>) {
+        parser.forEachChild("div") { if (it == "p") parseParagraph(parser, lines) }
     }
 
-    private data class ParsedSyllable(
-        val content: String,
-        val start: Int,
-        val end: Int
-    )
+    private fun parseParagraph(parser: XmlPullParser, lines: MutableList<SyncedLine>) {
+        val timing = parser.getTiming() ?: return parser.skipTo("p")
 
-    private fun parseP(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
-        val pBegin = parser.getAttributeValue(null, "begin")
-        val pEnd = parser.getAttributeValue(null, "end")
+        val main = mutableListOf<Syllable>()
+        val bg = mutableListOf<Syllable>()
+        var bgTiming: Timing? = null
+        var inBg = false
 
-        if (pBegin == null || pEnd == null) {
-            // Skip to end of this p element
-            skipToEndTag(parser, "p")
-            return
-        }
-
-        val mainSyllables = mutableListOf<ParsedSyllable>()
-        val bgSyllables = mutableListOf<ParsedSyllable>()
-        var bgStart: Int? = null
-        var bgEnd: Int? = null
-
-        var eventType = parser.next()
-        var inBgSpan = false
-
-        while (!(eventType == XmlPullParser.END_TAG && parser.name == "p")) {
-            if (eventType == XmlPullParser.START_TAG && parser.name == "span") {
-                val role = parser.getAttributeValue("http://www.w3.org/ns/ttml#metadata", "role")
-                val spanBegin = parser.getAttributeValue(null, "begin")
-                val spanEnd = parser.getAttributeValue(null, "end")
-
-                if (role == "x-bg") {
-                    // This is a background vocal container
-                    inBgSpan = true
-                    if (spanBegin != null) bgStart = parseTime(spanBegin)
-                    if (spanEnd != null) bgEnd = parseTime(spanEnd)
-                } else if (spanBegin != null && spanEnd != null) {
-                    // Regular syllable span
-                    val text = getElementText(parser, "span")
-                    if (text.isNotEmpty()) {
-                        val syllable = ParsedSyllable(
-                            content = text,
-                            start = parseTime(spanBegin),
-                            end = parseTime(spanEnd)
-                        )
-
-                        if (inBgSpan) {
-                            bgSyllables.add(syllable)
-                        } else {
-                            mainSyllables.add(syllable)
-                        }
+        parser.forEachChild("p") { tag ->
+            if (tag == "span") {
+                when {
+                    parser.isBackgroundVocal() -> {
+                        inBg = true
+                        bgTiming = parser.getTiming()
                     }
-                } else {
-                    // Skip this span
-                    skipToEndTag(parser, "span")
-                }
-            } else if (eventType == XmlPullParser.END_TAG && parser.name == "span") {
-                val role = parser.getAttributeValue("http://www.w3.org/ns/ttml#metadata", "role")
-                if (role == "x-bg") {
-                    inBgSpan = false
+                    else -> parser.extractSyllable()?.let { if (inBg) bg.add(it) else main.add(it) }
                 }
             }
-
-            eventType = parser.next()
-            if (eventType == XmlPullParser.END_DOCUMENT) break
         }
 
-        // Create main line using Kyrics DSL
-        if (mainSyllables.isNotEmpty()) {
-            val line = kyricsLine(
-                start = parseTime(pBegin),
-                end = parseTime(pEnd)
-            ) {
-                alignment("center")
-                mainSyllables.forEachIndexed { index, parsed ->
-                    val content = if (index == mainSyllables.lastIndex) {
-                        parsed.content.trimEnd()
-                    } else {
-                        parsed.content
-                    }
-                    syllable(content, start = parsed.start, end = parsed.end)
-                }
-            }
-            lyricsLines.add(line)
-        }
-
-        // Create background vocal line using Kyrics DSL
-        if (bgSyllables.isNotEmpty()) {
-            val line = kyricsLine(
-                start = bgStart ?: bgSyllables.first().start,
-                end = bgEnd ?: bgSyllables.last().end
-            ) {
-                alignment("center")
-                accompaniment()
-                bgSyllables.forEachIndexed { index, parsed ->
-                    val content = if (index == bgSyllables.lastIndex) {
-                        parsed.content.trimEnd()
-                    } else {
-                        parsed.content
-                    }
-                    syllable(content, start = parsed.start, end = parsed.end)
-                }
-            }
-            lyricsLines.add(line)
-        }
+        main.toLine(timing.start, timing.end, isAccompaniment = false)?.let { lines.add(it) }
+        val bgStart = bgTiming?.start ?: bg.firstOrNull()?.start ?: 0
+        val bgEnd = bgTiming?.end ?: bg.lastOrNull()?.end ?: 0
+        bg.toLine(bgStart, bgEnd, isAccompaniment = true)?.let { lines.add(it) }
     }
 
-    private fun getElementText(parser: XmlPullParser, tagName: String): String {
-        val text = StringBuilder()
-        var eventType = parser.next()
+    private fun XmlPullParser.isBackgroundVocal() = getAttributeValue(TTML_NS, "role") == "x-bg"
 
-        while (!(eventType == XmlPullParser.END_TAG && parser.name == tagName)) {
-            when (eventType) {
-                XmlPullParser.TEXT -> {
-                    text.append(parser.text)
-                }
-                XmlPullParser.START_TAG -> {
-                    // Skip nested tags
-                    skipToEndTag(parser, parser.name)
-                }
-            }
-            eventType = parser.next()
-            if (eventType == XmlPullParser.END_DOCUMENT) break
-        }
-
-        return text.toString()
+    private fun XmlPullParser.getTiming(): Timing? {
+        val b = getAttributeValue(null, "begin") ?: return null
+        val e = getAttributeValue(null, "end") ?: return null
+        return Timing(parseTime(b), parseTime(e))
     }
 
-    private fun skipToEndTag(parser: XmlPullParser, tagName: String) {
-        var depth = 1
-        var eventType = parser.next()
+    private fun XmlPullParser.extractSyllable(): Syllable? {
+        val timing = getTiming() ?: return skipTo("span").let { null }
+        val text = readText("span")
+        return if (text.isNotEmpty()) Syllable(text, timing.start, timing.end) else null
+    }
 
-        while (depth > 0 && eventType != XmlPullParser.END_DOCUMENT) {
-            when (eventType) {
-                XmlPullParser.START_TAG -> {
-                    if (parser.name == tagName) depth++
-                }
-                XmlPullParser.END_TAG -> {
-                    if (parser.name == tagName) depth--
-                }
-            }
-            if (depth > 0) {
-                eventType = parser.next()
+    private fun List<Syllable>.toLine(start: Int, end: Int, isAccompaniment: Boolean): SyncedLine? {
+        if (isEmpty()) return null
+        return kyricsLine(start = start, end = end) {
+            alignment("center")
+            if (isAccompaniment) accompaniment()
+            forEachIndexed { i, s ->
+                syllable(if (i == lastIndex) s.text.trimEnd() else s.text, start = s.start, end = s.end)
             }
         }
     }
 
-    private fun parseTime(timeStr: String?): Int {
-        if (timeStr == null) return 0
-
-        return when {
-            timeStr.endsWith("ms") -> {
-                timeStr.removeSuffix("ms").toIntOrNull() ?: 0
-            }
-            timeStr.endsWith("s") -> {
-                ((timeStr.removeSuffix("s").toDoubleOrNull() ?: 0.0) * 1000).toInt()
-            }
-            timeStr.contains(":") -> {
-                // Format: MM:SS.mmm or HH:MM:SS.mmm
-                val parts = timeStr.split(":")
-                when (parts.size) {
-                    2 -> {
-                        // MM:SS.mmm format
-                        val minutePart = parts[0].toIntOrNull() ?: 0
-                        val secondParts = parts[1].split(".")
-                        val seconds = secondParts[0].toIntOrNull() ?: 0
-                        val millis = if (secondParts.size > 1) {
-                            // Convert fractional seconds to milliseconds
-                            val fractionStr = secondParts[1]
-                            when (fractionStr.length) {
-                                1 -> fractionStr.toIntOrNull()?.times(100) ?: 0 // .6 = 600ms
-                                2 -> fractionStr.toIntOrNull()?.times(10) ?: 0 // .60 = 600ms
-                                3 -> fractionStr.toIntOrNull() ?: 0 // .600 = 600ms
-                                else -> fractionStr.take(3).toIntOrNull() ?: 0 // .6000 = 600ms
-                            }
-                        } else {
-                            0
-                        }
-                        minutePart * 60000 + seconds * 1000 + millis
-                    }
-                    3 -> {
-                        // HH:MM:SS.mmm format
-                        val hours = parts[0].toIntOrNull() ?: 0
-                        val minutes = parts[1].toIntOrNull() ?: 0
-                        val secondParts = parts[2].split(".")
-                        val seconds = secondParts[0].toIntOrNull() ?: 0
-                        val millis = if (secondParts.size > 1) {
-                            val fraction = secondParts[1].take(3).padEnd(3, '0')
-                            fraction.toIntOrNull() ?: 0
-                        } else {
-                            0
-                        }
-                        hours * 3600000 + minutes * 60000 + seconds * 1000 + millis
-                    }
-                    else -> 0
-                }
-            }
-            else -> timeStr.toIntOrNull() ?: 0
-        }
+    companion object {
+        private const val TTML_NS = "http://www.w3.org/ns/ttml#metadata"
     }
 }
+
+internal data class Timing(val start: Int, val end: Int)
+
+internal data class Syllable(val text: String, val start: Int, val end: Int)
