@@ -9,7 +9,7 @@ import com.kyrics.config.KyricsConfig
 import com.kyrics.models.SyncedLine
 
 /**
- * KaraokeLyricsView that uses the Kyrics library directly.
+ * KaraokeLyricsView that uses the Kyrics library directly with DSL support.
  * No conversion needed since we use library models throughout.
  */
 @Composable
@@ -20,15 +20,13 @@ fun KaraokeLyricsView(
     onLineClicked: (SyncedLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    lyrics?.let {
+    lyrics?.let { syncedLyrics ->
         KyricsViewer(
-            lines = it.lines,
+            lines = syncedLyrics.lines,
             currentTimeMs = currentTimeMs,
             config = libraryConfig,
             modifier = modifier.fillMaxSize(),
-            onLineClick = { line: SyncedLine, _: Int ->
-                onLineClicked(line)
-            }
+            onLineClick = { line, _ -> onLineClicked(line) }
         )
     }
 }

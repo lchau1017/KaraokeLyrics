@@ -2,9 +2,8 @@ package com.karaokelyrics.app.data.parser
 
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.parser.TtmlParser
+import com.kyrics.kyricsLine
 import com.kyrics.models.SyncedLine
-import com.kyrics.models.KyricsLine
-import com.kyrics.models.KyricsSyllable
 import javax.inject.Inject
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
@@ -67,6 +66,12 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
         }
     }
 
+    private data class ParsedSyllable(
+        val content: String,
+        val start: Int,
+        val end: Int
+    )
+
     private fun parseP(parser: XmlPullParser, lyricsLines: MutableList<SyncedLine>) {
         val pBegin = parser.getAttributeValue(null, "begin")
         val pEnd = parser.getAttributeValue(null, "end")
@@ -77,8 +82,8 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
             return
         }
 
-        val mainSyllables = mutableListOf<KyricsSyllable>()
-        val bgSyllables = mutableListOf<KyricsSyllable>()
+        val mainSyllables = mutableListOf<ParsedSyllable>()
+        val bgSyllables = mutableListOf<ParsedSyllable>()
         var bgStart: Int? = null
         var bgEnd: Int? = null
 
@@ -100,7 +105,7 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
                     // Regular syllable span
                     val text = getElementText(parser, "span")
                     if (text.isNotEmpty()) {
-                        val syllable = KyricsSyllable(
+                        val syllable = ParsedSyllable(
                             content = text,
                             start = parseTime(spanBegin),
                             end = parseTime(spanEnd)
@@ -127,40 +132,43 @@ class TtmlParserImpl @Inject constructor() : TtmlParser {
             if (eventType == XmlPullParser.END_DOCUMENT) break
         }
 
-        // Create main line
+        // Create main line using Kyrics DSL
         if (mainSyllables.isNotEmpty()) {
-            // Trim trailing space from last syllable
-            val lastIndex = mainSyllables.lastIndex
-            mainSyllables[lastIndex] = mainSyllables[lastIndex].copy(
-                content = mainSyllables[lastIndex].content.trimEnd()
-            )
-
-            lyricsLines.add(
-                KyricsLine(
-                    syllables = mainSyllables,
-                    start = parseTime(pBegin),
-                    end = parseTime(pEnd),
-                    metadata = mapOf("alignment" to "Center")
-                )
-            )
+            val line = kyricsLine(
+                start = parseTime(pBegin),
+                end = parseTime(pEnd)
+            ) {
+                alignment("center")
+                mainSyllables.forEachIndexed { index, parsed ->
+                    val content = if (index == mainSyllables.lastIndex) {
+                        parsed.content.trimEnd()
+                    } else {
+                        parsed.content
+                    }
+                    syllable(content, start = parsed.start, end = parsed.end)
+                }
+            }
+            lyricsLines.add(line)
         }
 
-        // Create background vocal line if exists
+        // Create background vocal line using Kyrics DSL
         if (bgSyllables.isNotEmpty()) {
-            // Trim trailing space from last syllable
-            val lastIndex = bgSyllables.lastIndex
-            bgSyllables[lastIndex] = bgSyllables[lastIndex].copy(
-                content = bgSyllables[lastIndex].content.trimEnd()
-            )
-
-            lyricsLines.add(
-                KyricsLine(
-                    syllables = bgSyllables,
-                    start = bgStart ?: bgSyllables.first().start,
-                    end = bgEnd ?: bgSyllables.last().end,
-                    metadata = mapOf("alignment" to "Center", "isAccompaniment" to "true")
-                )
-            )
+            val line = kyricsLine(
+                start = bgStart ?: bgSyllables.first().start,
+                end = bgEnd ?: bgSyllables.last().end
+            ) {
+                alignment("center")
+                accompaniment()
+                bgSyllables.forEachIndexed { index, parsed ->
+                    val content = if (index == bgSyllables.lastIndex) {
+                        parsed.content.trimEnd()
+                    } else {
+                        parsed.content
+                    }
+                    syllable(content, start = parsed.start, end = parsed.end)
+                }
+            }
+            lyricsLines.add(line)
         }
     }
 
