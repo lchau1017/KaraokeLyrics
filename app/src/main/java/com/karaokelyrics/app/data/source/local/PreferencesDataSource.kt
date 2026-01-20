@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.karaokelyrics.app.domain.model.FontSize
+import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
@@ -35,6 +36,7 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
         val ENABLE_CHARACTER_ANIMATIONS = booleanPreferencesKey("enable_character_animations")
         val LYRICS_TIMING_OFFSET_MS = intPreferencesKey("lyrics_timing_offset_ms")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
+        val LYRICS_SOURCE = stringPreferencesKey("lyrics_source")
     }
 
     /**
@@ -118,6 +120,12 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
         }
     }
 
+    suspend fun updateLyricsSource(lyricsSource: LyricsSource) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.LYRICS_SOURCE] = lyricsSource.name
+        }
+    }
+
     /**
      * Update all settings at once.
      */
@@ -133,6 +141,7 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
             preferences[PreferencesKeys.ENABLE_CHARACTER_ANIMATIONS] = settings.enableCharacterAnimations
             preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS] = settings.lyricsTimingOffsetMs
             preferences[PreferencesKeys.IS_DARK_MODE] = settings.isDarkMode
+            preferences[PreferencesKeys.LYRICS_SOURCE] = settings.lyricsSource.name
         }
     }
 
@@ -150,21 +159,22 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
      */
     private fun mapPreferencesToUserSettings(preferences: Preferences): UserSettings = UserSettings(
         darkLyricsColorArgb = preferences[PreferencesKeys.DARK_LYRICS_COLOR] ?: defaultSettings.darkLyricsColorArgb,
-        darkBackgroundColorArgb = preferences[PreferencesKeys.DARK_BACKGROUND_COLOR] ?: defaultSettings.darkBackgroundColorArgb,
+        darkBackgroundColorArgb = preferences[PreferencesKeys.DARK_BACKGROUND_COLOR]
+            ?: defaultSettings.darkBackgroundColorArgb,
         lightLyricsColorArgb = preferences[PreferencesKeys.LIGHT_LYRICS_COLOR] ?: defaultSettings.lightLyricsColorArgb,
-        lightBackgroundColorArgb = preferences[PreferencesKeys.LIGHT_BACKGROUND_COLOR] ?: defaultSettings.lightBackgroundColorArgb,
-        fontSize = preferences[PreferencesKeys.FONT_SIZE]?.let {
-            try {
-                FontSize.valueOf(it)
-            } catch (e: IllegalArgumentException) {
-                defaultSettings.fontSize
-            }
-        } ?: defaultSettings.fontSize,
+        lightBackgroundColorArgb = preferences[PreferencesKeys.LIGHT_BACKGROUND_COLOR]
+            ?: defaultSettings.lightBackgroundColorArgb,
+        fontSize = parseEnum(preferences[PreferencesKeys.FONT_SIZE], defaultSettings.fontSize),
         enableAnimations = preferences[PreferencesKeys.ENABLE_ANIMATIONS] ?: defaultSettings.enableAnimations,
         enableBlurEffect = preferences[PreferencesKeys.ENABLE_BLUR_EFFECT] ?: defaultSettings.enableBlurEffect,
-        enableCharacterAnimations =
-        preferences[PreferencesKeys.ENABLE_CHARACTER_ANIMATIONS] ?: defaultSettings.enableCharacterAnimations,
-        lyricsTimingOffsetMs = preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS] ?: defaultSettings.lyricsTimingOffsetMs,
-        isDarkMode = preferences[PreferencesKeys.IS_DARK_MODE] ?: defaultSettings.isDarkMode
+        enableCharacterAnimations = preferences[PreferencesKeys.ENABLE_CHARACTER_ANIMATIONS]
+            ?: defaultSettings.enableCharacterAnimations,
+        lyricsTimingOffsetMs = preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS]
+            ?: defaultSettings.lyricsTimingOffsetMs,
+        isDarkMode = preferences[PreferencesKeys.IS_DARK_MODE] ?: defaultSettings.isDarkMode,
+        lyricsSource = parseEnum(preferences[PreferencesKeys.LYRICS_SOURCE], defaultSettings.lyricsSource)
     )
+
+    private inline fun <reified T : Enum<T>> parseEnum(value: String?, default: T): T =
+        value?.let { runCatching { enumValueOf<T>(it) }.getOrNull() } ?: default
 }
