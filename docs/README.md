@@ -19,10 +19,18 @@ This folder contains media files and documentation for the KaraokeLyrics sample 
 
 This sample application demonstrates how to integrate and use the [Kyrics](https://github.com/lchau1017/Kyrics) library for karaoke lyrics display in Android applications.
 
+### Key Features (v1.2.0)
+
+- **Multi-Format Support** - TTML, LRC, and Enhanced LRC formats with auto-detection
+- **Synchronized Lyrics Display** - Real-time character-by-character highlighting
+- **Multiple Viewer Types** - 12+ different display modes
+- **Rich Customization** - Font settings, animations, gradients, and visual effects
+- **Built-in Presets** - 10 ready-to-use theme presets
+
 The Kyrics library is available via JitPack:
 
 ```kotlin
-implementation("com.github.lchau1017:Kyrics:v1.1.1")
+implementation("com.github.lchau1017:Kyrics:v1.2.0")
 ```
 
 ## Key Integration Points
@@ -46,15 +54,18 @@ val config = kyricsConfig {
 }
 ```
 
-### 2. TTML Parsing with DSL
+### 2. Lyrics Parsing with Auto-Detection
 
-The `TtmlParserImpl` uses Kyrics DSL to create synchronized lyrics:
+The `ParseLyricsUseCase` uses Kyrics library's `parseLyrics()` function which auto-detects the format:
 
 ```kotlin
-kyricsLine(start = start, end = end) {
-    alignment("center")
-    if (isAccompaniment) accompaniment()
-    syllable(text, start = syllableStart, end = syllableEnd)
+import com.kyrics.parseLyrics
+import com.kyrics.parser.ParseResult
+
+// Supports TTML, LRC, and Enhanced LRC formats
+when (val result = parseLyrics(content)) {
+    is ParseResult.Success -> SyncedLyrics(result.lines)
+    is ParseResult.Failure -> SyncedLyrics(emptyList())
 }
 ```
 
@@ -96,16 +107,16 @@ The sample app follows Clean Architecture with MVI pattern:
 │  - LibraryConfigMapper (kyricsConfig DSL)               │
 ├─────────────────────────────────────────────────────────┤
 │  Domain Layer                                           │
-│  - Use Cases, Repository Interfaces                     │
-│  - Business Models                                      │
+│  - Use Cases (ParseLyricsUseCase uses parseLyrics())    │
+│  - Repository Interfaces, Business Models               │
 ├─────────────────────────────────────────────────────────┤
 │  Data Layer                                             │
-│  - TtmlParserImpl (kyricsLine DSL)                      │
 │  - Repository Implementations                           │
 │  - Data Sources (with DispatcherProvider DI)            │
 ├─────────────────────────────────────────────────────────┤
-│  Kyrics Library                                         │
-│  - KyricsViewer, KyricsConfig, SyncedLine               │
+│  Kyrics Library (v1.2.0)                                │
+│  - KyricsViewer, KyricsConfig, parseLyrics()            │
+│  - Multi-format support (TTML, LRC, Enhanced LRC)       │
 └─────────────────────────────────────────────────────────┘
 ```
 

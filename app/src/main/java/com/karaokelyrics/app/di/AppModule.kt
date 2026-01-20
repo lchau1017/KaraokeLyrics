@@ -7,7 +7,7 @@ import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.ParseTtmlUseCase
+import com.karaokelyrics.app.domain.usecase.ParseLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
@@ -78,11 +78,7 @@ object AppModule {
         PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
 
     @Provides
-    @Singleton
-    fun provideTtmlParser(): com.karaokelyrics.app.domain.parser.TtmlParser = com.karaokelyrics.app.data.parser.TtmlParserImpl()
-
-    @Provides
-    fun provideParseTtmlUseCase(ttmlParser: com.karaokelyrics.app.domain.parser.TtmlParser): ParseTtmlUseCase = ParseTtmlUseCase(ttmlParser)
+    fun provideParseLyricsUseCase(): ParseLyricsUseCase = ParseLyricsUseCase()
 
     @Provides
     fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase = ProcessLyricsDataUseCase()
@@ -90,9 +86,9 @@ object AppModule {
     @Provides
     fun provideLoadLyricsUseCase(
         lyricsRepository: LyricsRepository,
-        parseTtmlUseCase: ParseTtmlUseCase,
+        parseLyricsUseCase: ParseLyricsUseCase,
         processLyricsDataUseCase: ProcessLyricsDataUseCase
-    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, parseTtmlUseCase, processLyricsDataUseCase)
+    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, parseLyricsUseCase, processLyricsDataUseCase)
 
     @Provides
     fun provideObserveUserSettingsUseCase(settingsRepository: SettingsRepository): ObserveUserSettingsUseCase =
