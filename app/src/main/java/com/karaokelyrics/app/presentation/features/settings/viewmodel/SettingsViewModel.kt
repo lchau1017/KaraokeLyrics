@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.model.FontSize
+import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
@@ -58,6 +59,7 @@ class SettingsViewModel @Inject constructor(
                     is SettingsIntent.UpdateBlurEffectEnabled -> updateBlurEffectEnabled(intent.enabled)
                     is SettingsIntent.UpdateCharacterAnimationsEnabled -> updateCharacterAnimationsEnabled(intent.enabled)
                     is SettingsIntent.UpdateDarkMode -> updateDarkMode(intent.isDark)
+                    is SettingsIntent.UpdateLyricsSource -> updateLyricsSource(intent.lyricsSource)
                     is SettingsIntent.ResetToDefaults -> resetToDefaults()
                 }
             }
@@ -105,6 +107,11 @@ class SettingsViewModel @Inject constructor(
     private suspend fun updateDarkMode(isDark: Boolean) {
         updateUserSettingsUseCase.updateDarkMode(isDark)
         _effects.send(SettingsEffect.SettingsUpdated)
+    }
+
+    private suspend fun updateLyricsSource(lyricsSource: LyricsSource) {
+        updateUserSettingsUseCase.updateLyricsSource(lyricsSource)
+        _effects.send(SettingsEffect.LyricsSourceChanged(lyricsSource))
     }
 
     private suspend fun resetToDefaults() {

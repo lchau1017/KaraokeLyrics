@@ -2,6 +2,7 @@ package com.karaokelyrics.app.data.repository
 
 import com.karaokelyrics.app.data.source.local.PreferencesDataSource
 import com.karaokelyrics.app.domain.model.FontSize
+import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import javax.inject.Inject
@@ -43,6 +44,10 @@ class SettingsRepositoryImpl @Inject constructor(private val preferencesDataSour
 
     override suspend fun updateDarkMode(isDark: Boolean) {
         preferencesDataSource.updateDarkModeEnabled(isDark)
+    }
+
+    override suspend fun updateLyricsSource(lyricsSource: LyricsSource) {
+        preferencesDataSource.updateLyricsSource(lyricsSource)
     }
 
     override suspend fun resetToDefaults() {

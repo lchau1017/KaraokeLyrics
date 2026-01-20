@@ -1,6 +1,7 @@
 package com.karaokelyrics.app.domain.repository
 
 import com.karaokelyrics.app.domain.model.FontSize
+import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import kotlinx.coroutines.flow.Flow
 
@@ -49,6 +50,11 @@ interface SettingsRepository {
      * Update dark mode preference
      */
     suspend fun updateDarkMode(isDark: Boolean)
+
+    /**
+     * Update lyrics source format
+     */
+    suspend fun updateLyricsSource(lyricsSource: LyricsSource)
 
     /**
      * Reset all settings to default values

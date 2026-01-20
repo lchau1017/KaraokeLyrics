@@ -19,6 +19,7 @@ import com.karaokelyrics.app.presentation.features.player.components.PlayerContr
 import com.karaokelyrics.app.presentation.features.player.intent.PlayerIntent
 import com.karaokelyrics.app.presentation.features.player.viewmodel.PlayerViewModel
 import com.karaokelyrics.app.presentation.features.settings.components.SettingsBottomSheet
+import com.karaokelyrics.app.presentation.features.settings.effect.SettingsEffect
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import com.karaokelyrics.app.presentation.features.settings.viewmodel.SettingsViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -53,6 +54,19 @@ fun LyricsScreen(
                 is LyricsEffect.ScrollToLine -> {
                     // Handled in KaraokeLyricsView
                 }
+            }
+        }
+    }
+
+    // Handle effects from settings ViewModel (specifically lyrics source changes)
+    LaunchedEffect(settingsViewModel) {
+        settingsViewModel.effects.collectLatest { effect ->
+            when (effect) {
+                is SettingsEffect.LyricsSourceChanged -> {
+                    // Reload lyrics with the new source
+                    lyricsViewModel.handleIntent(LyricsIntent.LoadLyricsWithSource(effect.lyricsSource))
+                }
+                else -> { /* Other effects handled elsewhere */ }
             }
         }
     }
@@ -142,6 +156,9 @@ fun LyricsScreen(
             },
             onUpdateDarkMode = { isDark ->
                 settingsViewModel.handleIntent(SettingsIntent.UpdateDarkMode(isDark))
+            },
+            onUpdateLyricsSource = { source ->
+                settingsViewModel.handleIntent(SettingsIntent.UpdateLyricsSource(source))
             },
             onResetToDefaults = {
                 settingsViewModel.handleIntent(SettingsIntent.ResetToDefaults)

@@ -9,10 +9,6 @@ object ColorPalette {
     object Brand {
         val spotifyGreen = 0xFF1DB954.toInt()
         val spotifyBlack = 0xFF121212.toInt()
-        val spotifyDarkGray = 0xFF181818.toInt()
-        val spotifyMediumGray = 0xFF282828.toInt()
-        val spotifyLightGray = 0xFF535353.toInt()
-        val spotifyTextGray = 0xFFB3B3B3.toInt()
         val white = 0xFFFFFFFF.toInt()
         val black = 0xFF000000.toInt()
     }
