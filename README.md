@@ -43,6 +43,7 @@
 ### Key Features
 
 - **Synchronized Lyrics Display** - Real-time character-by-character highlighting
+- **Multi-Format Support** - TTML, LRC, and Enhanced LRC formats with auto-detection
 - **Multiple Viewer Types** - 12+ different display modes (Stacked, Wave, Spiral, 3D-Carousel, etc.)
 - **Rich Customization** - Font settings, animations, gradients, and visual effects
 - **Built-in Presets** - 10 ready-to-use theme presets (Neon, Rainbow, Fire, Ocean, etc.)
@@ -71,7 +72,7 @@ In your `app/build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("com.github.lchau1017:Kyrics:v1.1.1")
+    implementation("com.github.lchau1017:Kyrics:v1.2.0")
 }
 ```
 
@@ -79,7 +80,7 @@ Or using Version Catalog (`gradle/libs.versions.toml`):
 
 ```toml
 [versions]
-kyrics = "v1.1.1"
+kyrics = "v1.2.0"
 
 [libraries]
 kyrics = { group = "com.github.lchau1017", name = "Kyrics", version.ref = "kyrics" }
@@ -246,10 +247,6 @@ app/
 │       └── PlaybackService.kt       # Media3 playback service
 │
 ├── data/                            # Data Layer
-│   ├── parser/
-│   │   ├── TtmlParser.kt            # TTML lyrics parser (uses Kyrics DSL)
-│   │   ├── TimeParser.kt            # Time format parsing utilities
-│   │   └── XmlPullParserExtensions.kt # XML navigation helpers
 │   ├── repository/
 │   │   ├── LyricsRepositoryImpl.kt  # Lyrics data repository
 │   │   └── SettingsRepositoryImpl.kt # User settings repository
@@ -264,14 +261,12 @@ app/
 │   │   ├── UserSettings.kt          # User preferences model
 │   │   ├── MediaContent.kt          # Media content model
 │   │   └── LyricsSyncState.kt       # Lyrics sync state
-│   ├── parser/
-│   │   └── TtmlParser.kt            # Parser interface
 │   ├── repository/
 │   │   ├── LyricsRepository.kt      # Lyrics repository interface
 │   │   └── SettingsRepository.kt    # Settings repository interface
 │   └── usecase/
 │       ├── LoadLyricsUseCase.kt     # Load and parse lyrics
-│       ├── ParseTtmlUseCase.kt      # TTML parsing
+│       ├── ParseLyricsUseCase.kt    # Uses Kyrics parseLyrics() with auto-detection
 │       ├── SyncLyricsUseCase.kt     # Lyrics synchronization
 │       ├── ProcessLyricsDataUseCase.kt # Process lyrics data
 │       └── ...                      # Other use cases
@@ -329,9 +324,12 @@ app/
 ┌─────────────────────────────▼────────────────────────────────────┐
 │                        Domain Layer                               │
 │  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐  │
-│  │ LoadLyricsUse  │  │ SyncLyricsUse  │  │  ObserveSettings   │  │
-│  │     Case       │  │     Case       │  │     UseCase        │  │
+│  │ LoadLyricsUse  │  │ ParseLyrics    │  │  ObserveSettings   │  │
+│  │     Case       │  │   UseCase      │  │     UseCase        │  │
 │  └───────┬────────┘  └───────┬────────┘  └─────────┬──────────┘  │
+│          │                   │                     │              │
+│          │       Uses Kyrics parseLyrics()         │              │
+│          │       (TTML/LRC/ELRC auto-detect)       │              │
 │          │                   │                     │              │
 │  ┌───────▼───────────────────▼─────────────────────▼────────────┐│
 │  │                    Repository Interfaces                      ││
@@ -341,24 +339,24 @@ app/
                                │
 ┌──────────────────────────────▼───────────────────────────────────┐
 │                         Data Layer                                │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                    TtmlParserImpl                           │  │
-│  │           Uses kyricsLine() DSL for parsing                 │  │
-│  │    ┌──────────────┐    ┌─────────────────────────────────┐ │  │
-│  │    │  TimeParser  │    │  XmlPullParserExtensions        │ │  │
-│  │    └──────────────┘    └─────────────────────────────────┘ │  │
-│  └────────────────────────────────────────────────────────────┘  │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐   │
 │  │ AssetDataSource │  │PreferencesData  │  │MediaContent     │   │
 │  │ (Dispatcher DI) │  │    Source       │  │   Provider      │   │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘   │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │          LyricsRepositoryImpl    SettingsRepositoryImpl      │ │
+│  └─────────────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────────────┘
                                │
 ┌──────────────────────────────▼───────────────────────────────────┐
-│                       Kyrics Library                              │
+│                   Kyrics Library (v1.2.0)                         │
 │  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐  │
-│  │  KyricsViewer  │  │  KyricsConfig  │  │    SyncedLine      │  │
-│  │   (Compose)    │  │     (DSL)      │  │     (Model)        │  │
+│  │  KyricsViewer  │  │  KyricsConfig  │  │   parseLyrics()    │  │
+│  │   (Compose)    │  │     (DSL)      │  │  (Multi-format)    │  │
+│  └────────────────┘  └────────────────┘  └────────────────────┘  │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐  │
+│  │   SyncedLine   │  │  kyricsConfig  │  │   kyricsLine       │  │
+│  │    (Model)     │  │     DSL {}     │  │     DSL {}         │  │
 │  └────────────────┘  └────────────────┘  └────────────────────┘  │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -398,7 +396,7 @@ app/
 
 - **Jetpack Compose** - Modern Android UI toolkit
 - **Kotlin 2.1.0** - Primary development language
-- **Kyrics Library v1.1.1** - Karaoke lyrics display (via JitPack)
+- **Kyrics Library v1.2.0** - Karaoke lyrics display (via JitPack)
 - **Media3/ExoPlayer** - Audio playback
 - **Dagger Hilt** - Dependency injection
 - **Coroutines & Flow** - Asynchronous programming
@@ -420,7 +418,7 @@ app/
 ```
 MIT License
 
-Copyright (c) 2025 KaraokeLyrics Contributors
+Copyright (c) 2026 KaraokeLyrics Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
