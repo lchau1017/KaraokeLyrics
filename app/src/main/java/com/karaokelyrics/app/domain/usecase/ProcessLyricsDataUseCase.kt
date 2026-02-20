@@ -21,25 +21,15 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         val sortedLines = lyrics.lines.sortedBy { it.start }
 
         // Validate timing data
-        val validatedLines = sortedLines.filter { line ->
-            when (line) {
-                is KyricsLine -> validateKyricsLine(line)
-                else -> line.start >= 0 && line.end > line.start
-            }
-        }
+        val validatedLines = sortedLines.filter { line -> validateLine(line) }
 
-        // Apply any other business transformations
-        val processedLines = validatedLines.map { line ->
-            when (line) {
-                is KyricsLine -> processKyricsLine(line)
-                else -> line
-            }
-        }
+        // Apply business transformations
+        val processedLines = validatedLines.map { line -> processLine(line) }
 
         return SyncedLyrics(processedLines)
     }
 
-    private fun validateKyricsLine(line: KyricsLine): Boolean {
+    private fun validateLine(line: KyricsLine): Boolean {
         // Validate that line has valid timing
         if (line.start < 0 || line.end <= line.start) {
             return false
@@ -51,7 +41,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         }
     }
 
-    private fun processKyricsLine(line: KyricsLine): KyricsLine {
+    private fun processLine(line: KyricsLine): KyricsLine {
         // Trim trailing spaces from last syllable
         val processedSyllables = line.syllables.toMutableList()
         if (processedSyllables.isNotEmpty()) {

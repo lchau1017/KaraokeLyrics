@@ -3,7 +3,6 @@ package com.karaokelyrics.app.domain.usecase
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.kyrics.models.KyricsLine
-import com.kyrics.models.SyncedLine
 import javax.inject.Inject
 
 class SyncLyricsUseCase @Inject constructor() {
@@ -25,14 +24,12 @@ class SyncLyricsUseCase @Inject constructor() {
         val currentLine = lyrics.lines.getOrNull(currentLineIndex)
 
         // Calculate progress for karaoke lines
-        val (lineProgress, syllableIndex, syllableProgress) = when (currentLine) {
-            is KyricsLine -> calculateKaraokeProgress(currentLine, positionMs)
-            else -> Triple(
-                calculateSimpleProgress(currentLine, positionMs),
-                -1,
-                0f
-            )
-        }
+        val (lineProgress, syllableIndex, syllableProgress) =
+            if (currentLine != null) {
+                calculateKaraokeProgress(currentLine, positionMs)
+            } else {
+                Triple(0f, -1, 0f)
+            }
 
         val nextLineStartTime = lyrics.lines.getOrNull(currentLineIndex + 1)?.start
 
@@ -70,14 +67,5 @@ class SyncLyricsUseCase @Inject constructor() {
         val overallProgress = (activeSyllableIndex + syllableProgress) / line.syllables.size
 
         return Triple(overallProgress, activeSyllableIndex, syllableProgress)
-    }
-
-    private fun calculateSimpleProgress(line: SyncedLine?, position: Int): Float {
-        if (line == null) return 0f
-
-        if (position < line.start) return 0f
-        if (position > line.end) return 1f
-
-        return (position - line.start).toFloat() / (line.end - line.start)
     }
 }

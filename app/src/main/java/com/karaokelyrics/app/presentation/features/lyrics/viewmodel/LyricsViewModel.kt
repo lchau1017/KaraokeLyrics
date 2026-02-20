@@ -2,7 +2,6 @@ package com.karaokelyrics.app.presentation.features.lyrics.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.UserSettings
@@ -72,7 +71,6 @@ class LyricsViewModel @Inject constructor(
                 when (intent) {
                     is LyricsIntent.LoadDefaultContent -> loadDefaultContent()
                     is LyricsIntent.LoadMediaContent -> loadMediaContent(intent.contentId)
-                    is LyricsIntent.LoadLyricsWithSource -> loadLyricsWithSource(intent.lyricsSource)
                     is LyricsIntent.SeekToLine -> seekToLine(intent.lineIndex)
                     is LyricsIntent.UpdateCurrentPosition -> updatePosition(intent.position)
                 }
@@ -97,16 +95,6 @@ class LyricsViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private suspend fun loadLyricsWithSource(lyricsSource: LyricsSource) {
-        Timber.d("loadLyricsWithSource: Switching to source $lyricsSource")
-        val defaultContent = getDefaultMediaContentUseCase()
-        // Replace extension based on selected source
-        val baseName = defaultContent.lyricsFileName.substringBeforeLast(".")
-        val newFileName = "$baseName.${lyricsSource.extension}"
-        Timber.d("loadLyricsWithSource: Loading file $newFileName")
-        loadLyrics(newFileName, defaultContent.audioFileName)
     }
 
     private suspend fun loadLyrics(fileName: String, audioFileName: String) {

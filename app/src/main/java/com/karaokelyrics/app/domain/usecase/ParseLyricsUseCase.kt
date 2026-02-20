@@ -8,13 +8,12 @@ import timber.log.Timber
 
 /**
  * Domain use case that orchestrates lyrics parsing.
- * Uses Kyrics library for parsing TTML, LRC, and Enhanced LRC formats.
+ * Uses Kyrics library for parsing TTML format.
  */
 class ParseLyricsUseCase @Inject constructor() {
 
     /**
-     * Parse lyrics content into domain model.
-     * Supports TTML, LRC, and Enhanced LRC formats with auto-detection.
+     * Parse TTML lyrics content into domain model.
      *
      * @param lines List of lines from lyrics file
      * @return Parsed SyncedLyrics domain model

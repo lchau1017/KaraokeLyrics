@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.kyrics.KyricsViewer
 import com.kyrics.config.KyricsConfig
-import com.kyrics.models.SyncedLine
+import com.kyrics.models.KyricsLine
 
 /**
  * KaraokeLyricsView that uses the Kyrics library directly with DSL support.
@@ -17,7 +17,7 @@ fun KaraokeLyricsView(
     lyrics: SyncedLyrics?,
     currentTimeMs: Int,
     libraryConfig: KyricsConfig,
-    onLineClicked: (SyncedLine) -> Unit,
+    onLineClicked: (KyricsLine) -> Unit,
     modifier: Modifier = Modifier
 ) {
     lyrics?.let { syncedLyrics ->

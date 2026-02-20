@@ -77,13 +77,10 @@ class PlayerViewModel @Inject constructor(private val playerController: PlayerCo
     private fun observePlaybackState() {
         viewModelScope.launch {
             combine(
-                playerController.observeIsPlaying(),
-                playerController.observePlaybackPosition()
+                playerController.observeIsPlaying(), playerController.observePlaybackPosition()
             ) { isPlaying, position ->
                 PlayerState(
-                    isPlaying = isPlaying,
-                    currentPosition = position,
-                    duration = _state.value.duration // Keep existing duration
+                    isPlaying = isPlaying, currentPosition = position, duration = _state.value.duration // Keep existing duration
                 )
             }.collect { newState ->
                 _state.value = newState
