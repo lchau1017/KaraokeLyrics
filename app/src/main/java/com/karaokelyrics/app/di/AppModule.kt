@@ -11,6 +11,8 @@ import com.karaokelyrics.app.domain.usecase.ParseLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
+import com.karaokelyrics.app.domain.parser.LyricsParser
+import com.karaokelyrics.app.data.parser.KyricsLyricsParser
 import com.karaokelyrics.app.presentation.features.lyrics.coordinator.PlaybackSyncCoordinator
 import com.karaokelyrics.app.presentation.player.MediaPlayerController
 import com.karaokelyrics.app.presentation.player.PlayerController
@@ -78,7 +80,11 @@ object AppModule {
         PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
 
     @Provides
-    fun provideParseLyricsUseCase(): ParseLyricsUseCase = ParseLyricsUseCase()
+    @Singleton
+    fun provideLyricsParser(): LyricsParser = KyricsLyricsParser()
+
+    @Provides
+    fun provideParseLyricsUseCase(lyricsParser: LyricsParser): ParseLyricsUseCase = ParseLyricsUseCase(lyricsParser)
 
     @Provides
     fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase = ProcessLyricsDataUseCase()

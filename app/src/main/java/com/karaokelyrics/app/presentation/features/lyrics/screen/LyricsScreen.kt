@@ -21,6 +21,7 @@ import com.karaokelyrics.app.presentation.features.player.viewmodel.PlayerViewMo
 import com.karaokelyrics.app.presentation.features.settings.components.SettingsBottomSheet
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import com.karaokelyrics.app.presentation.features.settings.viewmodel.SettingsViewModel
+import com.kyrics.config.KyricsConfig
 import kotlinx.coroutines.flow.collectLatest
 
 /**
@@ -39,6 +40,7 @@ fun LyricsScreen(
     val lyricsState by lyricsViewModel.state.collectAsStateWithLifecycle()
     val playerState by playerViewModel.state.collectAsStateWithLifecycle()
     val settingsState by settingsViewModel.state.collectAsStateWithLifecycle()
+    val libraryConfig by lyricsViewModel.libraryConfig.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var showSettings by remember { mutableStateOf(false) }
@@ -94,6 +96,7 @@ fun LyricsScreen(
             lyricsState.lyrics != null -> {
                 LyricsContent(
                     lyricsState = lyricsState,
+                    libraryConfig = libraryConfig,
                     playerState = playerState,
                     settings = settingsState.settings,
                     onLineClicked = { lineIndex ->
@@ -153,6 +156,7 @@ fun LyricsScreen(
 @Composable
 private fun LyricsContent(
     lyricsState: LyricsViewModel.LyricsState,
+    libraryConfig: KyricsConfig,
     playerState: PlayerViewModel.PlayerState,
     settings: com.karaokelyrics.app.domain.model.UserSettings,
     onLineClicked: (Int) -> Unit,
@@ -161,16 +165,11 @@ private fun LyricsContent(
     onSettingsClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Use the karaoke library
         KaraokeLyricsView(
             lyrics = lyricsState.lyrics,
             currentTimeMs = lyricsState.currentTimeMs,
-            libraryConfig = lyricsState.libraryConfig,
-            onLineClicked = { line ->
-                lyricsState.lyrics?.lines?.indexOf(line)?.let { index ->
-                    if (index >= 0) onLineClicked(index)
-                }
-            },
+            libraryConfig = libraryConfig,
+            onLineClicked = onLineClicked,
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(settings.backgroundColorArgb))

@@ -1,6 +1,5 @@
 package com.karaokelyrics.app.data.repository
 
-import android.content.res.AssetFileDescriptor
 import com.karaokelyrics.app.data.source.local.AssetDataSource
 import com.karaokelyrics.app.data.source.local.MediaContentProvider
 import com.karaokelyrics.app.domain.model.SyncedLyrics
@@ -24,12 +23,6 @@ class LyricsRepositoryImpl @Inject constructor(
      * This is pure data access without any parsing or processing.
      */
     override suspend fun loadFileContent(fileName: String): Result<List<String>> = assetDataSource.readTextFile(fileName)
-
-    /**
-     * Get audio file descriptor for media playback.
-     */
-    override suspend fun getAudioFileDescriptor(fileName: String): Result<AssetFileDescriptor> =
-        assetDataSource.getAssetFileDescriptor(fileName)
 
     /**
      * Get available media content.

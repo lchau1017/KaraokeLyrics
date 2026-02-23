@@ -18,7 +18,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * MVI ViewModel for Lyrics display following Clean Architecture.
@@ -41,12 +40,14 @@ class LyricsViewModel @Inject constructor(
         val isLoading: Boolean = false,
         val error: String? = null,
         val userSettings: UserSettings = UserSettings(),
-        val currentTimeMs: Int = 0,
-        val libraryConfig: KyricsConfig = KyricsConfig.Default
+        val currentTimeMs: Int = 0
     )
 
     private val _state = MutableStateFlow(LyricsState())
     val state: StateFlow<LyricsState> = _state.asStateFlow()
+
+    private val _libraryConfig = MutableStateFlow(KyricsConfig.Default)
+    val libraryConfig: StateFlow<KyricsConfig> = _libraryConfig.asStateFlow()
 
     private val _effects = Channel<LyricsEffect>(Channel.BUFFERED)
     val effects: Flow<LyricsEffect> = _effects.receiveAsFlow()
@@ -102,10 +103,6 @@ class LyricsViewModel @Inject constructor(
 
         loadLyricsUseCase(fileName)
             .onSuccess { lyrics ->
-                Timber.d("loadLyrics: Success - got ${lyrics.lines.size} lines")
-                if (lyrics.lines.isEmpty()) {
-                    Timber.w("loadLyrics: WARNING - lyrics has 0 lines!")
-                }
                 _state.update {
                     it.copy(
                         lyrics = lyrics,
@@ -116,7 +113,6 @@ class LyricsViewModel @Inject constructor(
                 playerController.loadMedia(audioFileName)
             }
             .onFailure { error ->
-                Timber.e(error, "Failed to load lyrics")
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -173,12 +169,9 @@ class LyricsViewModel @Inject constructor(
     private fun observeUserSettings() {
         viewModelScope.launch {
             observeUserSettingsUseCase().collect { settings ->
-                val libraryConfig = libraryConfigMapper.mapToLibraryConfig(settings)
+                _libraryConfig.value = libraryConfigMapper.mapToLibraryConfig(settings)
                 _state.update {
-                    it.copy(
-                        userSettings = settings,
-                        libraryConfig = libraryConfig
-                    )
+                    it.copy(userSettings = settings)
                 }
             }
         }

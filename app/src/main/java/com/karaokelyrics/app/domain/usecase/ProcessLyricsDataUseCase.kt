@@ -1,7 +1,7 @@
 package com.karaokelyrics.app.domain.usecase
 
+import com.karaokelyrics.app.domain.model.LyricsLine
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.kyrics.models.KyricsLine
 import javax.inject.Inject
 
 /**
@@ -29,7 +29,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         return SyncedLyrics(processedLines)
     }
 
-    private fun validateLine(line: KyricsLine): Boolean {
+    private fun validateLine(line: LyricsLine): Boolean {
         // Validate that line has valid timing
         if (line.start < 0 || line.end <= line.start) {
             return false
@@ -41,7 +41,7 @@ class ProcessLyricsDataUseCase @Inject constructor() {
         }
     }
 
-    private fun processLine(line: KyricsLine): KyricsLine {
+    private fun processLine(line: LyricsLine): LyricsLine {
         // Trim trailing spaces from last syllable
         val processedSyllables = line.syllables.toMutableList()
         if (processedSyllables.isNotEmpty()) {

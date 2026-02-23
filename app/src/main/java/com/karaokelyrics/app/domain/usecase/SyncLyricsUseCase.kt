@@ -1,8 +1,8 @@
 package com.karaokelyrics.app.domain.usecase
 
+import com.karaokelyrics.app.domain.model.LyricsLine
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
-import com.kyrics.models.KyricsLine
 import javax.inject.Inject
 
 class SyncLyricsUseCase @Inject constructor() {
@@ -43,7 +43,7 @@ class SyncLyricsUseCase @Inject constructor() {
         )
     }
 
-    private fun calculateKaraokeProgress(line: KyricsLine, position: Int): Triple<Float, Int, Float> {
+    private fun calculateKaraokeProgress(line: LyricsLine, position: Int): Triple<Float, Int, Float> {
         if (position < line.start) return Triple(0f, -1, 0f)
         if (position > line.end) return Triple(1f, line.syllables.size - 1, 1f)
 
