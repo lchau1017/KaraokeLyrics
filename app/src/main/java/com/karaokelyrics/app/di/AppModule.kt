@@ -80,7 +80,6 @@ object AppModule {
         PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
 
     @Provides
-    @Singleton
     fun provideLyricsParser(): LyricsParser = KyricsLyricsParser()
 
     @Provides

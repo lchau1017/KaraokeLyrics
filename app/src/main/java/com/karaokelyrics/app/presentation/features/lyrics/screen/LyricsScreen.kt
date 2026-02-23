@@ -46,7 +46,7 @@ fun LyricsScreen(
     var showSettings by remember { mutableStateOf(false) }
 
     // Handle effects from lyrics ViewModel
-    LaunchedEffect(lyricsViewModel) {
+    LaunchedEffect(Unit) {
         lyricsViewModel.effects.collectLatest { effect ->
             when (effect) {
                 is LyricsEffect.ShowError -> {
