@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.UserSettings
+import com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
+import com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
@@ -30,8 +32,8 @@ class LyricsViewModel @Inject constructor(
     private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
     private val libraryConfigMapper: LibraryConfigMapper,
-    private val getDefaultMediaContentUseCase: com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase,
-    private val getAvailableMediaContentUseCase: com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
+    private val getDefaultMediaContentUseCase: GetDefaultMediaContentUseCase,
+    private val getAvailableMediaContentUseCase: GetAvailableMediaContentUseCase
 ) : ViewModel() {
 
     data class LyricsState(
@@ -73,7 +75,6 @@ class LyricsViewModel @Inject constructor(
                     is LyricsIntent.LoadDefaultContent -> loadDefaultContent()
                     is LyricsIntent.LoadMediaContent -> loadMediaContent(intent.contentId)
                     is LyricsIntent.SeekToLine -> seekToLine(intent.lineIndex)
-                    is LyricsIntent.UpdateCurrentPosition -> updatePosition(intent.position)
                 }
             }
         }
@@ -131,12 +132,7 @@ class LyricsViewModel @Inject constructor(
         val line = _state.value.lyrics?.lines?.getOrNull(lineIndex)
         line?.let {
             playerController.seekTo(it.start.toLong())
-            _effects.send(LyricsEffect.ScrollToLine(lineIndex))
         }
-    }
-
-    private fun updatePosition(position: Long) {
-        // Position updates are handled by observeLyricsSync
     }
 
     private fun observeLyricsSync() {

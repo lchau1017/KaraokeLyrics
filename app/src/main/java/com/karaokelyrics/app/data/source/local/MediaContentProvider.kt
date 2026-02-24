@@ -43,13 +43,4 @@ class MediaContentProvider @Inject constructor() {
      */
     fun getDefaultContent(): MediaContent = getAvailableContent().first()
 
-    /**
-     * Find content by ID.
-     */
-    fun findContentById(id: String): MediaContent? = getAvailableContent().find { it.id == id }
-
-    /**
-     * Get content by index.
-     */
-    fun getContentByIndex(index: Int): MediaContent? = getAvailableContent().getOrNull(index)
 }

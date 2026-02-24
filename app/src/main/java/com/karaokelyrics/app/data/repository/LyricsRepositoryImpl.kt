@@ -2,6 +2,7 @@ package com.karaokelyrics.app.data.repository
 
 import com.karaokelyrics.app.data.source.local.AssetDataSource
 import com.karaokelyrics.app.data.source.local.MediaContentProvider
+import com.karaokelyrics.app.domain.model.MediaContent
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import javax.inject.Inject
@@ -27,9 +28,9 @@ class LyricsRepositoryImpl @Inject constructor(
     /**
      * Get available media content.
      */
-    override fun getAvailableContent(): List<com.karaokelyrics.app.domain.model.MediaContent> =
+    override fun getAvailableContent(): List<MediaContent> =
         mediaContentProvider.getAvailableContent().map {
-            com.karaokelyrics.app.domain.model.MediaContent(
+            MediaContent(
                 id = it.id,
                 title = it.title,
                 lyricsFileName = it.lyricsFileName,
@@ -42,9 +43,9 @@ class LyricsRepositoryImpl @Inject constructor(
     /**
      * Get default content to load.
      */
-    override fun getDefaultContent(): com.karaokelyrics.app.domain.model.MediaContent {
+    override fun getDefaultContent(): MediaContent {
         val content = mediaContentProvider.getDefaultContent()
-        return com.karaokelyrics.app.domain.model.MediaContent(
+        return MediaContent(
             id = content.id,
             title = content.title,
             lyricsFileName = content.lyricsFileName,

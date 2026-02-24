@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.domain.model.FontSize
@@ -253,7 +254,7 @@ fun SettingsBottomSheet(
 @Composable
 private fun SettingsSection(
     title: String,
-    titleStyle: androidx.compose.ui.text.TextStyle,
+    titleStyle: TextStyle,
     titleColor: Color,
     content: @Composable () -> Unit
 ) {
@@ -284,7 +285,7 @@ private fun SettingsToggle(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true,
-    labelStyle: androidx.compose.ui.text.TextStyle,
+    labelStyle: TextStyle,
     labelColor: Color,
     disabledColor: Color = labelColor.copy(alpha = 0.38f),
     switchColors: SwitchColorsViewData

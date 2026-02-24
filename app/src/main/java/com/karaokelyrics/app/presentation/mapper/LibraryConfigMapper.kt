@@ -7,7 +7,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.kyrics.config.KyricsConfig
-import com.kyrics.config.KyricsPresets
 import com.kyrics.config.ViewerType
 import com.kyrics.config.kyricsConfig
 import javax.inject.Inject
@@ -59,14 +58,5 @@ class LibraryConfigMapper @Inject constructor() {
                 lineSpacing = 12.dp
             }
         }
-    }
-
-    /**
-     * Create a preset configuration based on user preference.
-     */
-    fun getPresetConfig(presetName: String): KyricsConfig = when (presetName.lowercase()) {
-        "classic" -> KyricsPresets.Classic
-        "neon" -> KyricsPresets.Neon
-        else -> KyricsConfig.Default
     }
 }

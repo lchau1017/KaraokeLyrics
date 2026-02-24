@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.presentation.ui.core.*
@@ -42,7 +43,7 @@ private fun ErrorTitle(color: Color) {
             text = "Error loading lyrics",
             style = MaterialTheme.typography.headlineMedium,
             color = color,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold
         ),
         textAlign = TextAlign.Center
     )

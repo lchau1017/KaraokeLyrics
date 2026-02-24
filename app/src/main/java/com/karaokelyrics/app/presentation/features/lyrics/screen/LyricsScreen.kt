@@ -21,6 +21,7 @@ import com.karaokelyrics.app.presentation.features.player.viewmodel.PlayerViewMo
 import com.karaokelyrics.app.presentation.features.settings.components.SettingsBottomSheet
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import com.karaokelyrics.app.presentation.features.settings.viewmodel.SettingsViewModel
+import com.karaokelyrics.app.domain.model.UserSettings
 import com.kyrics.config.KyricsConfig
 import kotlinx.coroutines.flow.collectLatest
 
@@ -51,9 +52,6 @@ fun LyricsScreen(
             when (effect) {
                 is LyricsEffect.ShowError -> {
                     snackbarHostState.showSnackbar(effect.message)
-                }
-                is LyricsEffect.ScrollToLine -> {
-                    // Handled in KaraokeLyricsView
                 }
             }
         }
@@ -158,7 +156,7 @@ private fun LyricsContent(
     lyricsState: LyricsViewModel.LyricsState,
     libraryConfig: KyricsConfig,
     playerState: PlayerViewModel.PlayerState,
-    settings: com.karaokelyrics.app.domain.model.UserSettings,
+    settings: UserSettings,
     onLineClicked: (Int) -> Unit,
     onPlayPauseClick: () -> Unit,
     onSeekTo: (Long) -> Unit,

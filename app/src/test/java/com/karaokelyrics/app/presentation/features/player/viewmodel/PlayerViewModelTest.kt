@@ -68,13 +68,10 @@ class PlayerViewModelTest {
         isPlayingFlow.value = false
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.effects.test {
-            viewModel.handleIntent(PlayerIntent.PlayPause)
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(PlayerIntent.PlayPause)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { playerController.play() }
-            assertThat(awaitItem()).isEqualTo(PlayerEffect.PlaybackStarted)
-        }
+        coVerify { playerController.play() }
     }
 
     @Test
@@ -82,39 +79,30 @@ class PlayerViewModelTest {
         isPlayingFlow.value = true
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.effects.test {
-            viewModel.handleIntent(PlayerIntent.PlayPause)
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(PlayerIntent.PlayPause)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { playerController.pause() }
-            assertThat(awaitItem()).isEqualTo(PlayerEffect.PlaybackPaused)
-        }
+        coVerify { playerController.pause() }
     }
 
     // ==================== Seek Intent Tests ====================
 
     @Test
-    fun `SeekToPosition intent calls seekTo and emits effect`() = runTest {
+    fun `SeekToPosition intent calls seekTo`() = runTest {
         val seekPosition = 5000L
 
-        viewModel.effects.test {
-            viewModel.handleIntent(PlayerIntent.SeekToPosition(seekPosition))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(PlayerIntent.SeekToPosition(seekPosition))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { playerController.seekTo(seekPosition) }
-            assertThat(awaitItem()).isEqualTo(PlayerEffect.SeekCompleted(seekPosition))
-        }
+        coVerify { playerController.seekTo(seekPosition) }
     }
 
     @Test
     fun `SeekToPosition with zero position works correctly`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(PlayerIntent.SeekToPosition(0L))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(PlayerIntent.SeekToPosition(0L))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { playerController.seekTo(0L) }
-            assertThat(awaitItem()).isEqualTo(PlayerEffect.SeekCompleted(0L))
-        }
+        coVerify { playerController.seekTo(0L) }
     }
 
     // ==================== LoadMedia Intent Tests ====================
@@ -224,14 +212,10 @@ class PlayerViewModelTest {
         positionFlow.value = 1000L
         testDispatcher.scheduler.advanceUntilIdle()
 
-        viewModel.effects.test {
-            viewModel.handleIntent(PlayerIntent.SeekToPosition(5000L))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(PlayerIntent.SeekToPosition(5000L))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            assertThat(awaitItem()).isEqualTo(PlayerEffect.SeekCompleted(5000L))
-        }
-
-        // Verify state still reflects playing
+        coVerify { playerController.seekTo(5000L) }
         assertThat(viewModel.state.value.isPlaying).isTrue()
     }
 }

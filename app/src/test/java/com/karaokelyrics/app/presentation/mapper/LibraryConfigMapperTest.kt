@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.kyrics.config.KyricsConfig
-import com.kyrics.config.KyricsPresets
 import org.junit.Before
 import org.junit.Test
 
@@ -89,40 +88,6 @@ class LibraryConfigMapperTest {
         val result = mapper.mapToLibraryConfig(settings)
 
         assertThat(result).isNotNull()
-    }
-
-    // ==================== Preset Config Tests ====================
-
-    @Test
-    fun `getPresetConfig returns Default for unknown preset`() {
-        val result = mapper.getPresetConfig("unknown_preset")
-
-        assertThat(result).isEqualTo(KyricsConfig.Default)
-    }
-
-    @Test
-    fun `getPresetConfig returns Classic for classic preset`() {
-        val result = mapper.getPresetConfig("classic")
-
-        assertThat(result).isEqualTo(KyricsPresets.Classic)
-    }
-
-    @Test
-    fun `getPresetConfig returns Neon for neon preset`() {
-        val result = mapper.getPresetConfig("neon")
-
-        assertThat(result).isEqualTo(KyricsPresets.Neon)
-    }
-
-    @Test
-    fun `getPresetConfig is case insensitive`() {
-        val lowerResult = mapper.getPresetConfig("classic")
-        val upperResult = mapper.getPresetConfig("CLASSIC")
-        val mixedResult = mapper.getPresetConfig("Classic")
-
-        assertThat(lowerResult).isEqualTo(KyricsPresets.Classic)
-        assertThat(upperResult).isEqualTo(KyricsPresets.Classic)
-        assertThat(mixedResult).isEqualTo(KyricsPresets.Classic)
     }
 
     // ==================== Combined Settings Tests ====================

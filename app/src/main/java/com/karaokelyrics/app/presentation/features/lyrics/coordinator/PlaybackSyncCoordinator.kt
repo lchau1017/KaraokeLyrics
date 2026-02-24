@@ -45,19 +45,4 @@ class PlaybackSyncCoordinator @Inject constructor(
             syncState = syncState
         )
     }
-
-    /**
-     * Simplified version that doesn't require lyrics or user settings.
-     * Useful for when we just need playback state without sync.
-     */
-    fun observePlaybackOnly(): Flow<PlaybackSyncState> = combine(
-        playerController.observePlaybackPosition(),
-        playerController.observeIsPlaying()
-    ) { position, isPlaying ->
-        PlaybackSyncState(
-            playbackPosition = position,
-            isPlaying = isPlaying,
-            syncState = null
-        )
-    }
 }
