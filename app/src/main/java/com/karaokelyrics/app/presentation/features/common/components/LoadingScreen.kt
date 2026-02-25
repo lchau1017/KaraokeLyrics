@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.presentation.ui.core.AppText
 import com.karaokelyrics.app.presentation.ui.core.TextViewData
@@ -47,7 +48,7 @@ private fun AppLogo(titleColor: Color, subtitleColor: Color) {
                 text = "KaraokeLyrics",
                 style = MaterialTheme.typography.displayMedium,
                 color = titleColor,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                fontWeight = FontWeight.Bold
             )
         )
         AppText(

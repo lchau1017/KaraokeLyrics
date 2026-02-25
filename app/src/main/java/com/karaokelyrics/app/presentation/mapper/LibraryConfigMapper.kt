@@ -18,7 +18,7 @@ import javax.inject.Inject
 class LibraryConfigMapper @Inject constructor() {
 
     /**
-     * Convert user settings to library configuration using Kyrics DSL.
+     * Convert user settings to library configuration using Kyrics v1.3.0 DSL.
      */
     fun mapToLibraryConfig(userSettings: UserSettings): KyricsConfig {
         val primaryColor = Color(userSettings.lyricsColorArgb)
@@ -30,7 +30,6 @@ class LibraryConfigMapper @Inject constructor() {
                 played = primaryColor.copy(alpha = 0.7f)
                 upcoming = primaryColor.copy(alpha = 0.4f)
                 background = bgColor
-                accompaniment = primaryColor.copy(alpha = 0.4f)
             }
 
             typography {
@@ -39,23 +38,16 @@ class LibraryConfigMapper @Inject constructor() {
                 textAlign = TextAlign.Center
             }
 
-            animations {
-                characterAnimations = userSettings.enableCharacterAnimations
-                characterDuration = 800f
-                characterScale = 1.15f
-                characterFloat = 6f
-                lineAnimations = userSettings.enableAnimations
-                lineScale = 1.05f
-            }
-
-            effects {
-                blur = userSettings.enableBlurEffect
-                blurIntensity = 1.0f
-            }
-
             gradient {
                 enabled = false
                 angle = 45f
+            }
+
+            blur {
+                enabled = userSettings.enableBlurEffect
+                playedLineBlur = 2.dp
+                upcomingLineBlur = 3.dp
+                distantLineBlur = 5.dp
             }
 
             viewer {
@@ -66,14 +58,5 @@ class LibraryConfigMapper @Inject constructor() {
                 lineSpacing = 12.dp
             }
         }
-    }
-
-    /**
-     * Create a preset configuration based on user preference.
-     */
-    fun getPresetConfig(presetName: String): KyricsConfig = when (presetName.lowercase()) {
-        "minimal" -> KyricsConfig.Minimal
-        "dramatic" -> KyricsConfig.Dramatic
-        else -> KyricsConfig.Default
     }
 }

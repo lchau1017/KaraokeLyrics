@@ -54,16 +54,13 @@ class PlayerViewModel @Inject constructor(private val playerController: PlayerCo
     private suspend fun togglePlayPause() {
         if (_state.value.isPlaying) {
             playerController.pause()
-            _effects.send(PlayerEffect.PlaybackPaused)
         } else {
             playerController.play()
-            _effects.send(PlayerEffect.PlaybackStarted)
         }
     }
 
     private suspend fun seekTo(position: Long) {
         playerController.seekTo(position)
-        _effects.send(PlayerEffect.SeekCompleted(position))
     }
 
     private suspend fun loadMedia(fileName: String) {
@@ -77,13 +74,10 @@ class PlayerViewModel @Inject constructor(private val playerController: PlayerCo
     private fun observePlaybackState() {
         viewModelScope.launch {
             combine(
-                playerController.observeIsPlaying(),
-                playerController.observePlaybackPosition()
+                playerController.observeIsPlaying(), playerController.observePlaybackPosition()
             ) { isPlaying, position ->
                 PlayerState(
-                    isPlaying = isPlaying,
-                    currentPosition = position,
-                    duration = _state.value.duration // Keep existing duration
+                    isPlaying = isPlaying, currentPosition = position, duration = _state.value.duration // Keep existing duration
                 )
             }.collect { newState ->
                 _state.value = newState

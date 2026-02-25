@@ -5,7 +5,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.karaokelyrics.app.domain.model.FontSize
-import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
@@ -36,7 +35,6 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
         val ENABLE_CHARACTER_ANIMATIONS = booleanPreferencesKey("enable_character_animations")
         val LYRICS_TIMING_OFFSET_MS = intPreferencesKey("lyrics_timing_offset_ms")
         val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
-        val LYRICS_SOURCE = stringPreferencesKey("lyrics_source")
     }
 
     /**
@@ -120,12 +118,6 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
         }
     }
 
-    suspend fun updateLyricsSource(lyricsSource: LyricsSource) {
-        context.dataStore.edit { preferences ->
-            preferences[PreferencesKeys.LYRICS_SOURCE] = lyricsSource.name
-        }
-    }
-
     /**
      * Update all settings at once.
      */
@@ -141,7 +133,6 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
             preferences[PreferencesKeys.ENABLE_CHARACTER_ANIMATIONS] = settings.enableCharacterAnimations
             preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS] = settings.lyricsTimingOffsetMs
             preferences[PreferencesKeys.IS_DARK_MODE] = settings.isDarkMode
-            preferences[PreferencesKeys.LYRICS_SOURCE] = settings.lyricsSource.name
         }
     }
 
@@ -171,8 +162,7 @@ class PreferencesDataSource @Inject constructor(@ApplicationContext private val 
             ?: defaultSettings.enableCharacterAnimations,
         lyricsTimingOffsetMs = preferences[PreferencesKeys.LYRICS_TIMING_OFFSET_MS]
             ?: defaultSettings.lyricsTimingOffsetMs,
-        isDarkMode = preferences[PreferencesKeys.IS_DARK_MODE] ?: defaultSettings.isDarkMode,
-        lyricsSource = parseEnum(preferences[PreferencesKeys.LYRICS_SOURCE], defaultSettings.lyricsSource)
+        isDarkMode = preferences[PreferencesKeys.IS_DARK_MODE] ?: defaultSettings.isDarkMode
     )
 
     private inline fun <reified T : Enum<T>> parseEnum(value: String?, default: T): T =

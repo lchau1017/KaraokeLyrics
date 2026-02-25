@@ -12,10 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.domain.model.FontSize
-import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.backgroundColor
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.lyricsColor
@@ -36,7 +36,6 @@ fun SettingsBottomSheet(
     onUpdateBlurEffectEnabled: (Boolean) -> Unit,
     onUpdateCharacterAnimationsEnabled: (Boolean) -> Unit,
     onUpdateDarkMode: (Boolean) -> Unit,
-    onUpdateLyricsSource: (LyricsSource) -> Unit,
     onResetToDefaults: () -> Unit,
     viewData: SettingsBottomSheetViewData = SettingsBottomSheetViewData.default()
 ) {
@@ -75,36 +74,6 @@ fun SettingsBottomSheet(
                         fontWeight = FontWeight.Bold
                     )
                 )
-
-                // Lyrics Source Section (for testing different formats)
-                SettingsSection(
-                    title = "Lyrics Source",
-                    titleStyle = viewData.sectionTitleStyle,
-                    titleColor = viewData.sectionTitleColor
-                ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        AppText(
-                            viewData = TextViewData(
-                                text = "Select format to test parsing",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = viewData.secondaryLabelColor
-                            )
-                        )
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(LyricsSource.entries.toList()) { source ->
-                                LyricsSourceChip(
-                                    onClick = { onUpdateLyricsSource(source) },
-                                    chipViewData = ChipViewData.default(
-                                        text = source.displayName,
-                                        selected = source == settings.lyricsSource
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
 
                 // Theme Section
                 SettingsSection(
@@ -285,7 +254,7 @@ fun SettingsBottomSheet(
 @Composable
 private fun SettingsSection(
     title: String,
-    titleStyle: androidx.compose.ui.text.TextStyle,
+    titleStyle: TextStyle,
     titleColor: Color,
     content: @Composable () -> Unit
 ) {
@@ -316,7 +285,7 @@ private fun SettingsToggle(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true,
-    labelStyle: androidx.compose.ui.text.TextStyle,
+    labelStyle: TextStyle,
     labelColor: Color,
     disabledColor: Color = labelColor.copy(alpha = 0.38f),
     switchColors: SwitchColorsViewData
@@ -434,12 +403,4 @@ private fun ColorPicker(
             )
         }
     }
-}
-
-@Composable
-private fun LyricsSourceChip(onClick: () -> Unit, chipViewData: ChipViewData) {
-    AppChip(
-        viewData = chipViewData,
-        onClick = onClick
-    )
 }

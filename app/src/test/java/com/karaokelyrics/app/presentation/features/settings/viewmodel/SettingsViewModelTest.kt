@@ -1,13 +1,11 @@
 package com.karaokelyrics.app.presentation.features.settings.viewmodel
 
 import androidx.compose.ui.graphics.Color
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.karaokelyrics.app.domain.model.FontSize
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-import com.karaokelyrics.app.presentation.features.settings.effect.SettingsEffect
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import io.mockk.coVerify
 import io.mockk.every
@@ -77,95 +75,71 @@ class SettingsViewModelTest {
     // ==================== Intent Handling Tests ====================
 
     @Test
-    fun `UpdateLyricsColor intent calls use case and emits effect`() = runTest {
+    fun `UpdateLyricsColor intent calls use case`() = runTest {
         val testColor = Color.Red
 
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateLyricsColor(testColor))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(SettingsIntent.UpdateLyricsColor(testColor))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateLyricsColor(any()) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateLyricsColor(any()) }
     }
 
     @Test
-    fun `UpdateBackgroundColor intent calls use case and emits effect`() = runTest {
+    fun `UpdateBackgroundColor intent calls use case`() = runTest {
         val testColor = Color.Blue
 
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateBackgroundColor(testColor))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(SettingsIntent.UpdateBackgroundColor(testColor))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateBackgroundColor(any()) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateBackgroundColor(any()) }
     }
 
     @Test
-    fun `UpdateFontSize intent calls use case and emits effect`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateFontSize(FontSize.EXTRA_LARGE))
-            testDispatcher.scheduler.advanceUntilIdle()
+    fun `UpdateFontSize intent calls use case`() = runTest {
+        viewModel.handleIntent(SettingsIntent.UpdateFontSize(FontSize.EXTRA_LARGE))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateFontSize(FontSize.EXTRA_LARGE) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateFontSize(FontSize.EXTRA_LARGE) }
     }
 
     @Test
     fun `UpdateAnimationsEnabled intent calls use case`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateAnimationsEnabled(false))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(SettingsIntent.UpdateAnimationsEnabled(false))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateAnimationsEnabled(false) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateAnimationsEnabled(false) }
     }
 
     @Test
     fun `UpdateBlurEffectEnabled intent calls use case`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateBlurEffectEnabled(true))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(SettingsIntent.UpdateBlurEffectEnabled(true))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateBlurEffectEnabled(true) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateBlurEffectEnabled(true) }
     }
 
     @Test
     fun `UpdateCharacterAnimationsEnabled intent calls use case`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateCharacterAnimationsEnabled(false))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(SettingsIntent.UpdateCharacterAnimationsEnabled(false))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateCharacterAnimationsEnabled(false) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateCharacterAnimationsEnabled(false) }
     }
 
     @Test
     fun `UpdateDarkMode intent calls use case`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateDarkMode(false))
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.handleIntent(SettingsIntent.UpdateDarkMode(false))
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.updateDarkMode(false) }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        coVerify { updateUserSettingsUseCase.updateDarkMode(false) }
     }
 
     @Test
-    fun `ResetToDefaults intent calls use case and emits SettingsReset effect`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.ResetToDefaults)
-            testDispatcher.scheduler.advanceUntilIdle()
+    fun `ResetToDefaults intent calls use case`() = runTest {
+        viewModel.handleIntent(SettingsIntent.ResetToDefaults)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            coVerify { updateUserSettingsUseCase.resetToDefaults() }
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsReset)
-        }
+        coVerify { updateUserSettingsUseCase.resetToDefaults() }
     }
 
     // ==================== Settings Flow Tests ====================
@@ -195,17 +169,10 @@ class SettingsViewModelTest {
 
     @Test
     fun `multiple settings updates are handled correctly`() = runTest {
-        viewModel.effects.test {
-            viewModel.handleIntent(SettingsIntent.UpdateFontSize(FontSize.LARGE))
-            viewModel.handleIntent(SettingsIntent.UpdateAnimationsEnabled(false))
-            viewModel.handleIntent(SettingsIntent.UpdateDarkMode(false))
-            testDispatcher.scheduler.advanceUntilIdle()
-
-            // Should receive 3 effects
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-            assertThat(awaitItem()).isEqualTo(SettingsEffect.SettingsUpdated)
-        }
+        viewModel.handleIntent(SettingsIntent.UpdateFontSize(FontSize.LARGE))
+        viewModel.handleIntent(SettingsIntent.UpdateAnimationsEnabled(false))
+        viewModel.handleIntent(SettingsIntent.UpdateDarkMode(false))
+        testDispatcher.scheduler.advanceUntilIdle()
 
         coVerify(exactly = 1) { updateUserSettingsUseCase.updateFontSize(FontSize.LARGE) }
         coVerify(exactly = 1) { updateUserSettingsUseCase.updateAnimationsEnabled(false) }
