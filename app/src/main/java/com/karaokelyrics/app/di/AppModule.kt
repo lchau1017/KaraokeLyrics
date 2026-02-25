@@ -9,7 +9,6 @@ import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.ParseLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
-import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
 import com.karaokelyrics.app.domain.parser.LyricsParser
 import com.karaokelyrics.app.data.parser.KyricsLyricsParser
@@ -18,7 +17,6 @@ import com.karaokelyrics.app.data.source.local.MediaContentProvider
 import com.karaokelyrics.app.data.source.local.PreferencesDataSource
 import com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
 import com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase
-import com.karaokelyrics.app.presentation.features.lyrics.coordinator.PlaybackSyncCoordinator
 import com.karaokelyrics.app.presentation.player.MediaPlayerController
 import com.karaokelyrics.app.presentation.player.PlayerController
 import dagger.Module
@@ -74,13 +72,6 @@ object AppModule {
         MediaPlayerController(context, dispatcherProvider)
 
     // Domain Use Cases
-
-    @Provides
-    fun provideSyncLyricsUseCase(): SyncLyricsUseCase = SyncLyricsUseCase()
-
-    @Provides
-    fun providePlaybackSyncCoordinator(playerController: PlayerController, syncLyricsUseCase: SyncLyricsUseCase): PlaybackSyncCoordinator =
-        PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
 
     @Provides
     fun provideLyricsParser(): LyricsParser = KyricsLyricsParser()

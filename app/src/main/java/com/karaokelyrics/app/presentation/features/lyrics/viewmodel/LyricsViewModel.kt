@@ -2,14 +2,12 @@ package com.karaokelyrics.app.presentation.features.lyrics.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
 import com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.mapper.LibraryConfigMapper
@@ -28,7 +26,6 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class LyricsViewModel @Inject constructor(
     private val loadLyricsUseCase: LoadLyricsUseCase,
-    private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
     private val libraryConfigMapper: LibraryConfigMapper,
@@ -38,7 +35,6 @@ class LyricsViewModel @Inject constructor(
 
     data class LyricsState(
         val lyrics: SyncedLyrics? = null,
-        val syncState: LyricsSyncState = LyricsSyncState(),
         val isLoading: Boolean = false,
         val error: String? = null,
         val userSettings: UserSettings = UserSettings(),
@@ -138,25 +134,9 @@ class LyricsViewModel @Inject constructor(
     private fun observeLyricsSync() {
         viewModelScope.launch {
             playerController.observePlaybackPosition().collect { position ->
-                val lyrics = _state.value.lyrics
-                val userSettings = _state.value.userSettings
-
-                if (lyrics != null) {
-                    val syncState = syncLyricsUseCase(
-                        lyrics,
-                        position,
-                        userSettings.lyricsTimingOffsetMs
-                    )
-
-                    // Map to UI state with all pre-calculated values
-                    val currentTimeMs = (position + userSettings.lyricsTimingOffsetMs).toInt()
-
-                    _state.update {
-                        it.copy(
-                            syncState = syncState,
-                            currentTimeMs = currentTimeMs
-                        )
-                    }
+                val offset = _state.value.userSettings.lyricsTimingOffsetMs
+                _state.update {
+                    it.copy(currentTimeMs = (position + offset).toInt())
                 }
             }
         }
