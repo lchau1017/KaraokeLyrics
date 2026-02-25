@@ -1,6 +1,7 @@
 package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.SyncedLyrics
+import com.karaokelyrics.app.domain.parser.LyricsParser
 import com.karaokelyrics.app.domain.repository.LyricsRepository
 import javax.inject.Inject
 
@@ -10,7 +11,7 @@ import javax.inject.Inject
  */
 class LoadLyricsUseCase @Inject constructor(
     private val lyricsRepository: LyricsRepository,
-    private val parseLyricsUseCase: ParseLyricsUseCase,
+    private val lyricsParser: LyricsParser,
     private val processLyricsDataUseCase: ProcessLyricsDataUseCase
 ) {
     /**
@@ -26,7 +27,7 @@ class LoadLyricsUseCase @Inject constructor(
             .getOrThrow()
 
         // Step 2: Parse lyrics content
-        val parsedLyrics = parseLyricsUseCase(fileContent)
+        val parsedLyrics = SyncedLyrics(lyricsParser.parse(fileContent))
 
         // Step 3: Apply business processing rules
         val processedLyrics = processLyricsDataUseCase(parsedLyrics)

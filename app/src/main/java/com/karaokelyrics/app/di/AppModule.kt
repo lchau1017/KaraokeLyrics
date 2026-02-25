@@ -7,7 +7,6 @@ import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.ParseLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
 import com.karaokelyrics.app.domain.parser.LyricsParser
@@ -77,17 +76,14 @@ object AppModule {
     fun provideLyricsParser(): LyricsParser = KyricsLyricsParser()
 
     @Provides
-    fun provideParseLyricsUseCase(lyricsParser: LyricsParser): ParseLyricsUseCase = ParseLyricsUseCase(lyricsParser)
-
-    @Provides
     fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase = ProcessLyricsDataUseCase()
 
     @Provides
     fun provideLoadLyricsUseCase(
         lyricsRepository: LyricsRepository,
-        parseLyricsUseCase: ParseLyricsUseCase,
+        lyricsParser: LyricsParser,
         processLyricsDataUseCase: ProcessLyricsDataUseCase
-    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, parseLyricsUseCase, processLyricsDataUseCase)
+    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, lyricsParser, processLyricsDataUseCase)
 
     @Provides
     fun provideObserveUserSettingsUseCase(settingsRepository: SettingsRepository): ObserveUserSettingsUseCase =
