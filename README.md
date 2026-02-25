@@ -259,16 +259,13 @@ app/
 │   ├── model/
 │   │   ├── SyncedLyrics.kt          # Wrapper for Kyrics SyncedLine
 │   │   ├── UserSettings.kt          # User preferences model
-│   │   ├── MediaContent.kt          # Media content model
-│   │   └── LyricsSyncState.kt       # Lyrics sync state
+│   │   └── MediaContent.kt          # Media content model
 │   ├── repository/
 │   │   ├── LyricsRepository.kt      # Lyrics repository interface
 │   │   └── SettingsRepository.kt    # Settings repository interface
 │   └── usecase/
-│       ├── LoadLyricsUseCase.kt     # Load and parse lyrics
-│       ├── ParseLyricsUseCase.kt    # Uses Kyrics parseLyrics() with auto-detection
-│       ├── SyncLyricsUseCase.kt     # Lyrics synchronization
-│       ├── ProcessLyricsDataUseCase.kt # Process lyrics data
+│       ├── LoadLyricsUseCase.kt     # Load, parse, and process lyrics
+│       ├── ProcessLyricsDataUseCase.kt # Validate and transform lyrics data
 │       └── ...                      # Other use cases
 │
 └── presentation/                    # Presentation Layer (MVI)
@@ -285,7 +282,6 @@ app/
         │   ├── viewmodel/           # LyricsViewModel
         │   ├── screen/              # LyricsScreen composable
         │   ├── components/          # KaraokeLyricsView
-        │   ├── coordinator/         # PlaybackSyncCoordinator
         │   ├── intent/              # MVI intents
         │   └── effect/              # MVI effects
         ├── settings/
@@ -323,14 +319,14 @@ app/
                               │
 ┌─────────────────────────────▼────────────────────────────────────┐
 │                        Domain Layer                               │
-│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐  │
-│  │ LoadLyricsUse  │  │ ParseLyrics    │  │  ObserveSettings   │  │
-│  │     Case       │  │   UseCase      │  │     UseCase        │  │
-│  └───────┬────────┘  └───────┬────────┘  └─────────┬──────────┘  │
-│          │                   │                     │              │
-│          │       Uses Kyrics parseLyrics()         │              │
-│          │       (TTML/LRC/ELRC auto-detect)       │              │
-│          │                   │                     │              │
+│  ┌────────────────┐  ┌────────────────────┐  ┌──────────────────┐  │
+│  │ LoadLyricsUse  │  │  ProcessLyricsData │  │ ObserveSettings  │  │
+│  │     Case       │  │      UseCase       │  │    UseCase       │  │
+│  └───────┬────────┘  └─────────┬──────────┘  └────────┬─────────┘  │
+│          │                     │                      │             │
+│          │    Parses via LyricsParser interface        │             │
+│          │    (TTML format)                            │             │
+│          │                     │                      │             │
 │  ┌───────▼───────────────────▼─────────────────────▼────────────┐│
 │  │                    Repository Interfaces                      ││
 │  │         LyricsRepository    SettingsRepository               ││
