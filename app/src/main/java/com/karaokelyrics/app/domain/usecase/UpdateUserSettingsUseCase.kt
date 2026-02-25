@@ -1,7 +1,6 @@
 package com.karaokelyrics.app.domain.usecase
 
 import com.karaokelyrics.app.domain.model.FontSize
-import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import javax.inject.Inject
 
@@ -40,10 +39,6 @@ class UpdateUserSettingsUseCase @Inject constructor(private val settingsReposito
 
     suspend fun updateDarkMode(isDark: Boolean) {
         settingsRepository.updateDarkMode(isDark)
-    }
-
-    suspend fun updateLyricsSource(lyricsSource: LyricsSource) {
-        settingsRepository.updateLyricsSource(lyricsSource)
     }
 
     suspend fun resetToDefaults() {

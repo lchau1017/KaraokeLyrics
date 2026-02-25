@@ -13,12 +13,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
@@ -34,7 +35,9 @@ class MediaPlayerController @Inject constructor(
     private var mediaController: MediaController? = null
     private val controllerFuture: ListenableFuture<MediaController>
     private val _isPlaying = MutableStateFlow(false)
+    private val _playbackPosition = MutableStateFlow(0L)
     private val executor = Executors.newSingleThreadExecutor()
+    private val scope = CoroutineScope(SupervisorJob() + dispatcherProvider.main)
 
     init {
         val sessionToken = SessionToken(
@@ -43,6 +46,7 @@ class MediaPlayerController @Inject constructor(
         )
         controllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         initializeController()
+        startPositionPolling()
     }
 
     private fun initializeController() {
@@ -56,14 +60,20 @@ class MediaPlayerController @Inject constructor(
         }, executor)
     }
 
-    override fun observePlaybackPosition(): Flow<Long> = flow {
-        while (true) {
-            mediaController?.let {
-                emit(it.currentPosition)
-            } ?: emit(0L)
-            delay(100) // Update every 100ms for smooth animation
+    private fun startPositionPolling() {
+        scope.launch {
+            while (true) {
+                if (_isPlaying.value) {
+                    mediaController?.let {
+                        _playbackPosition.value = it.currentPosition
+                    }
+                }
+                delay(100)
+            }
         }
-    }.flowOn(dispatcherProvider.main)
+    }
+
+    override fun observePlaybackPosition(): Flow<Long> = _playbackPosition.asStateFlow()
 
     override fun observeIsPlaying(): Flow<Boolean> = _isPlaying.asStateFlow()
 
@@ -82,6 +92,10 @@ class MediaPlayerController @Inject constructor(
     override suspend fun seekTo(position: Long) {
         withContext(dispatcherProvider.main) {
             mediaController?.seekTo(position)
+            // Update position immediately after seek for responsive UI
+            mediaController?.let {
+                _playbackPosition.value = it.currentPosition
+            }
         }
     }
 

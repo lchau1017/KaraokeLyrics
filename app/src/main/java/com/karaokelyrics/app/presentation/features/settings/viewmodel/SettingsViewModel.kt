@@ -4,11 +4,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.karaokelyrics.app.domain.model.FontSize
-import com.karaokelyrics.app.domain.model.LyricsSource
 import com.karaokelyrics.app.domain.model.UserSettings
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-import com.karaokelyrics.app.presentation.features.settings.effect.SettingsEffect
 import com.karaokelyrics.app.presentation.features.settings.intent.SettingsIntent
 import com.karaokelyrics.app.presentation.features.settings.mapper.SettingsUiMapper.toColorArgb
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,9 +29,6 @@ class SettingsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()
-
-    private val _effects = Channel<SettingsEffect>(Channel.BUFFERED)
-    val effects: Flow<SettingsEffect> = _effects.receiveAsFlow()
 
     private val _intents = Channel<SettingsIntent>(Channel.BUFFERED)
 
@@ -59,7 +54,6 @@ class SettingsViewModel @Inject constructor(
                     is SettingsIntent.UpdateBlurEffectEnabled -> updateBlurEffectEnabled(intent.enabled)
                     is SettingsIntent.UpdateCharacterAnimationsEnabled -> updateCharacterAnimationsEnabled(intent.enabled)
                     is SettingsIntent.UpdateDarkMode -> updateDarkMode(intent.isDark)
-                    is SettingsIntent.UpdateLyricsSource -> updateLyricsSource(intent.lyricsSource)
                     is SettingsIntent.ResetToDefaults -> resetToDefaults()
                 }
             }
@@ -76,46 +70,33 @@ class SettingsViewModel @Inject constructor(
 
     private suspend fun updateLyricsColor(color: Color) {
         updateUserSettingsUseCase.updateLyricsColor(color.toColorArgb())
-        _effects.send(SettingsEffect.SettingsUpdated)
     }
 
     private suspend fun updateBackgroundColor(color: Color) {
         updateUserSettingsUseCase.updateBackgroundColor(color.toColorArgb())
-        _effects.send(SettingsEffect.SettingsUpdated)
     }
 
     private suspend fun updateFontSize(fontSize: FontSize) {
         updateUserSettingsUseCase.updateFontSize(fontSize)
-        _effects.send(SettingsEffect.SettingsUpdated)
     }
 
     private suspend fun updateAnimationsEnabled(enabled: Boolean) {
         updateUserSettingsUseCase.updateAnimationsEnabled(enabled)
-        _effects.send(SettingsEffect.SettingsUpdated)
     }
 
     private suspend fun updateBlurEffectEnabled(enabled: Boolean) {
         updateUserSettingsUseCase.updateBlurEffectEnabled(enabled)
-        _effects.send(SettingsEffect.SettingsUpdated)
     }
 
     private suspend fun updateCharacterAnimationsEnabled(enabled: Boolean) {
         updateUserSettingsUseCase.updateCharacterAnimationsEnabled(enabled)
-        _effects.send(SettingsEffect.SettingsUpdated)
     }
 
     private suspend fun updateDarkMode(isDark: Boolean) {
         updateUserSettingsUseCase.updateDarkMode(isDark)
-        _effects.send(SettingsEffect.SettingsUpdated)
-    }
-
-    private suspend fun updateLyricsSource(lyricsSource: LyricsSource) {
-        updateUserSettingsUseCase.updateLyricsSource(lyricsSource)
-        _effects.send(SettingsEffect.LyricsSourceChanged(lyricsSource))
     }
 
     private suspend fun resetToDefaults() {
         updateUserSettingsUseCase.resetToDefaults()
-        _effects.send(SettingsEffect.SettingsReset)
     }
 }

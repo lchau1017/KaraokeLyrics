@@ -7,11 +7,15 @@ import com.karaokelyrics.app.domain.repository.LyricsRepository
 import com.karaokelyrics.app.domain.repository.SettingsRepository
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.ParseLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ProcessLyricsDataUseCase
-import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.UpdateUserSettingsUseCase
-import com.karaokelyrics.app.presentation.features.lyrics.coordinator.PlaybackSyncCoordinator
+import com.karaokelyrics.app.domain.parser.LyricsParser
+import com.karaokelyrics.app.data.parser.KyricsLyricsParser
+import com.karaokelyrics.app.data.source.local.AssetDataSource
+import com.karaokelyrics.app.data.source.local.MediaContentProvider
+import com.karaokelyrics.app.data.source.local.PreferencesDataSource
+import com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
+import com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase
 import com.karaokelyrics.app.presentation.player.MediaPlayerController
 import com.karaokelyrics.app.presentation.player.PlayerController
 import dagger.Module
@@ -36,31 +40,29 @@ object AppModule {
     fun provideAssetDataSource(
         @ApplicationContext context: Context,
         dispatcherProvider: DispatcherProvider
-    ): com.karaokelyrics.app.data.source.local.AssetDataSource =
-        com.karaokelyrics.app.data.source.local.AssetDataSource(context, dispatcherProvider)
+    ): AssetDataSource = AssetDataSource(context, dispatcherProvider)
 
     @Provides
     @Singleton
-    fun provideMediaContentProvider(): com.karaokelyrics.app.data.source.local.MediaContentProvider =
-        com.karaokelyrics.app.data.source.local.MediaContentProvider()
+    fun provideMediaContentProvider(): MediaContentProvider = MediaContentProvider()
 
     @Provides
     @Singleton
-    fun providePreferencesDataSource(@ApplicationContext context: Context): com.karaokelyrics.app.data.source.local.PreferencesDataSource =
-        com.karaokelyrics.app.data.source.local.PreferencesDataSource(context)
+    fun providePreferencesDataSource(@ApplicationContext context: Context): PreferencesDataSource =
+        PreferencesDataSource(context)
 
     // Repositories
     @Provides
     @Singleton
     fun provideLyricsRepository(
-        assetDataSource: com.karaokelyrics.app.data.source.local.AssetDataSource,
-        mediaContentProvider: com.karaokelyrics.app.data.source.local.MediaContentProvider
+        assetDataSource: AssetDataSource,
+        mediaContentProvider: MediaContentProvider
     ): LyricsRepository = LyricsRepositoryImpl(assetDataSource, mediaContentProvider)
 
     @Provides
     @Singleton
     fun provideSettingsRepository(
-        preferencesDataSource: com.karaokelyrics.app.data.source.local.PreferencesDataSource
+        preferencesDataSource: PreferencesDataSource
     ): SettingsRepository = SettingsRepositoryImpl(preferencesDataSource)
 
     @Provides
@@ -71,14 +73,7 @@ object AppModule {
     // Domain Use Cases
 
     @Provides
-    fun provideSyncLyricsUseCase(): SyncLyricsUseCase = SyncLyricsUseCase()
-
-    @Provides
-    fun providePlaybackSyncCoordinator(playerController: PlayerController, syncLyricsUseCase: SyncLyricsUseCase): PlaybackSyncCoordinator =
-        PlaybackSyncCoordinator(playerController, syncLyricsUseCase)
-
-    @Provides
-    fun provideParseLyricsUseCase(): ParseLyricsUseCase = ParseLyricsUseCase()
+    fun provideLyricsParser(): LyricsParser = KyricsLyricsParser()
 
     @Provides
     fun provideProcessLyricsDataUseCase(): ProcessLyricsDataUseCase = ProcessLyricsDataUseCase()
@@ -86,9 +81,9 @@ object AppModule {
     @Provides
     fun provideLoadLyricsUseCase(
         lyricsRepository: LyricsRepository,
-        parseLyricsUseCase: ParseLyricsUseCase,
+        lyricsParser: LyricsParser,
         processLyricsDataUseCase: ProcessLyricsDataUseCase
-    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, parseLyricsUseCase, processLyricsDataUseCase)
+    ): LoadLyricsUseCase = LoadLyricsUseCase(lyricsRepository, lyricsParser, processLyricsDataUseCase)
 
     @Provides
     fun provideObserveUserSettingsUseCase(settingsRepository: SettingsRepository): ObserveUserSettingsUseCase =
@@ -101,14 +96,12 @@ object AppModule {
     @Provides
     fun provideGetDefaultMediaContentUseCase(
         lyricsRepository: LyricsRepository
-    ): com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase =
-        com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase(lyricsRepository)
+    ): GetDefaultMediaContentUseCase = GetDefaultMediaContentUseCase(lyricsRepository)
 
     @Provides
     fun provideGetAvailableMediaContentUseCase(
         lyricsRepository: LyricsRepository
-    ): com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase =
-        com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase(lyricsRepository)
+    ): GetAvailableMediaContentUseCase = GetAvailableMediaContentUseCase(lyricsRepository)
 
     // No presentation managers needed - clean architecture!
 }

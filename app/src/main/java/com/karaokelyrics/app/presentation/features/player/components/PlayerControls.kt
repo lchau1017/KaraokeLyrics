@@ -10,6 +10,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.karaokelyrics.app.presentation.features.player.viewdata.PlayButtonColorsViewData
 import com.karaokelyrics.app.presentation.features.player.viewdata.PlayerControlsViewData
@@ -72,8 +74,8 @@ private fun ProgressSection(
     duration: Long,
     onSeek: (Long) -> Unit,
     sliderColors: SliderColorsViewData,
-    timeTextStyle: androidx.compose.ui.text.TextStyle,
-    timeTextColor: androidx.compose.ui.graphics.Color
+    timeTextStyle: TextStyle,
+    timeTextColor: Color
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -113,8 +115,8 @@ private fun ProgressSection(
 private fun TimeDisplay(
     position: Long,
     duration: Long,
-    textStyle: androidx.compose.ui.text.TextStyle,
-    textColor: androidx.compose.ui.graphics.Color
+    textStyle: TextStyle,
+    textColor: Color
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -143,11 +145,11 @@ private fun ControlButtons(
     onPlayPause: () -> Unit,
     onOpenSettings: () -> Unit,
     playButtonColors: PlayButtonColorsViewData,
-    settingsIconColor: androidx.compose.ui.graphics.Color,
-    playButtonSize: androidx.compose.ui.unit.Dp,
-    settingsButtonSize: androidx.compose.ui.unit.Dp,
-    iconSize: androidx.compose.ui.unit.Dp,
-    settingsIconSize: androidx.compose.ui.unit.Dp
+    settingsIconColor: Color,
+    playButtonSize: Dp,
+    settingsButtonSize: Dp,
+    iconSize: Dp,
+    settingsIconSize: Dp
 ) {
     Row(
         modifier = Modifier
@@ -180,8 +182,8 @@ private fun PlayPauseButton(
     isPlaying: Boolean,
     onClick: () -> Unit,
     buttonColors: PlayButtonColorsViewData,
-    buttonSize: androidx.compose.ui.unit.Dp,
-    iconSize: androidx.compose.ui.unit.Dp
+    buttonSize: Dp,
+    iconSize: Dp
 ) {
     FilledIconButton(
         onClick = onClick,
@@ -208,48 +210,7 @@ private fun PlayPauseButton(
 }
 
 @Composable
-private fun AppIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit,
-    viewData: IconButtonViewData,
-    contentDescription: String? = null
-) {
-    if (viewData.backgroundColor != null && viewData.backgroundColor != Color.Transparent) {
-        FilledIconButton(
-            onClick = onClick,
-            modifier = Modifier.size(viewData.size),
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = viewData.backgroundColor,
-                contentColor = viewData.contentColor ?: MaterialTheme.colorScheme.onPrimary
-            )
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                tint = viewData.contentColor ?: MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(viewData.iconSize)
-            )
-        }
-    } else {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.size(viewData.size),
-            colors = IconButtonDefaults.iconButtonColors(
-                contentColor = viewData.contentColor ?: MaterialTheme.colorScheme.onSurface
-            )
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                tint = viewData.contentColor ?: MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(viewData.iconSize)
-            )
-        }
-    }
-}
-
-@Composable
-private fun PauseIcon(color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier) {
+private fun PauseIcon(color: Color, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.Center,
@@ -274,9 +235,9 @@ private fun PauseIcon(color: androidx.compose.ui.graphics.Color, modifier: Modif
 @Composable
 private fun SettingsButton(
     onClick: () -> Unit,
-    iconColor: androidx.compose.ui.graphics.Color,
-    buttonSize: androidx.compose.ui.unit.Dp,
-    iconSize: androidx.compose.ui.unit.Dp
+    iconColor: Color,
+    buttonSize: Dp,
+    iconSize: Dp
 ) {
     AppIconButton(
         icon = Icons.Default.Settings,

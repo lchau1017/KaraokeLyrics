@@ -2,13 +2,12 @@ package com.karaokelyrics.app.presentation.features.lyrics.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.karaokelyrics.app.domain.model.LyricsSource
-import com.karaokelyrics.app.domain.model.LyricsSyncState
 import com.karaokelyrics.app.domain.model.SyncedLyrics
 import com.karaokelyrics.app.domain.model.UserSettings
+import com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
+import com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase
 import com.karaokelyrics.app.domain.usecase.LoadLyricsUseCase
 import com.karaokelyrics.app.domain.usecase.ObserveUserSettingsUseCase
-import com.karaokelyrics.app.domain.usecase.SyncLyricsUseCase
 import com.karaokelyrics.app.presentation.features.lyrics.effect.LyricsEffect
 import com.karaokelyrics.app.presentation.features.lyrics.intent.LyricsIntent
 import com.karaokelyrics.app.presentation.mapper.LibraryConfigMapper
@@ -19,7 +18,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /**
  * MVI ViewModel for Lyrics display following Clean Architecture.
@@ -28,26 +26,26 @@ import timber.log.Timber
 @HiltViewModel
 class LyricsViewModel @Inject constructor(
     private val loadLyricsUseCase: LoadLyricsUseCase,
-    private val syncLyricsUseCase: SyncLyricsUseCase,
     private val playerController: PlayerController,
     private val observeUserSettingsUseCase: ObserveUserSettingsUseCase,
     private val libraryConfigMapper: LibraryConfigMapper,
-    private val getDefaultMediaContentUseCase: com.karaokelyrics.app.domain.usecase.GetDefaultMediaContentUseCase,
-    private val getAvailableMediaContentUseCase: com.karaokelyrics.app.domain.usecase.GetAvailableMediaContentUseCase
+    private val getDefaultMediaContentUseCase: GetDefaultMediaContentUseCase,
+    private val getAvailableMediaContentUseCase: GetAvailableMediaContentUseCase
 ) : ViewModel() {
 
     data class LyricsState(
         val lyrics: SyncedLyrics? = null,
-        val syncState: LyricsSyncState = LyricsSyncState(),
         val isLoading: Boolean = false,
         val error: String? = null,
         val userSettings: UserSettings = UserSettings(),
-        val currentTimeMs: Int = 0,
-        val libraryConfig: KyricsConfig = KyricsConfig.Default
+        val currentTimeMs: Int = 0
     )
 
     private val _state = MutableStateFlow(LyricsState())
     val state: StateFlow<LyricsState> = _state.asStateFlow()
+
+    private val _libraryConfig = MutableStateFlow(KyricsConfig.Default)
+    val libraryConfig: StateFlow<KyricsConfig> = _libraryConfig.asStateFlow()
 
     private val _effects = Channel<LyricsEffect>(Channel.BUFFERED)
     val effects: Flow<LyricsEffect> = _effects.receiveAsFlow()
@@ -72,9 +70,7 @@ class LyricsViewModel @Inject constructor(
                 when (intent) {
                     is LyricsIntent.LoadDefaultContent -> loadDefaultContent()
                     is LyricsIntent.LoadMediaContent -> loadMediaContent(intent.contentId)
-                    is LyricsIntent.LoadLyricsWithSource -> loadLyricsWithSource(intent.lyricsSource)
                     is LyricsIntent.SeekToLine -> seekToLine(intent.lineIndex)
-                    is LyricsIntent.UpdateCurrentPosition -> updatePosition(intent.position)
                 }
             }
         }
@@ -99,25 +95,11 @@ class LyricsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadLyricsWithSource(lyricsSource: LyricsSource) {
-        Timber.d("loadLyricsWithSource: Switching to source $lyricsSource")
-        val defaultContent = getDefaultMediaContentUseCase()
-        // Replace extension based on selected source
-        val baseName = defaultContent.lyricsFileName.substringBeforeLast(".")
-        val newFileName = "$baseName.${lyricsSource.extension}"
-        Timber.d("loadLyricsWithSource: Loading file $newFileName")
-        loadLyrics(newFileName, defaultContent.audioFileName)
-    }
-
     private suspend fun loadLyrics(fileName: String, audioFileName: String) {
         _state.update { it.copy(isLoading = true) }
 
         loadLyricsUseCase(fileName)
             .onSuccess { lyrics ->
-                Timber.d("loadLyrics: Success - got ${lyrics.lines.size} lines")
-                if (lyrics.lines.isEmpty()) {
-                    Timber.w("loadLyrics: WARNING - lyrics has 0 lines!")
-                }
                 _state.update {
                     it.copy(
                         lyrics = lyrics,
@@ -128,7 +110,6 @@ class LyricsViewModel @Inject constructor(
                 playerController.loadMedia(audioFileName)
             }
             .onFailure { error ->
-                Timber.e(error, "Failed to load lyrics")
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -147,36 +128,15 @@ class LyricsViewModel @Inject constructor(
         val line = _state.value.lyrics?.lines?.getOrNull(lineIndex)
         line?.let {
             playerController.seekTo(it.start.toLong())
-            _effects.send(LyricsEffect.ScrollToLine(lineIndex))
         }
-    }
-
-    private fun updatePosition(position: Long) {
-        // Position updates are handled by observeLyricsSync
     }
 
     private fun observeLyricsSync() {
         viewModelScope.launch {
             playerController.observePlaybackPosition().collect { position ->
-                val lyrics = _state.value.lyrics
-                val userSettings = _state.value.userSettings
-
-                if (lyrics != null) {
-                    val syncState = syncLyricsUseCase(
-                        lyrics,
-                        position,
-                        userSettings.lyricsTimingOffsetMs
-                    )
-
-                    // Map to UI state with all pre-calculated values
-                    val currentTimeMs = (position + userSettings.lyricsTimingOffsetMs).toInt()
-
-                    _state.update {
-                        it.copy(
-                            syncState = syncState,
-                            currentTimeMs = currentTimeMs
-                        )
-                    }
+                val offset = _state.value.userSettings.lyricsTimingOffsetMs
+                _state.update {
+                    it.copy(currentTimeMs = (position + offset).toInt())
                 }
             }
         }
@@ -185,12 +145,9 @@ class LyricsViewModel @Inject constructor(
     private fun observeUserSettings() {
         viewModelScope.launch {
             observeUserSettingsUseCase().collect { settings ->
-                val libraryConfig = libraryConfigMapper.mapToLibraryConfig(settings)
+                _libraryConfig.value = libraryConfigMapper.mapToLibraryConfig(settings)
                 _state.update {
-                    it.copy(
-                        userSettings = settings,
-                        libraryConfig = libraryConfig
-                    )
+                    it.copy(userSettings = settings)
                 }
             }
         }
